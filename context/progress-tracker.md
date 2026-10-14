@@ -1,0 +1,121 @@
+# SmartMeal — Progress Tracker
+
+> Update this file every time a feature's status changes. Keep entries
+> honest — "in progress" means actively being worked on, not "started once."
+
+Last reviewed: **2026-10-14** (P02 — repository hygiene and documentation truth; earlier the same day: P01 push bootstrap)
+
+> **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
+> and `docs/prompt-tracker.md` (status per prompt). Check them before picking
+> the next task.
+
+## Status legend
+
+✅ Done &nbsp;&nbsp; 🟡 In progress / partial &nbsp;&nbsp; ⬜ Not started
+
+## Foundation
+
+| Item | Status | Notes |
+|---|---|---|
+| Project scaffold (Flutter, Android + iOS) | ✅ | |
+| Riverpod + go_router wired up | ✅ | `StatefulShellRoute` shell with 5 tabs |
+| Design system (`AppColors`, `AppTheme`) | ✅ | Light theme only, no dark mode |
+| Shared widget library | ✅ | `CustomButton`, `CustomTextField`, `SocialAuthButton`, `RecipeCard`, `AiChefCard`, `AppNetworkImage` exist. `RecipeCard` now renders real network images via `AppNetworkImage` (shimmer while loading, icon fallback on error) instead of a static placeholder tile. `flutter analyze` clean. |
+| Supabase client bootstrap | ✅ | `Supabase.initialize(url:, publishableKey:)` in `main.dart`; real project URL + publishable key in `supabase_config.dart` (2026-07-20; switched from the deprecated `anonKey:` parameter in P02, 2026-10-14) |
+| Firebase (push notifications) | 🟡 | `PushNotificationService` (`lib/core/services/push_notification_service.dart`). `main()` starts `initialize()` without awaiting it, so push can never delay or block the first frame. `initialize()` touches no Firebase API until `Firebase.initializeApp()` succeeds, never throws and never prompts; it registers the background handler, attaches the foreground/opened-app listeners and sets `isAvailable`. With no Firebase config (today) it logs "Firebase not configured — push notifications disabled." in debug only and leaves `isAvailable` false. `requestPermissionAndRegisterToken()` (permission prompt + token fetch + refresh listener) exists but **nothing calls it** — P19 wires it to a contextual moment. `dispose()` cancels all subscriptions. Logging goes through the debug-only `AppLogger`; token values are never logged. Covered by `test/core/services/push_notification_service_test.dart` (2026-10-14). **Still blocked on external setup**: real Firebase project, `google-services.json` + Google Services Gradle plugin (Android), `GoogleService-Info.plist` via Xcode (iOS), and ideally `flutterfire configure` for `firebase_options.dart`. Exact steps are in the class doc comment. Deliberately did *not* touch Android/iOS build files — applying the Gradle plugin without a real `google-services.json` breaks the build for everyone. |
+
+## Feature: Splash
+
+| Item | Status | Notes |
+|---|---|---|
+| Splash screen UI/animation | ✅ | `flutter_animate` entrance sequence |
+| Session-aware routing | ⬜ | Currently *always* routes to `/onboarding` after 5s regardless of an existing session — needs a `shared_preferences` "onboarding seen" flag + auth-state check to skip straight to `/home` for returning users |
+
+## Feature: Onboarding
+
+| Item | Status | Notes |
+|---|---|---|
+| 3-slide carousel UI | ✅ | |
+| Skip / Next / Get Started actions | ✅ | Routes to `/auth/login` |
+| "Seen onboarding" persistence | ⬜ | Not implemented — see Splash issue above, same root cause |
+
+## Feature: Authentication
+
+| Item | Status | Notes |
+|---|---|---|
+| Repository layer (`AuthRepository`) | ✅ | Email/password, Google, sign-out, password reset |
+| State + Notifier (`AuthNotifier`, `SmartMealAuthState`) | ✅ | Sealed state, live Supabase stream subscription |
+| Login screen | ✅ | Email/password + Google; Apple/Facebook are UI-only stubs |
+| Signup screen | ✅ | Handles both "email confirmation off" and "on" paths |
+| Router auth guard | ✅ | Centralized `redirect` in `app_router.dart` |
+| Forgot password screen | ⬜ | Route exists (`/auth/forgot-password`), points at `PlaceholderScreen` |
+| Apple Sign-In | ⬜ | Button present, shows "coming soon" snackbar; needs Apple Developer account |
+| Facebook Sign-In | ⬜ | Button present, shows "coming soon" snackbar |
+| Password rule consistency | 🟡 | Login requires 6 chars min, signup requires 8 — should match |
+
+## Feature: Setup / Preferences flow
+
+| Item | Status | Notes |
+|---|---|---|
+| `/setup/loading` | ⬜ | Placeholder |
+| `/setup/lifestyle` | ⬜ | Placeholder |
+| `/setup/preferences` | ⬜ | Placeholder |
+| `/setup/processing` (AI processing experience) | ⬜ | Placeholder |
+| Supabase `preferences` table | ⬜ | Schema not designed yet |
+
+## Main tab shell
+
+| Tab | Status | Notes |
+|---|---|---|
+| Home | ⬜ | Placeholder screen |
+| Discover | ⬜ | Placeholder screen |
+| Planner | ⬜ | Placeholder screen |
+| Favorites | ⬜ | Placeholder screen |
+| Profile | ⬜ | Placeholder screen |
+
+## Backend / data
+
+| Item | Status | Notes |
+|---|---|---|
+| Real Supabase project provisioned | ✅ | Project `svrelfdfonxwlfcljrag` exists and the app points at it. The project is provisioned; the schema is not (no tables, RLS or migrations yet — P13) |
+| `profiles` table + RLS | ⬜ | |
+| `preferences` table + RLS | ⬜ | |
+| `recipes` table + RLS | ⬜ | |
+| `favorites` table + RLS | ⬜ | |
+| `meal_plans` table + RLS | ⬜ | |
+| AI recommendation logic | ⬜ | Not started — no scoring/matching engine, no Edge Functions |
+| Google OAuth client configured (Supabase + Cloud Console) | 🟡 | Web Client ID set in `supabase_config.dart` (2026-07-20). Still needed: (1) enable Google provider in Supabase Dashboard → Auth → Providers → Google with this Client ID; (2) Android OAuth Client ID in Google Cloud Console keyed to `com.example.smart_meal` + debug SHA-1 `A3:AA:68:7E:A6:86:B6:78:3E:75:E3:59:AF:8C:8F:16:4D:F2:08:DD` (re-register once the real `applicationId` is chosen — see known issues) — a release-keystore SHA-1 will also be needed before store submission; (3) iOS OAuth Client ID keyed to the real Bundle ID (not yet decided) + reversed-client-id URL scheme added to `ios/Runner/Info.plist`. |
+
+## Known issues (open)
+
+| Issue | Severity | Where |
+|---|---|---|
+| Splash always shows onboarding, even for returning authenticated users | Medium | `lib/features/splash/presentation/splash_screen.dart` |
+| `applicationId`/`namespace` still `com.example.smart_meal` | Medium (blocks store submission) | `android/app/build.gradle.kts` |
+| Password min length mismatch (login 6 vs signup 8) | Low | `login_screen.dart`, `signup_screen.dart` |
+| Asset filename casing inconsistent (`bckImg5.png` vs `bckimg1-4.png`), several unnamed SVG exports | Low | `assets/images/` |
+| Minimal test coverage — only `PushNotificationService` has real tests; `widget_test.dart` is a stub | Low | `test/` |
+| Firebase deps installed but inert: no config files, so the startup `Firebase.initializeApp()` attempt always fails (safely); `firebase_auth`, `cloud_firestore`, `firebase_storage` are never imported | Low (cleanup — P04) | `pubspec.yaml` |
+| Notification permission is never requested — wired in P19 | Medium | `lib/core/services/push_notification_service.dart` (`requestPermissionAndRegisterToken` has no caller) |
+| Push is receive-only scaffolding: FCM token is fetched but not stored, foreground messages show no UI, notification taps do not navigate, and taps that cold-start the app (`getInitialMessage`) are not handled — P19 | Medium | `lib/core/services/push_notification_service.dart` |
+| `dart format --set-exit-if-changed .` fails on 13 pre-existing files (e.g. `app_router.dart`, `login_screen.dart`, `auth_notifier.dart`) — blocks the P03 format gate until they are formatted in a dedicated commit | Low | `lib/core/`, `lib/features/` |
+
+## Resolved issues
+
+| Date | Issue | Fix |
+|---|---|---|
+| 2026-10-14 | Missing `INTERNET` permission in the release `AndroidManifest.xml` — release/profile builds could not reach the network | P02: verified `<uses-permission android:name="android.permission.INTERNET"/>` in `android/app/src/main/AndroidManifest.xml` and committed it. |
+| 2026-10-14 | Startup crash in push bootstrap — found and fixed 2026-10-14. `PushNotificationService` read `FirebaseMessaging.instance` in a field initializer, which threw `[core/no-app]` at construction (outside `initialize()`'s try/catch), escaping `main()` before `runApp`. It would also have shown the iOS permission prompt before the first frame once Firebase was configured. | P01: Firebase is touched only after `initializeApp()` succeeds; permission moved to an uncalled `requestPermissionAndRegisterToken()`; `main()` no longer awaits push init. Regression test in `test/core/services/push_notification_service_test.dart`. |
+
+## Next up (recommended order)
+
+1. Fix the remaining bug that blocks real-device testing
+   (splash session-skip — P15).
+2. Design and provision the Supabase schema (profiles, preferences,
+   recipes, favorites, meal plans) with RLS from day one.
+3. Build the `/setup/*` flow (lifestyle → preferences → AI processing),
+   since it's the natural continuation of auth and the first thing that
+   needs the new schema.
+4. Build the Home tab against real (or seeded) recipe data — `RecipeCard`
+   already renders real image URLs via `AppNetworkImage`, it just needs a
+   live data source to feed it.
