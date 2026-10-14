@@ -45,21 +45,14 @@ class CustomButton extends StatelessWidget {
       return const SizedBox(
         height: 24,
         width: 24,
-        child: CircularProgressIndicator(
-          strokeWidth: 2.5,
-          color: Colors.white,
-        ),
+        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
       );
     }
 
     if (icon != null) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(text),
-          const SizedBox(width: 8),
-          icon!,
-        ],
+        children: [Text(text), const SizedBox(width: 8), icon!],
       );
     }
 

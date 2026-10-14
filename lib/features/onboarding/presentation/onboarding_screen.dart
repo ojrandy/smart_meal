@@ -16,19 +16,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> _onboardingData = [
     {
       "title": "Welcome to SmartMeal",
-      "subtitle": "Discover meals you will enjoy with AI-powered recommendations tailored to your taste.",
-      "image": "assets/images/bckimg1.png"
+      "subtitle":
+          "Discover meals you will enjoy with AI-powered recommendations tailored to your taste.",
+      "image": "assets/images/bckimg1.png",
     },
     {
       "title": "Plan Your Meals",
-      "subtitle": "Manage your budget and plan your weekly recipes efficiently with intelligent tracking.",
-      "image": "assets/images/bckimg2.png"
+      "subtitle":
+          "Manage your budget and plan your weekly recipes efficiently with intelligent tracking.",
+      "image": "assets/images/bckimg2.png",
     },
     {
       "title": "Smarter Food Decisions",
-      "subtitle": "Get personalized recommendations and insights to make healthier food choices",
-      "image": "assets/images/bckimg3.png"
-    }
+      "subtitle":
+          "Get personalized recommendations and insights to make healthier food choices",
+      "image": "assets/images/bckimg3.png",
+    },
   ];
 
   @override
@@ -98,23 +101,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       children: [
                         Text(
                           _onboardingData[index]["title"]!,
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 36, // Increased font size as requested
+                                fontSize:
+                                    36, // Increased font size as requested
                               ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           _onboardingData[index]["subtitle"]!,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
                                 color: Colors.white70,
-                                fontSize: 20, // Increased font size as requested
+                                fontSize:
+                                    20, // Increased font size as requested
                               ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 56), // Increased from 32 to push title and paragraph up
+                        const SizedBox(
+                          height: 56,
+                        ), // Increased from 32 to push title and paragraph up
                         // Page Indicator
                         Row(
                           mainAxisSize: MainAxisSize.min,
@@ -126,7 +135,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               height: 8,
                               width: _currentIndex == indicatorIndex ? 24 : 8,
                               decoration: BoxDecoration(
-                                color: _currentIndex == indicatorIndex ? AppColors.primary : Colors.white54,
+                                color: _currentIndex == indicatorIndex
+                                    ? AppColors.primary
+                                    : Colors.white54,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
@@ -149,16 +160,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  _currentIndex == _onboardingData.length - 1 ? "Get started" : "Next",
+                                  _currentIndex == _onboardingData.length - 1
+                                      ? "Get started"
+                                      : "Next",
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                if (_currentIndex == _onboardingData.length - 1) ...[
+                                if (_currentIndex ==
+                                    _onboardingData.length - 1) ...[
                                   const SizedBox(width: 8),
-                                  const Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+                                  const Icon(
+                                    Icons.arrow_forward,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
                                 ],
                               ],
                             ),
@@ -171,7 +189,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               );
             },
           ),
-          
+
           // Skip Button at Top Right
           Positioned(
             top: 60,

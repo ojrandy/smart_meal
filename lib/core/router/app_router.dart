@@ -25,8 +25,9 @@ class PlaceholderScreen extends StatelessWidget {
 
 // ── Navigator Keys ─────────────────────────────────────────────────────────
 
-final GlobalKey<NavigatorState> _rootNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'root',
+);
 
 // ── Router Refresh Notifier ────────────────────────────────────────────────
 //
@@ -66,9 +67,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final loc = state.matchedLocation;
 
       // Public routes — never redirect away from these
-      final isPublic = loc == '/splash' ||
-          loc == '/onboarding' ||
-          loc.startsWith('/auth');
+      final isPublic =
+          loc == '/splash' || loc == '/onboarding' || loc.startsWith('/auth');
 
       if (isPublic) {
         // If authenticated and trying to access auth screens → go home

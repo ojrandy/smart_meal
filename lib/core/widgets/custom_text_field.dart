@@ -53,11 +53,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            widget.prefixIcon,
-            color: AppColors.primary,
-            size: 24,
-          ),
+          Icon(widget.prefixIcon, color: AppColors.primary, size: 24),
           const SizedBox(width: 16),
           Expanded(
             child: Column(

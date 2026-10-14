@@ -46,10 +46,7 @@ class AuthRepository {
     required String email,
     required String password,
   }) {
-    return _client.auth.signUp(
-      email: email,
-      password: password,
-    );
+    return _client.auth.signUp(email: email, password: password);
   }
 
   /// Signs in an existing user with [email] and [password].
@@ -59,10 +56,7 @@ class AuthRepository {
     required String email,
     required String password,
   }) {
-    return _client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
+    return _client.auth.signInWithPassword(email: email, password: password);
   }
 
   // ── Google OAuth ───────────────────────────────────────────────────────────

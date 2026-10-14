@@ -36,7 +36,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-    await ref.read(authNotifierProvider.notifier).signUp(
+    await ref
+        .read(authNotifierProvider.notifier)
+        .signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -197,8 +199,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter your email';
                     }
-                    final emailRegex =
-                        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                    final emailRegex = RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    );
                     if (!emailRegex.hasMatch(value.trim())) {
                       return 'Please enter a valid email';
                     }
@@ -257,8 +260,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 Row(
                   children: [
                     Expanded(
-                        child: Divider(
-                            color: AppColors.surfaceVariant, thickness: 1.5)),
+                      child: Divider(
+                        color: AppColors.surfaceVariant,
+                        thickness: 1.5,
+                      ),
+                    ),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
@@ -271,8 +277,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       ),
                     ),
                     Expanded(
-                        child: Divider(
-                            color: AppColors.surfaceVariant, thickness: 1.5)),
+                      child: Divider(
+                        color: AppColors.surfaceVariant,
+                        thickness: 1.5,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 32),
@@ -280,8 +289,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 // Google Sign-In
                 SocialAuthButton(
                   text: 'Continue with Google',
-                  icon: const FaIcon(FontAwesomeIcons.google,
-                      color: Colors.red, size: 20),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.google,
+                    color: Colors.red,
+                    size: 20,
+                  ),
                   onPressed: isLoading ? null : _signInWithGoogle,
                 ),
                 const SizedBox(height: 16),
@@ -289,15 +301,19 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 // Apple Sign-In (placeholder)
                 SocialAuthButton(
                   text: 'Continue with Apple',
-                  icon: const FaIcon(FontAwesomeIcons.apple,
-                      color: Colors.black, size: 24),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.apple,
+                    color: Colors.black,
+                    size: 24,
+                  ),
                   onPressed: isLoading
                       ? null
                       : () {
                           // TODO: Implement Apple Sign-In (requires Apple Developer account)
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text('Apple Sign-In coming soon')),
+                              content: Text('Apple Sign-In coming soon'),
+                            ),
                           );
                         },
                 ),
@@ -306,15 +322,19 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 // Facebook Sign-In (placeholder)
                 SocialAuthButton(
                   text: 'Continue with Facebook',
-                  icon: const FaIcon(FontAwesomeIcons.facebook,
-                      color: Colors.blue, size: 24),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.facebook,
+                    color: Colors.blue,
+                    size: 24,
+                  ),
                   onPressed: isLoading
                       ? null
                       : () {
                           // TODO: Implement Facebook Sign-In
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text('Facebook Sign-In coming soon')),
+                              content: Text('Facebook Sign-In coming soon'),
+                            ),
                           );
                         },
                 ),

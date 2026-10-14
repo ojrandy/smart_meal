@@ -48,16 +48,12 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
 
   // ── Email & Password Sign-In ───────────────────────────────────────────────
 
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     state = AuthLoading();
     try {
-      final response = await ref.read(authRepositoryProvider).signIn(
-            email: email,
-            password: password,
-          );
+      final response = await ref
+          .read(authRepositoryProvider)
+          .signIn(email: email, password: password);
       if (response.user != null) {
         state = AuthAuthenticated(response.user!);
       } else {
@@ -72,16 +68,12 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
 
   // ── Email & Password Sign-Up ───────────────────────────────────────────────
 
-  Future<void> signUp({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signUp({required String email, required String password}) async {
     state = AuthLoading();
     try {
-      final response = await ref.read(authRepositoryProvider).signUp(
-            email: email,
-            password: password,
-          );
+      final response = await ref
+          .read(authRepositoryProvider)
+          .signUp(email: email, password: password);
 
       if (response.user == null) {
         state = AuthError('Account creation failed. Please try again.');
@@ -107,8 +99,9 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
   Future<void> signInWithGoogle() async {
     state = AuthLoading();
     try {
-      final response =
-          await ref.read(authRepositoryProvider).signInWithGoogle();
+      final response = await ref
+          .read(authRepositoryProvider)
+          .signInWithGoogle();
       if (response.user != null) {
         state = AuthAuthenticated(response.user!);
       } else {
@@ -177,5 +170,6 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
 
 // ── Riverpod Provider ──────────────────────────────────────────────────────
 
-final authNotifierProvider =
-    NotifierProvider<AuthNotifier, SmartMealAuthState>(AuthNotifier.new);
+final authNotifierProvider = NotifierProvider<AuthNotifier, SmartMealAuthState>(
+  AuthNotifier.new,
+);
