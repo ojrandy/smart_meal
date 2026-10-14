@@ -82,19 +82,19 @@ taken anyway, it must be logged in `progress-tracker.md`, not left silent.
 | OAuth | `google_sign_in`, routed through Supabase `signInWithIdToken` |
 | Push notifications only | `firebase_core`, `firebase_messaging` |
 | Typography | `google_fonts` (Inter) |
-| Animation | `flutter_animate`, `lottie` |
+| Animation | `flutter_animate`; `lottie` *planned — first use wherever Figma calls for an animation* |
 | Loading states | `shimmer` |
-| Images | `cached_network_image`, `image_picker` |
+| Images | `cached_network_image`; `image_picker` *removed in P04 — re-added with iOS purpose strings in the avatar-upload task (T1-Profile)* |
 | Icons | `iconsax` (primary), `font_awesome_flutter` (social auth only) |
-| Local KV storage | `shared_preferences` |
-| Formatting | `intl` (dates + XAF currency) |
+| Local KV storage | `shared_preferences` *planned — first use in P15 (onboarding-seen flag); never for credentials (S7)* |
+| Formatting | `intl` *planned — first use in P16/P18 (dates + XAF currency)* |
 
-**Firebase caveat:** Firebase is used for push notifications only.
-`PushNotificationService` exists and `main()` starts it, but there is no
-`google-services.json` / `GoogleService-Info.plist` yet, so
-`Firebase.initializeApp()` fails safely and push stays inert until P19
-(`docs/prompt.md`). `firebase_auth`, `cloud_firestore` and `firebase_storage`
-are dependencies that are never imported; P04 removes them. Supabase is the
+**Firebase caveat:** Firebase is used for push notifications only
+(`firebase_core`, `firebase_messaging`). `PushNotificationService` exists and
+`main()` starts it, but there is no `google-services.json` /
+`GoogleService-Info.plist` yet, so `Firebase.initializeApp()` fails safely and
+push stays inert until P19 (`docs/prompt.md`). P04 removed the unused
+`firebase_auth`, `cloud_firestore` and `firebase_storage`. Supabase is the
 system of record, so don't build features against Firebase.
 
 ## Current build status (high level — see `progress-tracker.md` for detail)
