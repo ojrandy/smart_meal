@@ -15,7 +15,7 @@ Future<void> main() async {
   // Session persistence is handled automatically by supabase_flutter.
   await Supabase.initialize(
     url: SupabaseConfig.projectUrl,
-    anonKey: SupabaseConfig.anonKey, // ignore: deprecated_member_use
+    publishableKey: SupabaseConfig.publishableKey,
   );
 
   // Not awaited: push is optional, so neither a missing Firebase config nor
