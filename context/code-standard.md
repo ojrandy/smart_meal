@@ -11,8 +11,26 @@ change done.
 - `flutter analyze` must return zero issues before a change is considered
   finished. Don't suppress a lint with `// ignore:` unless there's a
   documented reason in the same comment.
-- `analysis_options.yaml` uses the stock `flutter_lints` set — don't loosen
-  it without a stated reason.
+- `analysis_options.yaml` is `flutter_lints` plus stricter rules (P03,
+  2026-10-14). Don't loosen it without a stated reason. Why each one:
+  - `strict-casts`, `strict-inference`, `strict-raw-types`: no silent
+    `dynamic`. Untyped JSON from Supabase must be cast explicitly at the
+    repository boundary, not deep in the UI.
+  - `avoid_print`: logging goes through the debug-only `AppLogger`, so
+    release builds log nothing (security rule S4).
+  - `unawaited_futures`: a dropped `Future` hides errors. Wrap deliberate
+    fire-and-forget calls in `unawaited(...)` so the choice is visible.
+  - `cancel_subscriptions`, `close_sinks`: stream leaks outlive the screen or
+    the signed-in user (S12).
+  - `avoid_dynamic_calls`: a call on `dynamic` skips type checking and fails
+    at runtime.
+  - `prefer_single_quotes`, `prefer_const_constructors`,
+    `prefer_const_declarations`, `always_declare_return_types`: consistent
+    style, fewer rebuilds, explicit APIs.
+- The local gate `tool/verify.sh` and CI both run
+  `dart format --output=none --set-exit-if-changed .` and
+  `flutter analyze --fatal-infos --fatal-warnings`, so an info-level lint
+  also blocks a merge.
 
 ## Naming
 

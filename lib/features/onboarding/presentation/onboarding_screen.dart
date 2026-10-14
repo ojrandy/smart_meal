@@ -15,22 +15,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, String>> _onboardingData = [
     {
-      "title": "Welcome to SmartMeal",
-      "subtitle":
-          "Discover meals you will enjoy with AI-powered recommendations tailored to your taste.",
-      "image": "assets/images/bckimg1.png",
+      'title': 'Welcome to SmartMeal',
+      'subtitle':
+          'Discover meals you will enjoy with AI-powered recommendations tailored to your taste.',
+      'image': 'assets/images/bckimg1.png',
     },
     {
-      "title": "Plan Your Meals",
-      "subtitle":
-          "Manage your budget and plan your weekly recipes efficiently with intelligent tracking.",
-      "image": "assets/images/bckimg2.png",
+      'title': 'Plan Your Meals',
+      'subtitle':
+          'Manage your budget and plan your weekly recipes efficiently with intelligent tracking.',
+      'image': 'assets/images/bckimg2.png',
     },
     {
-      "title": "Smarter Food Decisions",
-      "subtitle":
-          "Get personalized recommendations and insights to make healthier food choices",
-      "image": "assets/images/bckimg3.png",
+      'title': 'Smarter Food Decisions',
+      'subtitle':
+          'Get personalized recommendations and insights to make healthier food choices',
+      'image': 'assets/images/bckimg3.png',
     },
   ];
 
@@ -73,7 +73,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 fit: StackFit.expand,
                 children: [
                   Image.asset(
-                    _onboardingData[index]["image"]!,
+                    _onboardingData[index]['image']!,
                     fit: BoxFit.cover,
                   ),
                   // Gradient shadow
@@ -100,7 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          _onboardingData[index]["title"]!,
+                          _onboardingData[index]['title']!,
                           style: Theme.of(context).textTheme.headlineMedium
                               ?.copyWith(
                                 color: Colors.white,
@@ -112,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          _onboardingData[index]["subtitle"]!,
+                          _onboardingData[index]['subtitle']!,
                           style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(
                                 color: Colors.white70,
@@ -161,8 +161,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               children: [
                                 Text(
                                   _currentIndex == _onboardingData.length - 1
-                                      ? "Get started"
-                                      : "Next",
+                                      ? 'Get started'
+                                      : 'Next',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
@@ -197,7 +197,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: TextButton(
               onPressed: _onSkip,
               child: const Text(
-                "Skip",
+                'Skip',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
