@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Machine-local agent tool state (shared skills live in .agents/)
+.claude/*.lock
+.claude/skills/
