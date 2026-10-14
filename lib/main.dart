@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/supabase_config.dart';
 import 'core/router/app_router.dart';
+import 'core/services/push_notification_service.dart';
 import 'core/theme/app_theme.dart';
 
 Future<void> main() async {
@@ -15,11 +18,12 @@ Future<void> main() async {
     anonKey: SupabaseConfig.anonKey, // ignore: deprecated_member_use
   );
 
-  runApp(
-    const ProviderScope(
-      child: SmartMealApp(),
-    ),
-  );
+  // Not awaited: push is optional, so neither a missing Firebase config nor
+  // a slow platform channel may hold back the first frame. initialize()
+  // never throws and never prompts the user.
+  unawaited(PushNotificationService().initialize());
+
+  runApp(const ProviderScope(child: SmartMealApp()));
 }
 
 class SmartMealApp extends ConsumerWidget {
