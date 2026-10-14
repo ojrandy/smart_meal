@@ -1,0 +1,18 @@
+# Normalize text to LF in the repo and working tree, whatever the OS or
+# core.autocrlf setting, so diffs stay free of line-ending noise.
+* text=auto eol=lf
+
+# Windows batch scripts need CRLF to run.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets: never convert or diff as text.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.gif  binary
+*.ico  binary
+*.ttf  binary
+*.otf  binary
+*.jar  binary
