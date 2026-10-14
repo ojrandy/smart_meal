@@ -1,0 +1,19 @@
+# Gitleaks config: the default ruleset plus a narrow allowlist.
+# Only exact, known PUBLIC identifiers belong here. Never allowlist a path,
+# a whole rule, or anything that is actually secret (S1 in docs/prompt.md).
+# A new finding means stop: report it, rotate the secret, then decide.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+# Supabase publishable key: a client-side identifier by design. Access is
+# enforced by Row Level Security. Moves to env config in P07.
+description = "Supabase publishable key (public)"
+regexes = ['''sb_publishable_Ur6fIFyWtxKgubsnqk8ukA_FdsVCo4S''']
+
+[[allowlists]]
+# Google OAuth Web Client ID: an identifier that ships in every client build,
+# not a secret (the client *secret* never enters this repo).
+description = "Google OAuth Web Client ID (public)"
+regexes = ['''569732010135-d28ss0kahd0uo60prhn3rgf9m1in69rc\.apps\.googleusercontent\.com''']
