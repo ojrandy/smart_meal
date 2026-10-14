@@ -98,7 +98,7 @@ Last reviewed: **2026-10-14** (P02 — repository hygiene and documentation trut
 | Firebase deps installed but inert: no config files, so the startup `Firebase.initializeApp()` attempt always fails (safely); `firebase_auth`, `cloud_firestore`, `firebase_storage` are never imported | Low (cleanup — P04) | `pubspec.yaml` |
 | Notification permission is never requested — wired in P19 | Medium | `lib/core/services/push_notification_service.dart` (`requestPermissionAndRegisterToken` has no caller) |
 | Push is receive-only scaffolding: FCM token is fetched but not stored, foreground messages show no UI, notification taps do not navigate, and taps that cold-start the app (`getInitialMessage`) are not handled — P19 | Medium | `lib/core/services/push_notification_service.dart` |
-| `dart format --set-exit-if-changed .` fails on 13 pre-existing files (e.g. `app_router.dart`, `login_screen.dart`, `auth_notifier.dart`) — blocks the P03 format gate until they are formatted in a dedicated commit | Low | `lib/core/`, `lib/features/` |
+| `dart format --set-exit-if-changed .` fails on 12 pre-existing files in `lib/` + `test/` (e.g. `app_router.dart`, `login_screen.dart`, `auth_notifier.dart`; recounted in P02) — blocks the P03 format gate until they are formatted in a dedicated commit | Low | `lib/core/`, `lib/features/` |
 
 ## Resolved issues
 
