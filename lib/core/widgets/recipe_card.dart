@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../theme/app_colors.dart';
+import 'app_network_image.dart';
 
 class RecipeCard extends StatelessWidget {
   final String title;
@@ -54,17 +55,10 @@ class RecipeCard extends StatelessWidget {
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(24),
                   ),
-                  child: Container(
+                  child: AppNetworkImage(
+                    imageUrl: imageUrl,
                     height: 160,
                     width: double.infinity,
-                    color: Colors.grey.shade200,
-                    // If you have a local image, you'd use Image.asset here.
-                    // Placeholder for now:
-                    child: const Icon(
-                      Iconsax.image,
-                      color: Colors.grey,
-                      size: 40,
-                    ),
                   ),
                 ),
                 Positioned(
