@@ -15,6 +15,8 @@ more than local optimality.
 lib/
   core/                          # Shared across all features
     config/                      # Environment/config constants (Supabase keys, etc.)
+    constants/                   # Compile-time app constants: AppAssets (every bundled
+                                  # image path). Never hard-code an 'assets/...' string elsewhere.
     providers/                   # App-wide Riverpod providers (e.g. supabaseClientProvider)
     router/                      # go_router setup, shell scaffold, nav bar
     services/                    # App-lifecycle bootstrap classes with no reactive state

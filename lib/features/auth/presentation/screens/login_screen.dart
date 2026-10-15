@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
@@ -109,7 +110,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     Image.asset(
-                      'assets/images/app logo.png',
+                      AppAssets.appLogo,
                       height: 40,
                       errorBuilder: (context, error, stackTrace) => const Icon(
                         Icons.restaurant_menu,
@@ -153,7 +154,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 // Hero Image
                 Center(
                   child: Image.asset(
-                    'assets/images/img_login.png',
+                    AppAssets.authLoginHero,
                     width: double.infinity,
                     fit: BoxFit.fitWidth,
                     errorBuilder: (context, error, stackTrace) => Container(
@@ -161,7 +162,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       width: double.infinity,
                       color: AppColors.surfaceVariant,
                       alignment: Alignment.center,
-                      child: const Text('img_login.png missing'),
+                      child: const Text('auth_login_hero.png missing'),
                     ),
                   ),
                 ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
@@ -130,7 +131,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       ),
                     ),
                     Image.asset(
-                      'assets/images/app logo.png',
+                      AppAssets.appLogo,
                       height: 40,
                       errorBuilder: (context, error, stackTrace) => const Icon(
                         Icons.restaurant_menu,
@@ -174,7 +175,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 // Hero Image
                 Center(
                   child: Image.asset(
-                    'assets/images/img_signup.png',
+                    AppAssets.authSignupHero,
                     width: double.infinity,
                     fit: BoxFit.fitWidth,
                     errorBuilder: (context, error, stackTrace) => Container(
@@ -182,7 +183,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       width: double.infinity,
                       color: AppColors.surfaceVariant,
                       alignment: Alignment.center,
-                      child: const Text('img_signup.png missing'),
+                      child: const Text('auth_signup_hero.png missing'),
                     ),
                   ),
                 ),

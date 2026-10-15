@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -18,19 +19,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       'title': 'Welcome to SmartMeal',
       'subtitle':
           'Discover meals you will enjoy with AI-powered recommendations tailored to your taste.',
-      'image': 'assets/images/bckimg1.png',
+      'image': AppAssets.onboardingDiscover,
     },
     {
       'title': 'Plan Your Meals',
       'subtitle':
           'Manage your budget and plan your weekly recipes efficiently with intelligent tracking.',
-      'image': 'assets/images/bckimg2.png',
+      'image': AppAssets.onboardingPlan,
     },
     {
       'title': 'Smarter Food Decisions',
       'subtitle':
           'Get personalized recommendations and insights to make healthier food choices',
-      'image': 'assets/images/bckimg3.png',
+      'image': AppAssets.onboardingDecide,
     },
   ];
 

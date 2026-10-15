@@ -134,10 +134,18 @@ gracefully instead of crashing — see both auth screens for the pattern.
 
 ## Assets
 
-- Location: `assets/images/`. Registered as a directory wildcard in
-  `pubspec.yaml` (`assets: - assets/images/`).
-- **Known issue to clean up:** inconsistent casing (`bckImg5.png` vs
-  `bckimg1-4.png`) and several auto-exported placeholder names (`SVG
-  (1).svg`, `Vector (2).svg`). Rename to descriptive `snake_case` names as
-  each asset gets wired into a real screen — don't let unnamed exports
-  accumulate further.
+- Location: `assets/images/`, registered as a directory in `pubspec.yaml`
+  (`assets: - assets/images/`), so **everything in it ships in the app**.
+  Put only images a screen uses there.
+- Names: descriptive `snake_case`, `<screen>_<role>` (e.g.
+  `onboarding_discover.png`, `auth_login_hero.png`). No spaces, no
+  auto-export names like `SVG (1)`.
+- Reference images only through `AppAssets` in
+  `lib/core/constants/app_assets.dart`; `test/core/constants/app_assets_test.dart`
+  fails if a constant points at a missing file or an image is bundled
+  without a constant.
+- `design-assets/` (repo root) holds source/unused art that is **not**
+  bundled — e.g. the *Premium AI Chef robot illustration* SVG and the
+  unused `bckimg4`/`bckImg5` backgrounds. Move a file into `assets/images/`
+  (renamed, with a constant) only when a screen uses it. SVGs need
+  `flutter_svg`, which is not a dependency.

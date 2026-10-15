@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/constants/app_assets.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -81,11 +82,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 const Spacer(flex: 3),
 
                 // Logo
-                Image.asset(
-                      'assets/images/app logo.png',
-                      width: 140,
-                      height: 140,
-                    )
+                Image.asset(AppAssets.appLogo, width: 140, height: 140)
                     .animate()
                     .fade(duration: 800.ms)
                     .scale(duration: 800.ms, curve: Curves.easeOutBack),
