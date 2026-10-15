@@ -2,7 +2,7 @@
 
 > Companion to [`prompt.md`](prompt.md). The executing agent updates this file at the end of **every** prompt and whenever it is blocked (protocol: `prompt.md` §0.7). Use absolute dates (`YYYY-MM-DD`). Keep entries honest — 🟡 means actively being worked on in the current session, not "started once".
 
-**Last updated:** 2026-10-15 — P03 ⏸️ (branch `p03-ci-gates`, pushed; waiting on the owner to open the PR so CI can run). P04 ⏸️ (branch `p04-diet`, committed, push pending on the owner; code done, waiting on the owner's WebP sign-off and offline-font phone check).
+**Last updated:** 2026-10-15 — P03 ⏸️ (branch `p03-ci-gates`, pushed; waiting on the owner to open the PR so CI can run). P04 ⏸️ (branch `p04-diet`, all work committed incl. approved WebP; waiting on a push with the owner's GitHub credentials, CI, and a phone spot check).
 
 ## Status legend
 
@@ -15,7 +15,7 @@
 | P01 | Make push bootstrap crash-proof and non-blocking | 0 | 🔴 Critical | — | ✅ | 2026-10-14 | 2026-10-14 | `4274bbc` (branch `p01-push-bootstrap`, pushed) | Regression test red before fix (`[core/no-app]`), 4/4 green after; `flutter test` → 5 passed; `flutter analyze` → no issues; `dart format` on touched files → 0 changed; grep: no `requestPermission` reachable from `main()`, no token interpolated in any log; owner confirmed on a physical phone (2026-10-14) that the app works | Android emulator unusable on this host — runtime check done by the owner on a phone. Tracker/context doc updates are not in the commit (`docs/`, `context/` are still untracked — P02's commit plan). Repo-wide `dart format` gate fails on 13 pre-existing files (logged as a Known issue) |
 | P02 | Repository hygiene and documentation truth | 0 | 🟠 High | P01 | ✅ | 2026-10-14 | 2026-10-14 | `d15bcc0` `b02c05b` `e35da6a` `0705187` `6a9e90d` `84805b8` `019c014` + docs commit (branch `p02-repo-hygiene`, pushed) | Clean `git worktree` per code commit: `flutter analyze` → no issues at `d15bcc0`, `b02c05b`, `e35da6a`; `flutter test` at `e35da6a` → 5 passed; no Dart/pubspec changes after `e35da6a`; `git add --renormalize .` → 0 files changed; grep for stale claims (`anonKey`, placeholder values, `superpowers`, circular pointer) → none left | Plan approved by owner. Renormalize was a no-op (index already LF), so no renormalize commit. `auth_notifier.dart` cosmetic comment edit reverted on owner instruction. `.claude/skills/` (duplicate of `.agents/skills/`) and `.claude/*.lock` now in `.gitignore` |
 | P03 | CI quality and security gates | 0 | 🟠 High | P02 | ⏸️ | 2026-10-14 | | `d8b11cf` `766049f` `15c260a` `55a3f16` `41da534` + tracker commit (branch `p03-ci-gates`, pushed) | `tool/verify.sh` → all checks passed (analyze `--fatal-infos` clean, 5 tests); unformatted `lib/main.dart` → gate exit 1 at format step, then reverted; gitleaks 8.30.1 (checksum-verified) full history, all refs, 11 commits → no leaks, with and without `.gitleaks.toml` | **Waiting:** owner opens PR `p03-ci-gates` → base `p02-repo-hygiene`; then confirm CI green. OSV job non-blocking until **2026-11-14** (remove `continue-on-error` then). Plan approved by owner |
-| P04 | Dependency, asset and font diet | 1 | 🟡 Medium | P03 | ⏸️ | 2026-10-14 | | `6698dbf` `cfa83ff` `53e03c1` + tracker commit (branch `p04-diet`, off `p03-ci-gates`; push pending — owner runs `git push -u origin p04-diet`) | `tool/verify.sh` → all checks passed (analyze clean, 14 tests); removed packages absent from `pubspec.lock` (192 lines removed, 0 added); grep `bckimg\|img_login\|img_signup\|app logo` in `lib/` → none; 5 bundled Inter files SHA-256 = `google_fonts` 8.1.0 pins; release arm64 APK 35,074,878 → 30,253,533 B (−13.7 %) | Plan approved by owner 2026-10-14. **Waiting:** (1) owner sign-off on WebP (`compare.html`) — not applied; (2) owner's offline-font check on the phone (fresh install, network off; no emulator here); (3) P03 CI still unrun. Size builds ran Gradle directly with `-x lintVital*` because local Android lint is broken (see Known issues) |
+| P04 | Dependency, asset and font diet | 1 | 🟡 Medium | P03 | ⏸️ | 2026-10-14 | | `6698dbf` `cfa83ff` `53e03c1` `1619800` `257f81c` `ac3f30a` + tracker commit (branch `p04-diet`, off `p03-ci-gates`; **not pushed** — needs the owner's GitHub credentials) | `tool/verify.sh` → all checks passed (analyze clean, 18 tests); removed packages absent from `pubspec.lock` (192 lines removed, 0 added); grep `bckimg\|img_login\|img_signup\|app logo` in `lib/` → none; 5 bundled Inter files SHA-256 = `google_fonts` 8.1.0 pins; shipped WebP byte-identical to the approved `compare.html` set; offline render test + engine screenshots (splash/onboarding/login/signup, fetching off) show bundled Inter and all images; release arm64 APK 35,074,878 → 20,873,226 B (−40.5 %) | Plan + WebP approved by owner (2026-10-14/15). **Remaining:** (1) push `p04-diet` and run CI; (2) on-device spot check on a real phone (engine-rendered offline screenshots exist; no phone or emulator reachable here). Size builds ran Gradle directly with `-x lintVital*` because local Android lint is broken (see Known issues) |
 | P05 | UI standards and accessibility cleanup | 1 | 🟡 Medium | P04 | ⬜ | | | | | |
 | P06 | Permanent app identity | 1 | 🟠 High | P03 | ⬜ | | | | | Must run before P11, P12 and P19 |
 | P07 | Environment config, secrets policy, threat model | 1 | 🟠 High | P06 | ⬜ | | | | | Creates `docs/SECURITY.md` |
@@ -52,7 +52,7 @@ Add one row per screen built with the T1 template.
 | `COMMIT_AUTHORIZATION` | every prompt | Whether agents may create commits in a session | P01, P02, P03, P04: authorized 2026-10-14 — commit and push to its own branch (ask again each prompt) | ✅ |
 | `AGENT_SKILLS_IN_GIT` | P02 | Commit `.agents/` + `skills-lock.json`? | Yes (2026-10-14): commit `.agents/skills/` + `skills-lock.json`; ignore the duplicate `.claude/skills/` | ✅ |
 | `GIT_HOST` | P03 | Where CI runs (GitHub by default) | GitHub — `origin` is `github.com/ojrandy/smart_meal` (public). PR base for P03: `p02-repo-hygiene` (owner, 2026-10-14) | ✅ |
-| `IMAGE_RECOMPRESSION_APPROVAL` | P04 | Sign-off on WebP/resized hero images | Proposal ready: 5 heroes PNG → WebP q85 (no resize; all ≤ 1404 px wide), 10.27 MB → 0.89 MB, YUV PSNR 43–44 dB. Side-by-side page in the P04 session scratchpad (`webp-out/compare.html`); `app_logo.png` stays PNG (alpha, 9 KB). Owner to decide | ⬜ |
+| `IMAGE_RECOMPRESSION_APPROVAL` | P04 | Sign-off on WebP/resized hero images | Proposal ready: 5 heroes PNG → WebP q85 (no resize; all ≤ 1404 px wide), 10.27 MB → 0.89 MB, YUV PSNR 43–44 dB. Side-by-side page in the P04 session scratchpad (`webp-out/compare.html`); `app_logo.png` stays PNG (alpha, 9 KB). **Approved by owner 2026-10-15**; applied in `257f81c` (shipped files byte-identical to the reviewed set; masters kept in `design-assets/source/`) | ✅ |
 | `APP_ID` | P06 → P11, P12, P19 | Permanent reverse-DNS app ID you own (no underscores, for iOS) | | ⬜ |
 | `APP_DISPLAY_NAME` | P06 | Launcher name on both platforms | | ⬜ |
 | `ORIENTATION_POLICY` | P06 | Default: portrait-only on phones | | ⬜ |
@@ -96,12 +96,12 @@ Add one row per screen built with the T1 template.
 | Metric | Baseline (2026-10-14) | Latest | Updated by |
 |---|---|---|---|
 | `flutter analyze` issues | 0 (stock `flutter_lints`) | 0 under strict modes + 9 extra lints, `--fatal-infos` (2026-10-14) | P03 |
-| Tests | 1 (placeholder `expect(true, isTrue)`) | 14 — 4 `PushNotificationService` + 1 app-shell smoke + 2 `AppAssets` + 7 `AppFonts` (2026-10-15) | P04 |
+| Tests | 1 (placeholder `expect(true, isTrue)`) | 18 — 4 `PushNotificationService` + 1 app-shell smoke + 3 `AppAssets` + 7 `AppFonts` + 3 offline screen renders (2026-10-15) | P04 |
 | Files failing `dart format --set-exit-if-changed` | not measured | 0 (2026-10-14, gated in CI) | P03 |
 | Coverage | not measured | 25.4 % lines (156/614, 2026-10-14) | P03 |
-| Bundled image assets | 14.7 MB (4.4 MB unused) | 10.28 MB, 6 files, 0 unused (2026-10-15); 0.90 MB if WebP is approved | P04 |
+| Bundled image assets | 14.7 MB (4.4 MB unused) | 0.90 MB, 6 files (5 WebP + logo PNG), 0 unused (2026-10-15) | P04 |
 | Packages never imported in `lib/` | 8 | 3 — `lottie`, `intl`, `shared_preferences`, all scheduled (2026-10-15) | P04 |
-| Release APK size (arm64) | 35,074,878 B (2026-10-14, pre-P04) | 30,253,533 B, −13.7 % (2026-10-15): images −4.38 MB, dex −1.06 MB, other −0.17 MB, Inter +0.79 MB. Gradle `assembleRelease -Ptarget-platform=android-arm64 -x lintVital*` from a clean tree; `--analyze-size` unavailable (local lint broken) | P04 |
+| Release APK size (arm64) | 35,074,878 B (2026-10-14, pre-P04) | 20,873,226 B, −40.5 % (2026-10-15): images −13.76 MB, dex −1.06 MB, other −0.17 MB, Inter +0.79 MB (intermediate, before WebP: 30,253,533 B). Gradle `assembleRelease -Ptarget-platform=android-arm64 -x lintVital*` from a clean tree; `--analyze-size` unavailable (local lint broken) | P04 |
 | Cold start on low-end Android | not measured | | P20 |
 | Tables with RLS / total tables | 0 / 0 | | P13 |
 | pgTAP tests | 0 | | P13 |
@@ -120,6 +120,19 @@ Inputs consumed: <keys>
 New inputs or decisions needed: <keys, or "none">
 Known issues added/closed: <list>
 ```
+
+### 2026-10-15 — P04 — ⏸️ Waiting (push + CI + phone spot check) — WebP applied
+Agent/session: Claude Code (Opus 5.5)
+Summary: Owner approved the WebP proposal. The 5 hero PNGs moved to `design-assets/source/` (lossless masters, unbundled) and their WebP q85 encodes ship in `assets/images/`, byte-identical to the reviewed `compare.html` set. `AppAssets` points at the `.webp` files; the image-decode test enforces the 1440 px budget. Added `test/features/offline_render_test.dart` (onboarding/login/signup rendered at phone size with fetching off: every image decodes, every requested Inter variant loads from assets). Owner asked for the on-device offline check: no phone is attached (`adb devices` empty) and the emulator is unusable, so engine-rendered offline screenshots of splash/onboarding/login/signup were produced instead (P04 session scratchpad `screenshots/`). The owner's "merge the PR" can't be done from this session: there are no GitHub credentials, so no push, PR or merge.
+Commits: `257f81c` WebP · `ac3f30a` offline render test + `test/helpers/fake_auth_repository.dart` · tracker commit. Not pushed.
+Verification:
+  `tool/verify.sh` → format 0 changed, analyze No issues found, 18 tests passed → "All checks passed."
+  mutation: truncated `auth_login_hero.webp` → `app_assets_test` (decode) and `offline_render_test` (login) both fail; restored byte-identical
+  screenshots: splash shows Inter Bold/Medium/Black Italic; onboarding and the auth heroes render from WebP
+  release arm64 APK (clean tree) 35,074,878 → 20,873,226 B (−40.5 %); images 14.66 MB → 0.90 MB
+Inputs consumed: `IMAGE_RECOMPRESSION_APPROVAL`
+New inputs or decisions needed: owner pushes the branches / authenticates GitHub; merge strategy for the P01–P04 stack
+Known issues added/closed: closed — WebP pending sign-off. Added — login/signup headline `RichText` ignores the theme, so it renders in the platform font, not Inter (found in the offline screenshots; pre-existing) — P05.
 
 ### 2026-10-15 — P04 — ⏸️ Waiting (owner: WebP sign-off + offline-font phone check)
 Agent/session: Claude Code (Opus 5.5)

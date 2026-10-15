@@ -95,8 +95,8 @@ Last reviewed: **2026-10-15** (P04 — dependency, asset and font diet; earlier:
 | `applicationId`/`namespace` still `com.example.smart_meal` | Medium (blocks store submission) | `android/app/build.gradle.kts` |
 | Password min length mismatch (login 6 vs signup 8) | Low | `login_screen.dart`, `signup_screen.dart` |
 | Plain `TextStyle(fontWeight: …)` without `GoogleFonts.inter(...)` inherits the theme's per-variant family (`Inter_regular`), so the engine fakes the weight from Regular instead of using the bundled Medium/SemiBold/Bold file (found in P04 by code reading; e.g. onboarding, auth screens, `AiChefCard`, `RecipeCard`) — P05 | Low | `lib/core/theme/app_theme.dart`, screens/widgets |
-| Image `errorBuilder` fallbacks show developer text to users (`'auth_login_hero.png missing'`, `'auth_signup_hero.png missing'`) — P05 | Low | `login_screen.dart`, `signup_screen.dart` |
-| WebP conversion of the 5 hero images (10.27 MB → 0.89 MB) is prepared but **not applied** until the owner signs off visual parity (`IMAGE_RECOMPRESSION_APPROVAL`) | Medium | `assets/images/` |
+| Image `errorBuilder` fallbacks show developer text to users (`'auth_login_hero.webp missing'`, `'auth_signup_hero.webp missing'`) — P05 | Low | `login_screen.dart`, `signup_screen.dart` |
+| Login/signup headline ("Welcome back to SmartMeal" etc.) is a `RichText` with a bare `TextStyle`; `RichText` does not inherit the theme, so on devices it renders in the platform font (Roboto/SF), not Inter (seen in P04's offline screenshots) — P05 | Low | `login_screen.dart`, `signup_screen.dart` |
 | Release build on this dev machine fails in Android lint (`lintVital*`: `ClassNotFoundException: com.android.tools.lint.Main` / `UastEnvironment`) — environment issue, not project code; P04 size builds ran Gradle directly with `-x lintVital*`. CI's Linux runner is unaffected (it builds debug). Repair the local Gradle cache or reinstall before P08/P20 release work | Low (dev env) | local `~/.gradle` |
 | Low test coverage (25.4 % lines): `PushNotificationService` tests + one app-shell smoke test (`test/widget_test.dart`); auth, router and screens have no tests | Low | `test/` |
 | OSV-Scanner CI job is non-blocking (`continue-on-error`) — make it blocking on 2026-11-14 after triaging findings | Medium | `.github/workflows/ci.yml` |
@@ -108,6 +108,7 @@ Last reviewed: **2026-10-15** (P04 — dependency, asset and font diet; earlier:
 
 | Date | Issue | Fix |
 |---|---|---|
+| 2026-10-15 | Hero images shipped as 1.8–2.4 MB PNGs (10.27 MB total) | P04 `257f81c`: owner-approved WebP q85 (0.89 MB total), masters kept in `design-assets/source/`; release APK 35.07 → 20.87 MB |
 | 2026-10-15 | 8 packages never imported; `firebase_auth`, `cloud_firestore`, `firebase_storage`, `form_validator`, `image_picker` shipped unused native code (and camera/photo APIs → iOS ITMS-90683 risk) | P04 `6698dbf`: the 5 removed (24 packages left the lockfile); `lottie`, `intl`, `shared_preferences` kept and marked *planned* in `project-overview.md`. `image_picker` returns with iOS purpose strings in T1-Profile |
 | 2026-10-15 | 4.4 MB of unused images bundled; filenames with spaces/mixed casing | P04 `cfa83ff`: 16 files moved to unbundled `design-assets/`; bundled images renamed to snake_case behind `AppAssets`; `app_assets_test.dart` guards it |
 | 2026-10-15 | Inter downloaded at runtime — fallback font offline, network call at startup | P04 `53e03c1`: 5 used weights bundled (hash-identical to `google_fonts`' pins), runtime fetching off, OFL registered; `app_fonts_test.dart` guards it. Offline check on a fresh install is the owner's (no emulator) |
