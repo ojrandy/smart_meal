@@ -3,7 +3,7 @@
 > Update this file every time a feature's status changes. Keep entries
 > honest — "in progress" means actively being worked on, not "started once."
 
-Last reviewed: **2026-10-14** (P03 — CI quality and security gates; earlier the same day: P01, P02)
+Last reviewed: **2026-10-15** (P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
 
 > **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
 > and `docs/prompt-tracker.md` (status per prompt). Check them before picking
@@ -94,11 +94,13 @@ Last reviewed: **2026-10-14** (P03 — CI quality and security gates; earlier th
 | Splash always shows onboarding, even for returning authenticated users | Medium | `lib/features/splash/presentation/splash_screen.dart` |
 | `applicationId`/`namespace` still `com.example.smart_meal` | Medium (blocks store submission) | `android/app/build.gradle.kts` |
 | Password min length mismatch (login 6 vs signup 8) | Low | `login_screen.dart`, `signup_screen.dart` |
-| Asset filename casing inconsistent (`bckImg5.png` vs `bckimg1-4.png`), several unnamed SVG exports | Low | `assets/images/` |
+| Plain `TextStyle(fontWeight: …)` without `GoogleFonts.inter(...)` inherits the theme's per-variant family (`Inter_regular`), so the engine fakes the weight from Regular instead of using the bundled Medium/SemiBold/Bold file (found in P04 by code reading; e.g. onboarding, auth screens, `AiChefCard`, `RecipeCard`) — P05 | Low | `lib/core/theme/app_theme.dart`, screens/widgets |
+| Image `errorBuilder` fallbacks show developer text to users (`'auth_login_hero.png missing'`, `'auth_signup_hero.png missing'`) — P05 | Low | `login_screen.dart`, `signup_screen.dart` |
+| WebP conversion of the 5 hero images (10.27 MB → 0.89 MB) is prepared but **not applied** until the owner signs off visual parity (`IMAGE_RECOMPRESSION_APPROVAL`) | Medium | `assets/images/` |
+| Release build on this dev machine fails in Android lint (`lintVital*`: `ClassNotFoundException: com.android.tools.lint.Main` / `UastEnvironment`) — environment issue, not project code; P04 size builds ran Gradle directly with `-x lintVital*`. CI's Linux runner is unaffected (it builds debug). Repair the local Gradle cache or reinstall before P08/P20 release work | Low (dev env) | local `~/.gradle` |
 | Low test coverage (25.4 % lines): `PushNotificationService` tests + one app-shell smoke test (`test/widget_test.dart`); auth, router and screens have no tests | Low | `test/` |
 | OSV-Scanner CI job is non-blocking (`continue-on-error`) — make it blocking on 2026-11-14 after triaging findings | Medium | `.github/workflows/ci.yml` |
 | `osv-scanner-action` runs its Docker image by tag, not digest — residual supply-chain risk | Low | `.github/workflows/ci.yml` |
-| Firebase deps installed but inert: no config files, so the startup `Firebase.initializeApp()` attempt always fails (safely); `firebase_auth`, `cloud_firestore`, `firebase_storage` are never imported | Low (cleanup — P04) | `pubspec.yaml` |
 | Notification permission is never requested — wired in P19 | Medium | `lib/core/services/push_notification_service.dart` (`requestPermissionAndRegisterToken` has no caller) |
 | Push is receive-only scaffolding: FCM token is fetched but not stored, foreground messages show no UI, notification taps do not navigate, and taps that cold-start the app (`getInitialMessage`) are not handled — P19 | Medium | `lib/core/services/push_notification_service.dart` |
 
@@ -106,6 +108,9 @@ Last reviewed: **2026-10-14** (P03 — CI quality and security gates; earlier th
 
 | Date | Issue | Fix |
 |---|---|---|
+| 2026-10-15 | 8 packages never imported; `firebase_auth`, `cloud_firestore`, `firebase_storage`, `form_validator`, `image_picker` shipped unused native code (and camera/photo APIs → iOS ITMS-90683 risk) | P04 `6698dbf`: the 5 removed (24 packages left the lockfile); `lottie`, `intl`, `shared_preferences` kept and marked *planned* in `project-overview.md`. `image_picker` returns with iOS purpose strings in T1-Profile |
+| 2026-10-15 | 4.4 MB of unused images bundled; filenames with spaces/mixed casing | P04 `cfa83ff`: 16 files moved to unbundled `design-assets/`; bundled images renamed to snake_case behind `AppAssets`; `app_assets_test.dart` guards it |
+| 2026-10-15 | Inter downloaded at runtime — fallback font offline, network call at startup | P04 `53e03c1`: 5 used weights bundled (hash-identical to `google_fonts`' pins), runtime fetching off, OFL registered; `app_fonts_test.dart` guards it. Offline check on a fresh install is the owner's (no emulator) |
 | 2026-10-14 | 12 pre-existing files failed `dart format --set-exit-if-changed` | P03: formatted in commit `d8b11cf`; the gate now runs in `tool/verify.sh` and CI. |
 | 2026-10-14 | Missing `INTERNET` permission in the release `AndroidManifest.xml` — release/profile builds could not reach the network | P02: verified `<uses-permission android:name="android.permission.INTERNET"/>` in `android/app/src/main/AndroidManifest.xml` and committed it. |
 | 2026-10-14 | Startup crash in push bootstrap — found and fixed 2026-10-14. `PushNotificationService` read `FirebaseMessaging.instance` in a field initializer, which threw `[core/no-app]` at construction (outside `initialize()`'s try/catch), escaping `main()` before `runApp`. It would also have shown the iOS permission prompt before the first frame once Firebase was configured. | P01: Firebase is touched only after `initializeApp()` succeeds; permission moved to an uncalled `requestPermissionAndRegisterToken()`; `main()` no longer awaits push init. Regression test in `test/core/services/push_notification_service_test.dart`. |
