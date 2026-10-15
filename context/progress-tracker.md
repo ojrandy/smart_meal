@@ -3,7 +3,7 @@
 > Update this file every time a feature's status changes. Keep entries
 > honest — "in progress" means actively being worked on, not "started once."
 
-Last reviewed: **2026-10-15** (P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
+Last reviewed: **2026-10-15** (P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
 
 > **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
 > and `docs/prompt-tracker.md` (status per prompt). Check them before picking
@@ -23,7 +23,7 @@ Last reviewed: **2026-10-15** (P05 — UI standards and accessibility cleanup, �
 | Shared widget library | ✅ | `CustomButton`, `CustomTextField`, `SocialAuthButton`, `RecipeCard`, `AiChefCard`, `AppNetworkImage` exist. `RecipeCard` now renders real network images via `AppNetworkImage` (shimmer while loading, icon fallback on error) instead of a static placeholder tile. `flutter analyze` clean. |
 | Supabase client bootstrap | ✅ | `Supabase.initialize(url:, publishableKey:)` in `main.dart`; real project URL + publishable key in `supabase_config.dart` (2026-07-20; switched from the deprecated `anonKey:` parameter in P02, 2026-10-14) |
 | Firebase (push notifications) | 🟡 | `PushNotificationService` (`lib/core/services/push_notification_service.dart`). `main()` starts `initialize()` without awaiting it, so push can never delay or block the first frame. `initialize()` touches no Firebase API until `Firebase.initializeApp()` succeeds, never throws and never prompts; it registers the background handler, attaches the foreground/opened-app listeners and sets `isAvailable`. With no Firebase config (today) it logs "Firebase not configured — push notifications disabled." in debug only and leaves `isAvailable` false. `requestPermissionAndRegisterToken()` (permission prompt + token fetch + refresh listener) exists but **nothing calls it** — P19 wires it to a contextual moment. `dispose()` cancels all subscriptions. Logging goes through the debug-only `AppLogger`; token values are never logged. Covered by `test/core/services/push_notification_service_test.dart` (2026-10-14). **Still blocked on external setup**: real Firebase project, `google-services.json` + Google Services Gradle plugin (Android), `GoogleService-Info.plist` via Xcode (iOS), and ideally `flutterfire configure` for `firebase_options.dart`. Exact steps are in the class doc comment. Deliberately did *not* touch Android/iOS build files — applying the Gradle plugin without a real `google-services.json` breaks the build for everyone. |
-| Quality + security gates | 🟡 | `tool/verify.sh` (format → analyze `--fatal-infos` → test --coverage) and `.github/workflows/ci.yml` (same gate + debug APK + gitleaks full history + OSV) added in P03, 2026-10-14. Passes locally; first CI run on a PR still pending |
+| Quality + security gates | ✅ | `tool/verify.sh` (format → analyze `--fatal-infos` → test --coverage) and `.github/workflows/ci.yml` (same gate + debug APK + gitleaks full history + OSV) added in P03, 2026-10-14. Passes locally and in CI: first run on `main` 2026-10-15 (run 38766137427), all jobs green |
 
 ## Feature: Splash
 
