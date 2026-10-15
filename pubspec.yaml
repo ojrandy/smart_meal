@@ -79,6 +79,11 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    # Inter, loaded by google_fonts from here instead of over HTTP. Files keep
+    # the Google Fonts names (Inter-<Weight><Style>.ttf) because google_fonts
+    # matches on them; they are byte-identical to the files it would download.
+    # Bundle a new weight here before using it in code (see AppFonts).
+    - assets/fonts/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

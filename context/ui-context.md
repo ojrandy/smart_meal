@@ -29,7 +29,14 @@ first. No inline hex values in screens.
 ## Typography
 
 - Font: **Inter** via `google_fonts`, applied globally through
-  `AppTheme.lightTheme.textTheme`.
+  `AppTheme.lightTheme.textTheme`. The files are **bundled** in
+  `assets/fonts/` and runtime fetching is off (`AppFonts.configure()` in
+  `main()`), so text looks the same offline and startup makes no font request.
+- Bundled weights: 400, 500, 600, 700 and 900 italic (the splash), listed in
+  `AppFonts.bundledInterVariants`. **Using any other weight/style needs its
+  `Inter-<Weight><Style>.ttf` added first** (same Google Fonts file name, from
+  the URL/hash pinned in the `google_fonts` package), or it fails to load;
+  `test/core/theme/app_fonts_test.dart` guards this.
 - Headings: `bold`/`w700`, `textPrimary`.
 - Body: regular weight; `bodyMedium` defaults to `textSecondary` for
   de-emphasized copy, `bodyLarge` for primary reading text.

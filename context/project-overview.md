@@ -81,7 +81,7 @@ taken anyway, it must be logged in `progress-tracker.md`, not left silent.
 | Backend (primary) | `supabase_flutter` — auth, Postgres, storage, realtime |
 | OAuth | `google_sign_in`, routed through Supabase `signInWithIdToken` |
 | Push notifications only | `firebase_core`, `firebase_messaging` |
-| Typography | `google_fonts` (Inter) |
+| Typography | `google_fonts` (Inter, bundled in `assets/fonts/` — no runtime download) |
 | Animation | `flutter_animate`; `lottie` *planned — first use wherever Figma calls for an animation* |
 | Loading states | `shimmer` |
 | Images | `cached_network_image`; `image_picker` *removed in P04 — re-added with iOS purpose strings in the avatar-upload task (T1-Profile)* |

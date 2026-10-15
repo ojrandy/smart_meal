@@ -6,10 +6,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/supabase_config.dart';
 import 'core/router/app_router.dart';
 import 'core/services/push_notification_service.dart';
+import 'core/theme/app_fonts.dart';
 import 'core/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppFonts.configure();
 
   // Initialize Supabase before the app starts.
   // Session persistence is handled automatically by supabase_flutter.

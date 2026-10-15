@@ -50,8 +50,7 @@ class FakeAuthRepository implements AuthRepository {
 
 void main() {
   setUpAll(() {
-    // Tests have no network; fall back to the default font instead of
-    // fetching Inter.
+    // Same as main(): Inter comes from assets/fonts, never the network.
     GoogleFonts.config.allowRuntimeFetching = false;
   });
 
