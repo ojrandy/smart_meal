@@ -2,7 +2,7 @@
 
 > Companion to [`prompt.md`](prompt.md). The executing agent updates this file at the end of **every** prompt and whenever it is blocked (protocol: `prompt.md` §0.7). Use absolute dates (`YYYY-MM-DD`). Keep entries honest — 🟡 means actively being worked on in the current session, not "started once".
 
-**Last updated:** 2026-10-15 — P03 ⏸️ (branch `p03-ci-gates`, pushed; waiting on the owner to open the PR so CI can run). P04 ⏸️ (branch `p04-diet`, all work committed incl. approved WebP; waiting on a push with the owner's GitHub credentials, CI, and a phone spot check).
+**Last updated:** 2026-10-15 — P05 ✅ (branch `p05-ui-a11y`, off `p04-diet`; owner verified on a phone, authorized commit + push to `main`). P03 ⏸️ (branch `p03-ci-gates`, pushed; waiting on the owner to open the PR so CI can run). P04 ⏸️ (branch `p04-diet`, all work committed incl. approved WebP; waiting on a push with the owner's GitHub credentials, CI, and a phone spot check).
 
 ## Status legend
 
@@ -16,7 +16,7 @@
 | P02 | Repository hygiene and documentation truth | 0 | 🟠 High | P01 | ✅ | 2026-10-14 | 2026-10-14 | `d15bcc0` `b02c05b` `e35da6a` `0705187` `6a9e90d` `84805b8` `019c014` + docs commit (branch `p02-repo-hygiene`, pushed) | Clean `git worktree` per code commit: `flutter analyze` → no issues at `d15bcc0`, `b02c05b`, `e35da6a`; `flutter test` at `e35da6a` → 5 passed; no Dart/pubspec changes after `e35da6a`; `git add --renormalize .` → 0 files changed; grep for stale claims (`anonKey`, placeholder values, `superpowers`, circular pointer) → none left | Plan approved by owner. Renormalize was a no-op (index already LF), so no renormalize commit. `auth_notifier.dart` cosmetic comment edit reverted on owner instruction. `.claude/skills/` (duplicate of `.agents/skills/`) and `.claude/*.lock` now in `.gitignore` |
 | P03 | CI quality and security gates | 0 | 🟠 High | P02 | ⏸️ | 2026-10-14 | | `d8b11cf` `766049f` `15c260a` `55a3f16` `41da534` + tracker commit (branch `p03-ci-gates`, pushed) | `tool/verify.sh` → all checks passed (analyze `--fatal-infos` clean, 5 tests); unformatted `lib/main.dart` → gate exit 1 at format step, then reverted; gitleaks 8.30.1 (checksum-verified) full history, all refs, 11 commits → no leaks, with and without `.gitleaks.toml` | **Waiting:** owner opens PR `p03-ci-gates` → base `p02-repo-hygiene`; then confirm CI green. OSV job non-blocking until **2026-11-14** (remove `continue-on-error` then). Plan approved by owner |
 | P04 | Dependency, asset and font diet | 1 | 🟡 Medium | P03 | ⏸️ | 2026-10-14 | | `6698dbf` `cfa83ff` `53e03c1` `1619800` `257f81c` `ac3f30a` + tracker commit (branch `p04-diet`, off `p03-ci-gates`; **not pushed** — needs the owner's GitHub credentials) | `tool/verify.sh` → all checks passed (analyze clean, 18 tests); removed packages absent from `pubspec.lock` (192 lines removed, 0 added); grep `bckimg\|img_login\|img_signup\|app logo` in `lib/` → none; 5 bundled Inter files SHA-256 = `google_fonts` 8.1.0 pins; shipped WebP byte-identical to the approved `compare.html` set; offline render test + engine screenshots (splash/onboarding/login/signup, fetching off) show bundled Inter and all images; release arm64 APK 35,074,878 → 20,873,226 B (−40.5 %) | Plan + WebP approved by owner (2026-10-14/15). **Remaining:** (1) push `p04-diet` and run CI; (2) on-device spot check on a real phone (engine-rendered offline screenshots exist; no phone or emulator reachable here). Size builds ran Gradle directly with `-x lintVital*` because local Android lint is broken (see Known issues) |
-| P05 | UI standards and accessibility cleanup | 1 | 🟡 Medium | P04 | ⬜ | | | | | |
+| P05 | UI standards and accessibility cleanup | 1 | 🟡 Medium | P04 | ✅ | 2026-10-15 | 2026-10-15 | `3b429c5` widgets/theme · `f279b00` splash + onboarding · `3615750` auth screens + docs commit (branch `p05-ui-a11y`) | `tool/verify.sh` → all checks passed (analyze `--fatal-infos` clean, 48 tests, coverage 64.6 %); enforcement grep (word-bounded, see notes) → nothing; screenshots: splash pixel-identical, login/signup identical below the title apart from a 34 dp shift (title now Inter via `Text.rich`); onboarding now with owner-approved overlays; onboarding contrast test (real artwork, worst visible pixel) passes AA on all 3 slides at 3 sizes and fails on the old scrim; system-back, onboarding layout and button tests red on the old code, green on the new; owner verified on a phone (2026-10-15) | Started while P04 was ⏸️ — stacked like P04 on P03. Owner approved the 4 screen-reader labels, onboarding overlays, the visible primary loading spinner, and system back matching the on-screen back. The prompt's enforcement command (`Colors\.` has no word boundary) also matches every `AppColors.`; run it with `\bColors\.` instead. Still open: splash accent/subtitle contrast and `textHint` icons (need a color decision) |
 | P06 | Permanent app identity | 1 | 🟠 High | P03 | ⬜ | | | | | Must run before P11, P12 and P19 |
 | P07 | Environment config, secrets policy, threat model | 1 | 🟠 High | P06 | ⬜ | | | | | Creates `docs/SECURITY.md` |
 | P08 | Android and iOS platform hardening | 1 | 🟠 High | P06, P07 | ⬜ | | | | | Creates `docs/RELEASE.md` |
@@ -49,7 +49,7 @@ Add one row per screen built with the T1 template.
 
 | Key | Needed by | What it is | Value / decision | Status |
 |---|---|---|---|---|
-| `COMMIT_AUTHORIZATION` | every prompt | Whether agents may create commits in a session | P01, P02, P03, P04: authorized 2026-10-14 — commit and push to its own branch (ask again each prompt) | ✅ |
+| `COMMIT_AUTHORIZATION` | every prompt | Whether agents may create commits in a session | P01, P02, P03, P04: authorized 2026-10-14 — commit and push to its own branch (ask again each prompt). P05: authorized 2026-10-15 — commit and push to `main` | ✅ |
 | `AGENT_SKILLS_IN_GIT` | P02 | Commit `.agents/` + `skills-lock.json`? | Yes (2026-10-14): commit `.agents/skills/` + `skills-lock.json`; ignore the duplicate `.claude/skills/` | ✅ |
 | `GIT_HOST` | P03 | Where CI runs (GitHub by default) | GitHub — `origin` is `github.com/ojrandy/smart_meal` (public). PR base for P03: `p02-repo-hygiene` (owner, 2026-10-14) | ✅ |
 | `IMAGE_RECOMPRESSION_APPROVAL` | P04 | Sign-off on WebP/resized hero images | Proposal ready: 5 heroes PNG → WebP q85 (no resize; all ≤ 1404 px wide), 10.27 MB → 0.89 MB, YUV PSNR 43–44 dB. Side-by-side page in the P04 session scratchpad (`webp-out/compare.html`); `app_logo.png` stays PNG (alpha, 9 KB). **Approved by owner 2026-10-15**; applied in `257f81c` (shipped files byte-identical to the reviewed set; masters kept in `design-assets/source/`) | ✅ |
@@ -61,7 +61,7 @@ Add one row per screen built with the T1 template.
 | `LAUNCH_MARKETS` | P07 | Countries at launch (drives data-protection obligations) | | ⬜ |
 | `SECURITY_DOC_REVIEW` | P07 | Owner review of `docs/SECURITY.md` | | ⬜ |
 | `RELEASE_KEYSTORE` | P08 | Owner-held upload keystore + `key.properties` values (never in git) | | ⬜ |
-| `COPY_APPROVALS` | P10, P11, P16, P17, P18 | Approval of new user-facing messages | | ⬜ |
+| `COPY_APPROVALS` | P10, P11, P16, P17, P18 | Approval of new user-facing messages | P05 screen-reader labels "Show password", "Hide password", "Add to favorites", "Remove from favorites": approved by owner 2026-10-15. Other prompts: pending | ⬜ |
 | `FIGMA_FORGOT_PASSWORD_URL` | P11 | Figma frame(s) | | ⬜ |
 | `FIGMA_RESET_PASSWORD_URL` | P11 | Figma frame(s) | | ⬜ |
 | `AUTH_REDIRECT_URI` | P11 | e.g. `<APP_ID>://auth-callback` | | ⬜ |
@@ -96,9 +96,9 @@ Add one row per screen built with the T1 template.
 | Metric | Baseline (2026-10-14) | Latest | Updated by |
 |---|---|---|---|
 | `flutter analyze` issues | 0 (stock `flutter_lints`) | 0 under strict modes + 9 extra lints, `--fatal-infos` (2026-10-14) | P03 |
-| Tests | 1 (placeholder `expect(true, isTrue)`) | 18 — 4 `PushNotificationService` + 1 app-shell smoke + 3 `AppAssets` + 7 `AppFonts` + 3 offline screen renders (2026-10-15) | P04 |
+| Tests | 1 (placeholder `expect(true, isTrue)`) | 48 (2026-10-15): P04's 18 + 2 `AppColors` + 3 `CustomButton` + 2 `CustomTextField` + 1 `RecipeCard` + 7 onboarding + 3 onboarding contrast + 12 auth-screen a11y/navigation | P05 |
 | Files failing `dart format --set-exit-if-changed` | not measured | 0 (2026-10-14, gated in CI) | P03 |
-| Coverage | not measured | 25.4 % lines (156/614, 2026-10-14) | P03 |
+| Coverage | not measured | 64.6 % lines (484/749, 2026-10-15; was 25.4 % on 2026-10-14) | P05 |
 | Bundled image assets | 14.7 MB (4.4 MB unused) | 0.90 MB, 6 files (5 WebP + logo PNG), 0 unused (2026-10-15) | P04 |
 | Packages never imported in `lib/` | 8 | 3 — `lottie`, `intl`, `shared_preferences`, all scheduled (2026-10-15) | P04 |
 | Release APK size (arm64) | 35,074,878 B (2026-10-14, pre-P04) | 20,873,226 B, −40.5 % (2026-10-15): images −13.76 MB, dex −1.06 MB, other −0.17 MB, Inter +0.79 MB (intermediate, before WebP: 30,253,533 B). Gradle `assembleRelease -Ptarget-platform=android-arm64 -x lintVital*` from a clean tree; `--analyze-size` unavailable (local lint broken) | P04 |
@@ -120,6 +120,40 @@ Inputs consumed: <keys>
 New inputs or decisions needed: <keys, or "none">
 Known issues added/closed: <list>
 ```
+
+### 2026-10-15 — P05 — ✅ Done
+Agent/session: Claude Code (Opus 5.5)
+Summary: Owner answers: commit and push to `main`; the 4 screen-reader labels are approved, and the "built-in back" must give a perfect UI; contrast is to be fixed with overlays; the main button's loading spinner must be visible; all phone checks pass. Follow-up changes:
+- **System back:** `PopScope` on login/signup makes the Android back button/gesture behave like the on-screen back (signup → login → onboarding) instead of closing the app.
+- **Onboarding overlays:** the full-screen scrim became a text-anchored `_TextScrim` (120 dp fade, then black 60 % → 85 % behind the text and CTA), and Skip got a black 55 % pill.
+- **Primary loading:** the primary `CustomButton` keeps its green fill while loading.
+- **Test harness:** the P04 offline-render test now hosts screens in a GoRouter, because the auth screens read the router during build.
+Commits: `3b429c5` widgets/theme · `f279b00` splash + onboarding · `3615750` auth screens + docs commit (branch `p05-ui-a11y`); pushed to `origin/p05-ui-a11y` and `origin/main` — see the status board.
+Verification:
+  `tool/verify.sh` → format 0 changed, analyze No issues found, 48 tests passed, coverage 64.6 % → "All checks passed."
+  `onboarding_contrast_test.dart` (renders the real artwork with transparent glyphs, checks every visible pixel under each text box): pass at 393×873 ×1.0, 360×640 ×1.3, 320×568 ×1.3; worst pixels — title ≥ 5.97:1, subtitle ≥ 4.71:1, Skip ≥ 5.11:1. Against the previous scrim it fails on the first slide at every size
+  system-back tests (platform `popRoute` message): fail without `PopScope` (app would exit), pass with it
+  primary loading: fill = `primary`, spinner `onPrimary` (5.32:1); a disabled non-loading button keeps the theme's disabled look
+  owner: all P05 checks fine on their phone (2026-10-15)
+Inputs consumed: `COMMIT_AUTHORIZATION` (P05), `COPY_APPROVALS` (P05 labels)
+New inputs or decisions needed: splash contrast (orange "AI"/"TECH" on green 1.27:1, white subtitle 2.33:1 — needs a color change, not an overlay) and `textHint` meta icons (2.54:1)
+Known issues added/closed: closed — onboarding contrast, primary loading spinner, system back exiting the app from auth screens. Still open — splash/`textHint` contrast, text-field tap target, synthesized bold, prompt enforcement regex.
+
+### 2026-10-15 — P05 — ⏸️ Waiting (superseded by the entry above)
+Agent/session: Claude Code (Opus 5.5)
+Summary: The listed inline colors became `AppColors` tokens with unchanged values (`splashGradient*`, `splashGlow`, `brandAccent`, `onPrimary`, `onDark`/`onDarkMuted`/`onDarkSubtle`, `scrim`, `shadow`, `favorite`, `placeholderIcon`, `social*`). Onboarding now uses a private `_OnboardingSlide` class, has an image `errorBuilder`, places Skip at `max(60, top inset + 8)`, and puts the bottom block in a bottom-anchored scroll view (same look at 1.0×, scrolls when it doesn't fit). Auth hero fallbacks are a plain grey box; back goes to onboarding (login) or login (signup) when nothing can pop. The outline spinner uses primary. `RichText` was replaced by `Text.rich` on the splash and auth screens. The back, password and favorite icon controls are labelled 48 dp targets (the password toggle is an `IconButton` overlaid on its old slot, so the field keeps its height), and decorative images are excluded from semantics.
+Commits: none — not authorized in this session. Proposed (branch `p05-ui-a11y`): (1) "Move inline colors into AppColors tokens with identical values, so screens follow the design-system rule and an audit grep stays empty" — app_colors, app_theme, splash/onboarding/auth color lines, widgets, `app_colors_test`; (2) "Fix the outline spinner, dead back button, developer-facing image fallbacks and onboarding layout on small screens, without changing the default look" — custom_button, onboarding, auth back/fallback + tests; (3) "Make text scale and screen readers work: Text.rich for scaled titles, labelled 48 dp icon controls, decorative images hidden" — the remaining a11y edits + tests; (4) trackers/context docs. (Splitting (1) from (2)/(3) needs `git add -p` because the same files carry both.)
+Verification:
+  `tool/verify.sh` → format 0 changed, `analyze --fatal-infos --fatal-warnings` No issues found, 41 tests passed, coverage 62.8 % (455/724) → "All checks passed."
+  enforcement: `grep -rnE "Color\(0x|(^|[^A-Za-z])Colors\." lib/features lib/core/widgets | grep -v Colors.transparent` → nothing (the prompt's literal pattern matches `AppColors.` too)
+  screenshots (engine render, before = `p04-diet` HEAD, after = working tree, 2×): splash, onboarding 1–3 → pixel-identical; login/signup → rows below the title identical (max channel delta 1) after a 34 dp upward shift. The title now inherits Inter instead of the platform font; under `RichText` it fell back to the test font. Widgets sheet → only the outline spinner changed (now visible); RecipeCard and the password field are pixel-identical after placing the toggle at `right: 5.5` (accounts for the 1.5 dp border). Files: P05 session scratchpad `before/` and `after/`
+  red-first: against the old onboarding/button code, 5 of the new tests fail (320×568 @1.3 and 360×640 @2.0 readability, Skip below a 72 dp inset, decorative images, outline spinner color)
+  note: the old onboarding did *not* overflow at the prompt's 360×640 @1.3 (title at 152 dp, below Skip). It broke at 320×568 @1.3 (title under Skip) and @2.0 (title at −287 dp, off screen); the test covers all three
+  device run → **not done** (no phone or usable emulator here)
+WCAG AA contrast (reported, not changed — owner decision): primary on background 5.10:1 ✅; onPrimary on primary 5.32:1 ✅; textSecondary on background 4.63:1 ✅; textHint on surface 2.54:1 ❌ (used for RecipeCard meta icons, below 3:1 for non-text). Splash: brandAccent "AI" on the green gradient 1.27:1 ❌ (large text needs 3:1); white on `splashGradientEnd` 2.33:1 ❌ (the 13 px subtitle and "BY OJ" lie where the gradient lightens); white on `splashGradientStart` 4.87:1 ✅. Onboarding (image + scrim measured under each text box; worst / 10th percentile / median): slide 1 title 1.47/3.58/6.97, subtitle (white 70 %) 1.59/1.97/7.25, Skip 1.15/1.61/2.41; slide 2 title 1.82/2.47/11.24, subtitle 1.62/3.82/7.26, Skip 6.39/19.1/19.3; slide 3 title 1.22/1.50/6.57, subtitle 1.55/3.73/5.03, Skip 1.13/1.13/1.13 (white on cream, effectively invisible). The scrim does not guarantee AA anywhere; the fix (stronger/taller scrim, text shadow, or a dark Skip on light art) is a design decision.
+Inputs consumed: none (`COMMIT_AUTHORIZATION` not given)
+New inputs or decisions needed: `COMMIT_AUTHORIZATION` for P05; `COPY_APPROVALS` (4 screen-reader labels); contrast decision (onboarding scrim/Skip, splash accent/subtitle, `textHint` icons); primary `CustomButton` loading state (see Known issues)
+Known issues added/closed: closed — hardcoded colors; onboarding `errorBuilder`, Skip safe area, small-screen layout; outline spinner; dead back button; `RichText` text scaling and platform font in the auth titles; unlabeled icon-only controls; developer text in image fallbacks. Added — contrast failures; the primary `CustomButton` loading state shows a white spinner on the disabled grey fill (≈ invisible; the fix changes the loading look, so it needs the owner); `CustomTextField`'s tappable input is 24 dp tall (the field box is 56 dp but taps outside the text line do nothing); the prompt's enforcement regex. Still open (not P05: visible change) — synthesized bold from plain `TextStyle` weights.
 
 ### 2026-10-15 — P04 — ⏸️ Waiting (push + CI + phone spot check) — WebP applied
 Agent/session: Claude Code (Opus 5.5)

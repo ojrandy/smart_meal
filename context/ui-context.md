@@ -22,9 +22,25 @@ Figma wins and this file must be updated in the same change.
 | `success` | `#10B981` | Success states |
 | `warning` | `#F59E0B` | Warnings, also used as a fallback icon color |
 | `aiChefGradient` | `#1B5E20 → #F59E0B` diagonal | AI Chef card background only |
+| `onPrimary` | `#FFFFFF` | Text/icons/spinner on `primary` fills |
+| `brandAccent` | `#FF6B00` | Logo orange; "AI"/"TECH" highlight on the splash |
+| `onDark` | `#FFFFFF` | Text/icons on photos, gradients, dark fills (apply alpha at the call site, e.g. `0.9`) |
+| `onDarkMuted` | `#FFFFFF` @ 70 % (`0xB3FFFFFF`) | Secondary text on photos (onboarding subtitle) |
+| `onDarkSubtle` | `#FFFFFF` @ 54 % (`0x8AFFFFFF`) | Inactive page-indicator dots on photos |
+| `scrim` | `#000000` | Base for photo scrims / dark overlays; alpha at the call site |
+| `shadow` | `#000000` | Base for card shadows; alpha at the call site (`0.04`) |
+| `favorite` | `#F44336` | Active favorite heart |
+| `placeholderIcon` | `#9E9E9E` | Icon in `AppNetworkImage`'s missing-image fallback |
+| `socialGoogle` / `socialApple` / `socialFacebook` | `#F44336` / `#000000` / `#2196F3` | Brand marks on the social sign-in buttons only |
+| `splashGradient` | `#188241 → #289A45 → #86B93F`, stops 0 / 0.4 / 1, diagonal | Splash background only (`splashGradientStart/Mid/End`) |
+| `splashGlow` | `#F59E0B` | Pulsing glow behind the splash logo (at 40 %) |
 
 Rule: any new color need gets added to this table + `app_colors.dart`
-first. No inline hex values in screens.
+first. No inline hex values or raw `Colors.*` (except `Colors.transparent`)
+in `lib/features/` or `lib/core/widgets/`. Check with
+`rg -n "Color\(0x|\bColors\." lib/features lib/core/widgets | rg -v "Colors\.transparent"`
+— it must print nothing. `test/core/theme/app_colors_test.dart` pins the
+values of tokens that replaced Material constants.
 
 ## Typography
 
@@ -53,7 +69,7 @@ first. No inline hex values in screens.
   (`elevation: 0` — flat, modern look, not material-default shadowed
   buttons).
 - Card shadow (see `RecipeCard`): very soft —
-  `Colors.black.withValues(alpha: 0.04)`, `blurRadius: 10`,
+  `AppColors.shadow.withValues(alpha: 0.04)`, `blurRadius: 10`,
   `offset: (0, 4)`. Don't use heavier default Material elevation shadows.
 
 ## Icons
@@ -72,8 +88,8 @@ first. No inline hex values in screens.
 
 | Widget | Purpose | Notes |
 |---|---|---|
-| `CustomButton` | Primary/outline button with loading + icon states | Use for every primary CTA. `isOutline` for secondary actions. |
-| `CustomTextField` | Labeled input with icon, integrates `Form` validation | Built-in password visibility toggle when `isPassword: true`. |
+| `CustomButton` | Primary/outline button with loading + icon states | Use for every primary CTA. `isOutline` for secondary actions. While loading it keeps its normal fill and the spinner uses the variant's foreground (`onPrimary` / `primary`). |
+| `CustomTextField` | Labeled input with icon, integrates `Form` validation | Built-in password visibility toggle when `isPassword: true`: a labelled 48 dp `IconButton` laid over the 24 dp icon slot, so the field height does not change. |
 | `SocialAuthButton` | Outlined button for OAuth providers | Icon + label row, white/surface background. |
 | `AppNetworkImage` | Standard remote-image treatment: shimmer skeleton while loading, icon fallback on missing/failed URL | Wraps `cached_network_image` + `shimmer`. Use for any recipe photo, avatar, or other remote image — don't call `CachedNetworkImage` directly in a screen. |
 | `RecipeCard` | 180-wide horizontal-scroll card: image, match %, favorite toggle, price/time/difficulty | Image rendered via `AppNetworkImage`. Still needs a real `imageUrl` feed once recipe data exists (currently only exercised with local/placeholder data). |
@@ -97,7 +113,8 @@ Scaffold(
         key: _formKey,
         child: Column(crossAxisAlignment: start, children: [
           // header row: back button + logo
-          // title (RichText, two-tone: textPrimary + primary highlight)
+          // title (Text.rich — never RichText, which ignores the system text size —
+          //   two-tone: textPrimary + primary highlight)
           // subtitle (textSecondary, often with a friendly emoji)
           // hero image (Image.asset with an errorBuilder fallback — never let
           //   a missing asset crash the screen)
@@ -114,6 +131,48 @@ Scaffold(
 Always provide an `errorBuilder` on `Image.asset` calls for
 content/marketing imagery (not for icons) so a missing asset degrades
 gracefully instead of crashing — see both auth screens for the pattern.
+The fallback is neutral and text-free (e.g. a `surfaceVariant` box, or a
+brand-color fill behind text on photos) — never developer text like
+"x.png missing".
+
+## Accessibility
+
+Established in P05 (2026-10-15); widget tests in `test/core/widgets/` and
+`test/features/` check these.
+
+- **Text scale:** use `Text`/`Text.rich`, never `RichText` (it ignores the
+  system text size). Layouts must not clip or hide content at large text:
+  onboarding is tested at 360×640 and 320×568 ×1.3 and at ×2.0. Make
+  fixed-position blocks bottom-anchored scroll views rather than shrinking
+  the default look.
+- **Icon-only controls** (back, password toggle, favorite, …) are
+  `IconButton`s with a ≥ 48×48 dp touch target and a screen-reader label:
+  `tooltip:` for back (use `MaterialLocalizations.backButtonTooltip`),
+  `Icon.semanticLabel` otherwise. New label strings need owner copy approval.
+  When a 48 dp target would change the layout, lay the button over the old
+  icon slot (see `CustomTextField`, `RecipeCard`).
+- **Decorative images** (backgrounds, heroes, the logo next to the app name)
+  set `excludeFromSemantics: true`.
+- **Contrast:** WCAG AA — 4.5:1 for body text, 3:1 for large text (≥ 24 px,
+  or ≥ 18.7 px bold) and for icons/controls. `primary` on `background` is
+  5.10:1. Known failures are logged in `context/progress-tracker.md`; color
+  changes need owner approval.
+- **Text on photos** (owner-approved overlay approach, 2026-10-15): anchor the
+  scrim to the text, not the screen — onboarding's `_TextScrim` is a 120 dp
+  fade above the title, then `scrim` 60 % → 85 % behind the text and CTA, so
+  it follows the text at any screen size or text scale. A lone control on
+  light art (Skip) gets a `scrim` 55 % pill instead of darkening the photo.
+  `test/features/onboarding/presentation/onboarding_contrast_test.dart`
+  renders the real artwork and fails if any visible text pixel drops below
+  AA — run it whenever artwork, overlays or text colors change.
+- **Safe areas:** never position content at a fixed offset from the screen
+  edge without accounting for `MediaQuery.paddingOf(context)`.
+- **System back:** a screen with an on-screen back button wraps its
+  `Scaffold` in `PopScope` so the Android back button/gesture does the same
+  thing (see the auth screens) instead of closing the app.
+- **Loading buttons:** `CustomButton` keeps its normal fill while
+  `isLoading` (it is disabled, but must not turn grey) so the spinner stays
+  visible.
 
 ## Motion
 

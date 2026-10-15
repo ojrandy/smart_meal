@@ -3,7 +3,7 @@
 > Update this file every time a feature's status changes. Keep entries
 > honest — "in progress" means actively being worked on, not "started once."
 
-Last reviewed: **2026-10-15** (P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
+Last reviewed: **2026-10-15** (P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
 
 > **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
 > and `docs/prompt-tracker.md` (status per prompt). Check them before picking
@@ -94,11 +94,12 @@ Last reviewed: **2026-10-15** (P04 — dependency, asset and font diet; earlier:
 | Splash always shows onboarding, even for returning authenticated users | Medium | `lib/features/splash/presentation/splash_screen.dart` |
 | `applicationId`/`namespace` still `com.example.smart_meal` | Medium (blocks store submission) | `android/app/build.gradle.kts` |
 | Password min length mismatch (login 6 vs signup 8) | Low | `login_screen.dart`, `signup_screen.dart` |
-| Plain `TextStyle(fontWeight: …)` without `GoogleFonts.inter(...)` inherits the theme's per-variant family (`Inter_regular`), so the engine fakes the weight from Regular instead of using the bundled Medium/SemiBold/Bold file (found in P04 by code reading; e.g. onboarding, auth screens, `AiChefCard`, `RecipeCard`) — P05 | Low | `lib/core/theme/app_theme.dart`, screens/widgets |
-| Image `errorBuilder` fallbacks show developer text to users (`'auth_login_hero.webp missing'`, `'auth_signup_hero.webp missing'`) — P05 | Low | `login_screen.dart`, `signup_screen.dart` |
-| Login/signup headline ("Welcome back to SmartMeal" etc.) is a `RichText` with a bare `TextStyle`; `RichText` does not inherit the theme, so on devices it renders in the platform font (Roboto/SF), not Inter (seen in P04's offline screenshots) — P05 | Low | `login_screen.dart`, `signup_screen.dart` |
+| Plain `TextStyle(fontWeight: …)` without `GoogleFonts.inter(...)` inherits the theme's per-variant family (`Inter_regular`), so the engine fakes the weight from Regular instead of using the bundled Medium/SemiBold/Bold file (found in P04 by code reading; e.g. onboarding, auth screens, `AiChefCard`, `RecipeCard`) — not fixed in P05: using the real weight files visibly changes glyphs, so it needs the owner's sign-off (fix in `AppTheme`, e.g. a pubspec `Inter` family with weights) | Low | `lib/core/theme/app_theme.dart`, screens/widgets |
 | Release build on this dev machine fails in Android lint (`lintVital*`: `ClassNotFoundException: com.android.tools.lint.Main` / `UastEnvironment`) — environment issue, not project code; P04 size builds ran Gradle directly with `-x lintVital*`. CI's Linux runner is unaffected (it builds debug). Repair the local Gradle cache or reinstall before P08/P20 release work | Low (dev env) | local `~/.gradle` |
-| Low test coverage (25.4 % lines): `PushNotificationService` tests + one app-shell smoke test (`test/widget_test.dart`); auth, router and screens have no tests | Low | `test/` |
+| Test coverage 62.8 % lines (2026-10-15): auth notifier/repository and router redirect logic are still untested | Low | `test/` |
+| WCAG AA contrast failures left after P05 (onboarding fixed): splash "AI"/"TECH" orange (`brandAccent`) on the green gradient 1.27:1 and white subtitle/"BY OJ" on the light end of the gradient 2.33:1 — an overlay can't fix orange-on-green, so this needs a color decision; `textHint` (2.54:1 on surface) used for `RecipeCard` meta icons (non-text needs 3:1) | Medium | `splash_screen.dart`, `app_colors.dart`, `recipe_card.dart` |
+| `CustomTextField`: only the 24 dp text line is tappable; taps on the rest of the 56 dp box (label, padding) do not focus the input (fails the 48 dp tap-target guideline) | Low | `lib/core/widgets/custom_text_field.dart` |
+| `docs/prompt.md` P05 enforcement command: its `Colors\.` alternative has no word boundary, so it also matches every `AppColors.`; use `\bColors\.` | Low (docs) | `docs/prompt.md` |
 | OSV-Scanner CI job is non-blocking (`continue-on-error`) — make it blocking on 2026-11-14 after triaging findings | Medium | `.github/workflows/ci.yml` |
 | `osv-scanner-action` runs its Docker image by tag, not digest — residual supply-chain risk | Low | `.github/workflows/ci.yml` |
 | Notification permission is never requested — wired in P19 | Medium | `lib/core/services/push_notification_service.dart` (`requestPermissionAndRegisterToken` has no caller) |
@@ -108,6 +109,14 @@ Last reviewed: **2026-10-15** (P04 — dependency, asset and font diet; earlier:
 
 | Date | Issue | Fix |
 |---|---|---|
+| 2026-10-15 | Onboarding white text failed WCAG AA over the photos (worst pixel 1.1–1.8:1; slide 3 Skip ≈ 1.13:1) | P05 (owner chose overlays): text-anchored `_TextScrim` + 55 % pill behind Skip → worst visible pixel ≥ 4.7:1 (subtitle), ≥ 5.1:1 (Skip), ≥ 6:1 (title) on all slides at 393×873, 360×640 and 320×568 (×1.0/×1.3); `onboarding_contrast_test.dart` guards it |
+| 2026-10-15 | Primary `CustomButton` loading: white spinner on the disabled grey fill (invisible) | P05 (owner OK): keeps `primary` fill while `isLoading`; a disabled non-loading button still uses the theme's disabled look |
+| 2026-10-15 | Android back button/gesture closed the app from login/signup reached via `context.go` | P05: `PopScope` routes it like the on-screen back (signup → login → onboarding) |
+| 2026-10-15 | Hardcoded hex/`Colors.*` in splash, onboarding, auth brand icons and shared widgets | P05: named `AppColors` tokens with identical values (`app_colors_test.dart` pins them); enforcement grep in `lib/features` + `lib/core/widgets` returns nothing |
+| 2026-10-15 | Onboarding: no image `errorBuilder`, Skip at a fixed `top: 60`, bottom text pushed off screen/under Skip on small screens or large text, `List<Map>` slide data | P05: `errorBuilder`, Skip at `max(60, inset + 8)`, bottom-anchored scroll view (same look at 1.0×), `_OnboardingSlide` class; tests at 360×640/320×568 ×1.3 and ×2.0 |
+| 2026-10-15 | Outline `CustomButton` spinner white on the light background (invisible) | P05: spinner uses the variant foreground (`primary`) |
+| 2026-10-15 | Auth back button did nothing after `context.go` | P05: falls back to onboarding (login) / login (signup) |
+| 2026-10-15 | Auth titles/links and splash wordmark used `RichText` (ignored system text scale; auth titles rendered in the platform font, not Inter); icon-only controls unlabeled and < 48 dp; image fallbacks showed developer text | P05: `Text.rich`; back (platform "Back" tooltip), password toggle (`IconButton`) and favorite are labelled 48 dp targets; decorative images excluded from semantics; neutral grey fallbacks |
 | 2026-10-15 | Hero images shipped as 1.8–2.4 MB PNGs (10.27 MB total) | P04 `257f81c`: owner-approved WebP q85 (0.89 MB total), masters kept in `design-assets/source/`; release APK 35.07 → 20.87 MB |
 | 2026-10-15 | 8 packages never imported; `firebase_auth`, `cloud_firestore`, `firebase_storage`, `form_validator`, `image_picker` shipped unused native code (and camera/photo APIs → iOS ITMS-90683 risk) | P04 `6698dbf`: the 5 removed (24 packages left the lockfile); `lottie`, `intl`, `shared_preferences` kept and marked *planned* in `project-overview.md`. `image_picker` returns with iOS purpose strings in T1-Profile |
 | 2026-10-15 | 4.4 MB of unused images bundled; filenames with spaces/mixed casing | P04 `cfa83ff`: 16 files moved to unbundled `design-assets/`; bundled images renamed to snake_case behind `AppAssets`; `app_assets_test.dart` guards it |
