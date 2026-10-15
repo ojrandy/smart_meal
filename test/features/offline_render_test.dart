@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smart_meal/core/theme/app_fonts.dart';
 import 'package:smart_meal/core/theme/app_theme.dart';
@@ -35,11 +36,19 @@ void main() {
 
       final authRepository = FakeAuthRepository();
       addTearDown(authRepository.dispose);
+      // The auth screens read GoRouter (back navigation), as in the app.
+      final router = GoRouter(
+        routes: [GoRoute(path: '/', builder: (_, _) => build())],
+      );
+      addTearDown(router.dispose);
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [authRepositoryProvider.overrideWithValue(authRepository)],
-          child: MaterialApp(theme: AppTheme.lightTheme, home: build()),
+          child: MaterialApp.router(
+            theme: AppTheme.lightTheme,
+            routerConfig: router,
+          ),
         ),
       );
 
