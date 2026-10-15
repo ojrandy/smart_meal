@@ -43,7 +43,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final field = Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -103,25 +103,46 @@ class _CustomTextFieldState extends State<CustomTextField> {
               ],
             ),
           ),
+          // Keeps the 24 dp icon slot; the toggle is laid over it below so its
+          // 48 dp touch target does not make the field taller.
           if (widget.isPassword) ...[
             const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () {
+            const SizedBox(width: 24, height: 24),
+          ],
+        ],
+      ),
+    );
+
+    if (!widget.isPassword) return field;
+
+    return Stack(
+      children: [
+        field,
+        Positioned(
+          top: 0,
+          bottom: 0,
+          // Centres the 48 dp button on the slot: 1.5 border + 16 padding +
+          // 12 half-icon - 24 half-button.
+          right: 5.5,
+          child: Center(
+            child: IconButton(
+              onPressed: () {
                 setState(() {
                   _obscureText = !_obscureText;
                 });
               },
-              child: Icon(
+              icon: Icon(
                 _obscureText
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
                 color: AppColors.textSecondary,
                 size: 24,
+                semanticLabel: _obscureText ? 'Show password' : 'Hide password',
               ),
             ),
-          ],
-        ],
-      ),
+          ),
+        ),
+      ],
     );
   }
 }

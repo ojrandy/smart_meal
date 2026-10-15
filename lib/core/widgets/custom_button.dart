@@ -36,16 +36,27 @@ class CustomButton extends StatelessWidget {
 
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
+      // Loading disables the button; keep the brand fill so the white spinner
+      // stays visible instead of sitting on the disabled grey.
+      style: isLoading
+          ? ElevatedButton.styleFrom(
+              disabledBackgroundColor: AppColors.primary,
+              disabledForegroundColor: AppColors.onPrimary,
+            )
+          : null,
       child: _buildContent(),
     );
   }
 
   Widget _buildContent() {
     if (isLoading) {
-      return const SizedBox(
+      return SizedBox(
         height: 24,
         width: 24,
-        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+        child: CircularProgressIndicator(
+          strokeWidth: 2.5,
+          color: isOutline ? AppColors.primary : AppColors.onPrimary,
+        ),
       );
     }
 

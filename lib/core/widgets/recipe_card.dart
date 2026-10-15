@@ -35,11 +35,11 @@ class RecipeCard extends StatelessWidget {
         width: 180,
         margin: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: AppColors.shadow.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -70,7 +70,7 @@ class RecipeCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: AppColors.surface.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -93,22 +93,28 @@ class RecipeCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                // A 34 dp circle drawn 12 dp from the corner, inside a 48 dp
+                // touch target (hence 12 - 7).
                 Positioned(
-                  top: 12,
-                  right: 12,
-                  child: GestureDetector(
-                    onTap: onFavoriteToggle,
-                    child: Container(
+                  top: 5,
+                  right: 5,
+                  child: IconButton(
+                    onPressed: onFavoriteToggle,
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.surface.withValues(alpha: 0.9),
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isFavorite ? Iconsax.heart_tick : Iconsax.heart,
-                        color: isFavorite ? Colors.red : AppColors.textPrimary,
-                        size: 18,
-                      ),
+                      minimumSize: const Size(34, 34),
+                      tapTargetSize: MaterialTapTargetSize.padded,
+                    ),
+                    iconSize: 18,
+                    icon: Icon(
+                      isFavorite ? Iconsax.heart_tick : Iconsax.heart,
+                      color: isFavorite
+                          ? AppColors.favorite
+                          : AppColors.textPrimary,
+                      semanticLabel: isFavorite
+                          ? 'Remove from favorites'
+                          : 'Add to favorites',
                     ),
                   ),
                 ),

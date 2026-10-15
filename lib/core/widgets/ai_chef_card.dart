@@ -30,12 +30,12 @@ class AiChefCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.2),
+                  color: AppColors.scrim.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Iconsax.magic_star,
-                  color: Colors.white,
+                  color: AppColors.onDark,
                   size: 20,
                 ),
               ),
@@ -43,7 +43,7 @@ class AiChefCard extends StatelessWidget {
               Text(
                 'YOUR AI CHEF RECOMMENDS',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: AppColors.onDark.withValues(alpha: 0.9),
                   letterSpacing: 1.2,
                   fontWeight: FontWeight.w600,
                 ),
@@ -54,7 +54,7 @@ class AiChefCard extends StatelessWidget {
           Text(
             recommendation,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Colors.white,
+              color: AppColors.onDark,
               fontWeight: FontWeight.bold,
               height: 1.4,
             ),
@@ -66,7 +66,7 @@ class AiChefCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Row(

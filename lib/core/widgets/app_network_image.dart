@@ -57,7 +57,11 @@ class AppNetworkImage extends StatelessWidget {
       height: height,
       color: AppColors.surfaceVariant,
       alignment: Alignment.center,
-      child: const Icon(Iconsax.image, color: Colors.grey, size: 32),
+      child: const Icon(
+        Iconsax.image,
+        color: AppColors.placeholderIcon,
+        size: 32,
+      ),
     );
   }
 }
