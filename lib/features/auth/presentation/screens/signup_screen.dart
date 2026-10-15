@@ -183,7 +183,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       width: double.infinity,
                       color: AppColors.surfaceVariant,
                       alignment: Alignment.center,
-                      child: const Text('auth_signup_hero.png missing'),
+                      child: const Text('auth_signup_hero.webp missing'),
                     ),
                   ),
                 ),

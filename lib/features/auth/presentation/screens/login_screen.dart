@@ -162,7 +162,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       width: double.infinity,
                       color: AppColors.surfaceVariant,
                       alignment: Alignment.center,
-                      child: const Text('auth_login_hero.png missing'),
+                      child: const Text('auth_login_hero.webp missing'),
                     ),
                   ),
                 ),

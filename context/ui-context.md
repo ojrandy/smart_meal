@@ -151,6 +151,13 @@ gracefully instead of crashing — see both auth screens for the pattern.
   `lib/core/constants/app_assets.dart`; `test/core/constants/app_assets_test.dart`
   fails if a constant points at a missing file or an image is bundled
   without a constant.
+- Format: photos/illustrations ship as **WebP q85, max 1440 px wide**
+  (owner-approved 2026-10-15); small art with transparency (the logo) stays
+  PNG. Keep the lossless master in `design-assets/source/<same_name>.png` and
+  re-encode from it, never from a WebP:
+  `cwebp -q 85 -metadata none design-assets/source/<name>.png -o assets/images/<name>.webp`
+  (official libwebp release, signature-checked). `app_assets_test.dart` also
+  decodes every image and enforces the 1440 px limit.
 - `design-assets/` (repo root) holds source/unused art that is **not**
   bundled — e.g. the *Premium AI Chef robot illustration* SVG and the
   unused `bckimg4`/`bckImg5` backgrounds. Move a file into `assets/images/`
