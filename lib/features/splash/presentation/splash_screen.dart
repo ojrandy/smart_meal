@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/theme/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -28,18 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF188241), // Top left green
-              Color(0xFF289A45), // Middle green
-              Color(0xFF86B93F), // Bottom right yellowish green
-            ],
-            stops: [0.0, 0.4, 1.0],
-          ),
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.splashGradient),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -54,9 +44,9 @@ class _SplashScreenState extends State<SplashScreen> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(
-                                0xFFF59E0B,
-                              ).withValues(alpha: 0.4),
+                              color: AppColors.splashGlow.withValues(
+                                alpha: 0.4,
+                              ),
                               blurRadius: 100,
                               spreadRadius: 40,
                             ),
@@ -82,7 +72,12 @@ class _SplashScreenState extends State<SplashScreen> {
                 const Spacer(flex: 3),
 
                 // Logo
-                Image.asset(AppAssets.appLogo, width: 140, height: 140)
+                Image.asset(
+                      AppAssets.appLogo,
+                      width: 140,
+                      height: 140,
+                      excludeFromSemantics: true,
+                    )
                     .animate()
                     .fade(duration: 800.ms)
                     .scale(duration: 800.ms, curve: Curves.easeOutBack),
@@ -90,8 +85,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 const SizedBox(height: 16),
 
                 // SmartMeal AI Text
-                RichText(
-                      text: TextSpan(
+                Text.rich(
+                      TextSpan(
                         style: GoogleFonts.inter(
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
@@ -100,13 +95,11 @@ class _SplashScreenState extends State<SplashScreen> {
                         children: const [
                           TextSpan(
                             text: 'SmartMeal ',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: AppColors.onDark),
                           ),
                           TextSpan(
                             text: 'AI',
-                            style: TextStyle(
-                              color: Color(0xFFFF6B00),
-                            ), // Vibrant orange matching logo
+                            style: TextStyle(color: AppColors.brandAccent),
                           ),
                         ],
                       ),
@@ -121,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 Text(
                   'AI POWERED FOOD COMPANION',
                   style: GoogleFonts.inter(
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: AppColors.onDark.withValues(alpha: 0.9),
                     fontSize: 13,
                     letterSpacing: 1.5,
                     fontWeight: FontWeight.w500,
@@ -139,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: AppColors.onDark.withValues(alpha: 0.9),
                             shape: BoxShape.circle,
                           ),
                         )
@@ -155,8 +148,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 const Spacer(flex: 2),
 
                 // Bottom Text
-                RichText(
-                  text: TextSpan(
+                Text.rich(
+                  TextSpan(
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
@@ -166,11 +159,11 @@ class _SplashScreenState extends State<SplashScreen> {
                     children: const [
                       TextSpan(
                         text: 'BY OJ ',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: AppColors.onDark),
                       ),
                       TextSpan(
                         text: 'TECH',
-                        style: TextStyle(color: Color(0xFFFF6B00)),
+                        style: TextStyle(color: AppColors.brandAccent),
                       ),
                     ],
                   ),
