@@ -1,4 +1,4 @@
-package com.example.smart_meal
+package com.ojtech.smartmeal
 
 import io.flutter.embedding.android.FlutterActivity
 
