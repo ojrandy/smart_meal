@@ -3,7 +3,7 @@
 > Update this file every time a feature's status changes. Keep entries
 > honest — "in progress" means actively being worked on, not "started once."
 
-Last reviewed: **2026-10-15** (P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
+Last reviewed: **2026-10-15** (P06 — permanent app identity `com.ojtech.smartmeal`, on `p06-app-identity`; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
 
 > **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
 > and `docs/prompt-tracker.md` (status per prompt). Check them before picking
@@ -85,14 +85,15 @@ Last reviewed: **2026-10-15** (P01–P05 on `main`, CI green; P05 — UI standar
 | `favorites` table + RLS | ⬜ | |
 | `meal_plans` table + RLS | ⬜ | |
 | AI recommendation logic | ⬜ | Not started — no scoring/matching engine, no Edge Functions |
-| Google OAuth client configured (Supabase + Cloud Console) | 🟡 | Web Client ID set in `supabase_config.dart` (2026-07-20). Still needed: (1) enable Google provider in Supabase Dashboard → Auth → Providers → Google with this Client ID; (2) Android OAuth Client ID in Google Cloud Console keyed to `com.example.smart_meal` + debug SHA-1 `A3:AA:68:7E:A6:86:B6:78:3E:75:E3:59:AF:8C:8F:16:4D:F2:08:DD` (re-register once the real `applicationId` is chosen — see known issues) — a release-keystore SHA-1 will also be needed before store submission; (3) iOS OAuth Client ID keyed to the real Bundle ID (not yet decided) + reversed-client-id URL scheme added to `ios/Runner/Info.plist`. |
+| Google OAuth client configured (Supabase + Cloud Console) | 🟡 | Web Client ID set in `supabase_config.dart` (2026-07-20). Still needed: (1) enable Google provider in Supabase Dashboard → Auth → Providers → Google with this Client ID; (2) Android OAuth Client ID in Google Cloud Console keyed to **`com.ojtech.smartmeal`** (P06, 2026-10-15) + the debug SHA-1, then the upload and Play App Signing SHA-1s (P12). Any client created earlier for `com.example.smart_meal` (debug SHA-1 `A3:AA:68:7E:A6:86:B6:78:3E:75:E3:59:AF:8C:8F:16:4D:F2:08:DD`) no longer matches the app — delete it and create a new one; (3) iOS OAuth Client ID keyed to bundle ID `com.ojtech.smartmeal` + reversed-client-id URL scheme added to `ios/Runner/Info.plist`. |
 
 ## Known issues (open)
 
 | Issue | Severity | Where |
 |---|---|---|
 | Splash always shows onboarding, even for returning authenticated users | Medium | `lib/features/splash/presentation/splash_screen.dart` |
-| `applicationId`/`namespace` still `com.example.smart_meal` | Medium (blocks store submission) | `android/app/build.gradle.kts` |
+| Desktop scaffolds (`linux/`, `macos/`, `windows/`) are still in the repo with `com.example` identifiers. The app is Android + iOS only (§0.3), so P06 left them alone; deleting them needs the owner's OK | Low | `linux/`, `macos/`, `windows/` |
+| Android 16+ ignores `screenOrientation="portrait"` on large screens (smallest width ≥ 600 dp: tablets, unfolded foldables) for apps targeting SDK 36, so the app can appear in landscape there; the portrait-only layouts have not been checked in landscape on a tablet | Low | `android/app/src/main/AndroidManifest.xml`, all screens |
 | Password min length mismatch (login 6 vs signup 8) | Low | `login_screen.dart`, `signup_screen.dart` |
 | Plain `TextStyle(fontWeight: …)` without `GoogleFonts.inter(...)` inherits the theme's per-variant family (`Inter_regular`), so the engine fakes the weight from Regular instead of using the bundled Medium/SemiBold/Bold file (found in P04 by code reading; e.g. onboarding, auth screens, `AiChefCard`, `RecipeCard`) — not fixed in P05: using the real weight files visibly changes glyphs, so it needs the owner's sign-off (fix in `AppTheme`, e.g. a pubspec `Inter` family with weights) | Low | `lib/core/theme/app_theme.dart`, screens/widgets |
 | Release build on this dev machine fails in Android lint (`lintVital*`: `ClassNotFoundException: com.android.tools.lint.Main` / `UastEnvironment`) — environment issue, not project code; P04 size builds ran Gradle directly with `-x lintVital*`. CI's Linux runner is unaffected (it builds debug). Repair the local Gradle cache or reinstall before P08/P20 release work | Low (dev env) | local `~/.gradle` |
@@ -109,6 +110,7 @@ Last reviewed: **2026-10-15** (P01–P05 on `main`, CI green; P05 — UI standar
 
 | Date | Issue | Fix |
 |---|---|---|
+| 2026-10-15 | Placeholder identity: Android `com.example.smart_meal`, iOS `com.example.smartMeal`, launcher name `smart_meal`, iPhone allowed landscape | P06: Android namespace/applicationId and iOS bundle IDs (Runner + `.RunnerTests`) are `com.ojtech.smartmeal`; `MainActivity` moved to that package; launcher name "Smart Meal" on both platforms (= `MaterialApp.title`); portrait-only on phones (Android activity lock, iPhone `Info.plist`; iPad unchanged) |
 | 2026-10-15 | Onboarding white text failed WCAG AA over the photos (worst pixel 1.1–1.8:1; slide 3 Skip ≈ 1.13:1) | P05 (owner chose overlays): text-anchored `_TextScrim` + 55 % pill behind Skip → worst visible pixel ≥ 4.7:1 (subtitle), ≥ 5.1:1 (Skip), ≥ 6:1 (title) on all slides at 393×873, 360×640 and 320×568 (×1.0/×1.3); `onboarding_contrast_test.dart` guards it |
 | 2026-10-15 | Primary `CustomButton` loading: white spinner on the disabled grey fill (invisible) | P05 (owner OK): keeps `primary` fill while `isLoading`; a disabled non-loading button still uses the theme's disabled look |
 | 2026-10-15 | Android back button/gesture closed the app from login/signup reached via `context.go` | P05: `PopScope` routes it like the on-screen back (signup → login → onboarding) |

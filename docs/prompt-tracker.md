@@ -2,7 +2,7 @@
 
 > Companion to [`prompt.md`](prompt.md). The executing agent updates this file at the end of **every** prompt and whenever it is blocked (protocol: `prompt.md` §0.7). Use absolute dates (`YYYY-MM-DD`). Keep entries honest — 🟡 means actively being worked on in the current session, not "started once".
 
-**Last updated:** 2026-10-15 — P01–P05 ✅, all on `main` (fast-forwarded to `67b1fa0` on the owner's instruction; CI run 38766137427 green: quality gate + debug APK, gitleaks, OSV). Next: P06.
+**Last updated:** 2026-10-16 — P01–P05 ✅, all on `main` (fast-forwarded to `67b1fa0` on the owner's instruction; CI run 38766137427 green: quality gate + debug APK, gitleaks, OSV). P06 ⏸️ on `p06-app-identity`: app ID `com.ojtech.smartmeal` applied, waiting on the owner's phone check.
 
 ## Status legend
 
@@ -17,7 +17,7 @@
 | P03 | CI quality and security gates | 0 | 🟠 High | P02 | ✅ | 2026-10-14 | 2026-10-15 | `d8b11cf` `766049f` `15c260a` `55a3f16` `41da534` + tracker commit (branch `p03-ci-gates`, pushed) | `tool/verify.sh` → all checks passed (analyze `--fatal-infos` clean, 5 tests); unformatted `lib/main.dart` → gate exit 1 at format step, then reverted; gitleaks 8.30.1 (checksum-verified) full history, all refs, 11 commits → no leaks, with and without `.gitleaks.toml` | First CI run: on `main` after the owner had P01–P05 fast-forwarded there instead of a stacked PR (2026-10-15) — run 38766137427 at `67b1fa0`: all 3 jobs green (Format/analyze/test/build, gitleaks full history, OSV). OSV job non-blocking until **2026-11-14** (remove `continue-on-error` then). Plan approved by owner |
 | P04 | Dependency, asset and font diet | 1 | 🟡 Medium | P03 | ✅ | 2026-10-14 | 2026-10-15 | `6698dbf` `cfa83ff` `53e03c1` `1619800` `257f81c` `ac3f30a` + tracker commit (branch `p04-diet`, off `p03-ci-gates`; **not pushed** — needs the owner's GitHub credentials) | `tool/verify.sh` → all checks passed (analyze clean, 18 tests); removed packages absent from `pubspec.lock` (192 lines removed, 0 added); grep `bckimg\|img_login\|img_signup\|app logo` in `lib/` → none; 5 bundled Inter files SHA-256 = `google_fonts` 8.1.0 pins; shipped WebP byte-identical to the approved `compare.html` set; offline render test + engine screenshots (splash/onboarding/login/signup, fetching off) show bundled Inter and all images; release arm64 APK 35,074,878 → 20,873,226 B (−40.5 %) | Plan + WebP approved by owner (2026-10-14/15). Pushed to `main` with P05 (2026-10-15), CI green (run 38766137427); owner confirmed on their phone that everything works (2026-10-15). Size builds ran Gradle directly with `-x lintVital*` because local Android lint is broken (see Known issues) |
 | P05 | UI standards and accessibility cleanup | 1 | 🟡 Medium | P04 | ✅ | 2026-10-15 | 2026-10-15 | `3b429c5` widgets/theme · `f279b00` splash + onboarding · `3615750` auth screens + docs commit (branch `p05-ui-a11y`) | `tool/verify.sh` → all checks passed (analyze `--fatal-infos` clean, 48 tests, coverage 64.6 %); enforcement grep (word-bounded, see notes) → nothing; screenshots: splash pixel-identical, login/signup identical below the title apart from a 34 dp shift (title now Inter via `Text.rich`); onboarding now with owner-approved overlays; onboarding contrast test (real artwork, worst visible pixel) passes AA on all 3 slides at 3 sizes and fails on the old scrim; system-back, onboarding layout and button tests red on the old code, green on the new; owner verified on a phone (2026-10-15) | Started while P04 was ⏸️ — stacked like P04 on P03. Owner approved the 4 screen-reader labels, onboarding overlays, the visible primary loading spinner, and system back matching the on-screen back. The prompt's enforcement command (`Colors\.` has no word boundary) also matches every `AppColors.`; run it with `\bColors\.` instead. Still open: splash accent/subtitle contrast and `textHint` icons (need a color decision) |
-| P06 | Permanent app identity | 1 | 🟠 High | P03 | ⬜ | | | | | Must run before P11, P12 and P19 |
+| P06 | Permanent app identity | 1 | 🟠 High | P03 | ⏸️ | 2026-10-15 | | `c8474ac` + tracker commit (branch `p06-app-identity`, off `p05-ui-a11y` = `main`) | `tool/verify.sh` → all checks passed (analyze clean, 48 tests); `flutter clean` + `flutter build apk --debug` → built; `aapt dump badging` → `package: name='com.ojtech.smartmeal'`, `application-label:'Smart Meal'`, launcher `com.ojtech.smartmeal.MainActivity`; built manifest `screenOrientation=0x1` (portrait); `git grep com.example` in `android/` `ios/` → none | Plan + inputs approved by owner (2026-10-15). **Waiting:** owner installs the APK on their phone (uninstall the old `com.example.smart_meal` app first) and confirms it launches as "Smart Meal", portrait-locked. iOS `flutter build ios --no-codesign` pending (no Mac). Desktop folders still carry `com.example` — out of scope (Known issue). Must run before P11, P12 and P19 |
 | P07 | Environment config, secrets policy, threat model | 1 | 🟠 High | P06 | ⬜ | | | | | Creates `docs/SECURITY.md` |
 | P08 | Android and iOS platform hardening | 1 | 🟠 High | P06, P07 | ⬜ | | | | | Creates `docs/RELEASE.md` |
 | P09 | Encrypted session storage | 2 | 🟠 High | P08 | ⬜ | | | | | Authorizes `flutter_secure_storage` |
@@ -49,14 +49,14 @@ Add one row per screen built with the T1 template.
 
 | Key | Needed by | What it is | Value / decision | Status |
 |---|---|---|---|---|
-| `COMMIT_AUTHORIZATION` | every prompt | Whether agents may create commits in a session | P01, P02, P03, P04: authorized 2026-10-14 — commit and push to its own branch (ask again each prompt). P05: authorized 2026-10-15 — commit and push to `main` | ✅ |
+| `COMMIT_AUTHORIZATION` | every prompt | Whether agents may create commits in a session | P01, P02, P03, P04: authorized 2026-10-14 — commit and push to its own branch (ask again each prompt). P05: authorized 2026-10-15 — commit and push to `main`. P06: authorized 2026-10-15 — commit and push branch `p06-app-identity` | ✅ |
 | `AGENT_SKILLS_IN_GIT` | P02 | Commit `.agents/` + `skills-lock.json`? | Yes (2026-10-14): commit `.agents/skills/` + `skills-lock.json`; ignore the duplicate `.claude/skills/` | ✅ |
 | `GIT_HOST` | P03 | Where CI runs (GitHub by default) | GitHub — `origin` is `github.com/ojrandy/smart_meal` (public). PR base for P03: `p02-repo-hygiene` (owner, 2026-10-14) | ✅ |
 | `IMAGE_RECOMPRESSION_APPROVAL` | P04 | Sign-off on WebP/resized hero images | Proposal ready: 5 heroes PNG → WebP q85 (no resize; all ≤ 1404 px wide), 10.27 MB → 0.89 MB, YUV PSNR 43–44 dB. Side-by-side page in the P04 session scratchpad (`webp-out/compare.html`); `app_logo.png` stays PNG (alpha, 9 KB). **Approved by owner 2026-10-15**; applied in `257f81c` (shipped files byte-identical to the reviewed set; masters kept in `design-assets/source/`) | ✅ |
-| `APP_ID` | P06 → P11, P12, P19 | Permanent reverse-DNS app ID you own (no underscores, for iOS) | | ⬜ |
-| `APP_DISPLAY_NAME` | P06 | Launcher name on both platforms | | ⬜ |
-| `ORIENTATION_POLICY` | P06 | Default: portrait-only on phones | | ⬜ |
-| `MACOS_ACCESS` | P06, P08, P12, P19, P20 | A Mac with Xcode, for iOS steps | | ⬜ |
+| `APP_ID` | P06 → P11, P12, P19 | Permanent reverse-DNS app ID you own (no underscores, for iOS) | **`com.ojtech.smartmeal`** (owner, 2026-10-15). Applied in P06 to Android `namespace`/`applicationId` and the iOS bundle ID (`.RunnerTests` for tests). Downstream — register everything under this ID, never the old `com.example.smart_meal` / `com.example.smartMeal`: **P12** Android OAuth client with the debug, upload *and* Play App Signing SHA-1s (an earlier client keyed to `com.example.smart_meal` + debug SHA-1 `A3:AA:…:08:DD` must be replaced), iOS OAuth client + Sign in with Apple for this bundle ID; **P19** Firebase Android + iOS apps; **P11** deep-link scheme / Supabase redirect allow-list built from it | ✅ |
+| `APP_DISPLAY_NAME` | P06 | Launcher name on both platforms | "Smart Meal" (owner, 2026-10-15) — same as `MaterialApp.title`; the splash "SmartMeal AI" wordmark is design and unchanged | ✅ |
+| `ORIENTATION_POLICY` | P06 | Default: portrait-only on phones | Portrait-only on phones (owner, 2026-10-15): Android activity `screenOrientation="portrait"`, iPhone `UISupportedInterfaceOrientations` = portrait; iPad list unchanged | ✅ |
+| `MACOS_ACCESS` | P06, P08, P12, P19, P20 | A Mac with Xcode, for iOS steps | None (owner, 2026-10-15). P06's `flutter build ios --no-codesign` is pending until a Mac is available | ⬜ |
 | `SUPABASE_ENVIRONMENTS` | P07 | Separate dev/staging Supabase project? | | ⬜ |
 | `LAUNCH_MARKETS` | P07 | Countries at launch (drives data-protection obligations) | | ⬜ |
 | `SECURITY_DOC_REVIEW` | P07 | Owner review of `docs/SECURITY.md` | | ⬜ |
@@ -120,6 +120,20 @@ Inputs consumed: <keys>
 New inputs or decisions needed: <keys, or "none">
 Known issues added/closed: <list>
 ```
+
+### 2026-10-16 — P06 — ⏸️ Waiting (owner phone check; iOS build pending, no Mac)
+Agent/session: Claude Code (Opus 5.5)
+Summary: Owner chose `APP_ID` = `com.ojtech.smartmeal`, display name "Smart Meal", portrait-only on phones; no Mac. Android `namespace`/`applicationId` and `MainActivity` (moved to `kotlin/com/ojtech/smartmeal/`) now use the new ID, and the template `TODO` above `applicationId` is gone. The 6 iOS `PRODUCT_BUNDLE_IDENTIFIER` lines (Runner ×3, RunnerTests ×3) were edited surgically. Launcher name "Smart Meal" on Android (`android:label`) and iOS (`CFBundleName`; `CFBundleDisplayName` and `MaterialApp.title` already matched; the splash wordmark is untouched). Portrait lock: the activity has `screenOrientation="portrait"` and the iPhone list is portrait only; the iPad list is unchanged.
+Commits: `c8474ac` identity · tracker commit. Branch `p06-app-identity`.
+Verification:
+  `tool/verify.sh` (after `flutter clean`) → format 0 changed, analyze No issues found, 48 tests passed → "All checks passed."
+  `flutter build apk --debug` → first try failed downloading Gradle artifacts (flaky network); retry → `Built build\app\outputs\flutter-apk\app-debug.apk`
+  `aapt dump badging` → `package: name='com.ojtech.smartmeal'`, `application-label:'Smart Meal'`, `launchable-activity: com.ojtech.smartmeal.MainActivity`; `aapt dump xmltree` → `screenOrientation=0x1` (portrait)
+  `git grep -n "com\.example\|smartMeal"` in `android/` `ios/` → none (only `linux/`, `macos/`, `windows/` scaffolds, which are out of scope per §0.3)
+  install + launch on a device → **owner's phone** (no usable emulator here); `flutter build ios --no-codesign` → **pending** (no Mac)
+Inputs consumed: `APP_ID`, `APP_DISPLAY_NAME`, `ORIENTATION_POLICY`, `MACOS_ACCESS` (none), `COMMIT_AUTHORIZATION`
+New inputs or decisions needed: owner phone confirmation; whether to delete the unused `linux/` `macos/` `windows/` scaffolds
+Known issues added/closed: closed — placeholder `com.example` app ID. Added — desktop scaffolds still carry `com.example`; Android 16+ ignores the portrait lock on large screens (tablet landscape unchecked). Downstream re-registrations (P11/P12/P19) recorded under `APP_ID` in the Inputs register.
 
 ### 2026-10-15 — P03 + P04 — ✅ Done
 Agent/session: Claude Code (Opus 5.5)
