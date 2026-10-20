@@ -11,16 +11,43 @@ one fits. Product detail is in
   [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 - Android SDK for Android builds; a Mac with Xcode for iOS builds.
 
-## Run
+## Run locally
 
-```sh
-flutter pub get
-flutter run
-```
+Configuration comes from a per-environment JSON file passed as build
+defines; nothing environment-specific lives in source.
 
-The app uses the Supabase project configured in
-`lib/core/config/supabase_config.dart`. Push notifications stay disabled
-until a Firebase project is configured (P19 in `docs/prompt.md`).
+1. Copy the template and fill in real values. `env/*.json` is gitignored,
+   except the template.
+
+   ```sh
+   cp env/example.json env/dev.json
+   ```
+
+   | Key | Where to find it | Required |
+   |---|---|---|
+   | `APP_ENV` | `dev`, `staging` or `prod` | yes |
+   | `SUPABASE_URL` | Supabase Dashboard → Settings → API (`https://…`) | yes |
+   | `SUPABASE_PUBLISHABLE_KEY` | Supabase Dashboard → Settings → API Keys (`sb_publishable_…`) | yes |
+   | `GOOGLE_WEB_CLIENT_ID` | Google Cloud Console → Credentials → Web client | yes |
+   | `GOOGLE_IOS_CLIENT_ID` | Google Cloud Console → Credentials → iOS client | empty until P12 |
+
+2. Run with that file, or pick **SmartMeal (dev)** in VS Code's Run and
+   Debug panel (`.vscode/launch.json`):
+
+   ```sh
+   flutter pub get
+   flutter run --dart-define-from-file=env/dev.json
+   ```
+
+Without a valid file the app stops at startup with an `AppConfigException`
+that lists each missing or malformed key.
+
+**Only public identifiers go in these files.** Build defines are compiled
+into the app and can be extracted from it. Secret or service-role keys never
+go here; see [`docs/SECURITY.md`](docs/SECURITY.md).
+
+Push notifications stay disabled until a Firebase project is configured
+(P19 in `docs/prompt.md`).
 
 ## Verify
 

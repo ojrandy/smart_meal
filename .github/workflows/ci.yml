@@ -41,8 +41,10 @@ jobs:
       - name: Quality gate (tool/verify.sh)
         run: bash tool/verify.sh
 
+      # Placeholder defines are enough: CI compiles the app but never runs
+      # it, and no real project value or secret belongs in CI (SECURITY.md).
       - name: Compile smoke test (debug APK)
-        run: flutter build apk --debug
+        run: flutter build apk --debug --dart-define-from-file=env/example.json
 
       - name: Upload coverage
         if: always()

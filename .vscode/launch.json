@@ -1,0 +1,37 @@
+{
+  // Each configuration passes one gitignored env file as build defines.
+  // Create it from env/example.json first (README → "Run locally").
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "SmartMeal (dev)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": ["--dart-define-from-file=env/dev.json"]
+    },
+    {
+      "name": "SmartMeal (dev, profile)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "profile",
+      "args": ["--dart-define-from-file=env/dev.json"]
+    },
+    {
+      "name": "SmartMeal (staging)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": ["--dart-define-from-file=env/staging.json"]
+    },
+    {
+      "name": "SmartMeal (prod, release)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "args": ["--dart-define-from-file=env/prod.json"]
+    }
+  ]
+}
