@@ -47,3 +47,8 @@ app.*.map.json
 # Machine-local agent tool state (shared skills live in .agents/)
 .claude/*.lock
 .claude/skills/
+
+# Per-environment build defines (docs/SECURITY.md → "Configuration").
+# Only the placeholder template is committed.
+/env/*.json
+!/env/example.json

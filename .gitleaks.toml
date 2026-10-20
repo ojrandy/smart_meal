@@ -8,12 +8,14 @@ useDefault = true
 
 [[allowlists]]
 # Supabase publishable key: a client-side identifier by design. Access is
-# enforced by Row Level Security. Moves to env config in P07.
+# enforced by Row Level Security. Since P07 it lives only in the gitignored
+# env/<env>.json files; the entry stays because CI scans the full history.
 description = "Supabase publishable key (public)"
 regexes = ['''sb_publishable_Ur6fIFyWtxKgubsnqk8ukA_FdsVCo4S''']
 
 [[allowlists]]
 # Google OAuth Web Client ID: an identifier that ships in every client build,
-# not a secret (the client *secret* never enters this repo).
+# not a secret (the client *secret* never enters this repo). Since P07 it
+# lives in env/<env>.json; kept for the full-history scan.
 description = "Google OAuth Web Client ID (public)"
 regexes = ['''569732010135-d28ss0kahd0uo60prhn3rgf9m1in69rc\.apps\.googleusercontent\.com''']

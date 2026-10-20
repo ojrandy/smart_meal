@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/config/supabase_config.dart';
+import '../../../core/providers/app_config_provider.dart';
 import '../../../core/providers/supabase_provider.dart';
 
 /// Auth Repository — Data Layer
@@ -20,11 +20,10 @@ class AuthRepository {
   // ── Google Sign-In Configuration ──────────────────────────────────────────
   // serverClientId is required to receive the server auth code on Android,
   // which is then exchanged with Supabase via signInWithIdToken.
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    serverClientId: SupabaseConfig.googleWebClientId,
-  );
+  final GoogleSignIn _googleSignIn;
 
-  AuthRepository(this._client);
+  AuthRepository(this._client, {required String googleWebClientId})
+    : _googleSignIn = GoogleSignIn(serverClientId: googleWebClientId);
 
   // ── Current Session ────────────────────────────────────────────────────────
 
@@ -112,5 +111,6 @@ class AuthRepository {
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final client = ref.watch(supabaseClientProvider);
-  return AuthRepository(client);
+  final config = ref.watch(appConfigProvider);
+  return AuthRepository(client, googleWebClientId: config.googleWebClientId);
 });
