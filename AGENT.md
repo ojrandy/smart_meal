@@ -16,8 +16,9 @@ architectural decision:
 4. `context/code-standard.md` — naming, formatting, error handling, and testing rules
 5. `context/ai-workflow-rules.md` — how to plan, implement, verify, and hand off work on this repo
 6. `context/progress-tracker.md` — what's built, what's in progress, known issues, and what's next
-7. `docs/prompt-tracker.md` — remediation status: which prompts are done, blocked or next, plus owner inputs and decisions
-8. `docs/prompt.md` — remediation instructions: global rules (§0) and the prompt for each task
+7. `docs/SECURITY.md` — trust boundaries, secrets policy, data classification and threat model; every change is checked against it
+8. `docs/prompt-tracker.md` — remediation status: which prompts are done, blocked or next, plus owner inputs and decisions
+9. `docs/prompt.md` — remediation instructions: global rules (§0) and the prompt for each task
 
 `AGENT.md` is the entry point; `context/` holds the detail.
 

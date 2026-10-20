@@ -14,10 +14,13 @@ more than local optimality.
 ```
 lib/
   core/                          # Shared across all features
-    config/                      # Environment/config constants (Supabase keys, etc.)
+    config/                      # AppConfig: typed, validated build defines from
+                                  # env/<env>.json (Supabase URL/key, OAuth client IDs,
+                                  # APP_ENV). Built once in main(); read via appConfigProvider.
     constants/                   # Compile-time app constants: AppAssets (every bundled
                                   # image path). Never hard-code an 'assets/...' string elsewhere.
-    providers/                   # App-wide Riverpod providers (e.g. supabaseClientProvider)
+    providers/                   # App-wide Riverpod providers (e.g. supabaseClientProvider,
+                                  # appConfigProvider — overridden in main()'s ProviderScope)
     router/                      # go_router setup, shell scaffold, nav bar
     services/                    # App-lifecycle bootstrap classes with no reactive state
                                   # to watch (e.g. PushNotificationService) — called directly

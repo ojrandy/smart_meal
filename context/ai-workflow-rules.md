@@ -81,10 +81,16 @@ responsibility is to:
 - Every new table needs Row Level Security policies defined in the same
   change that creates it. No table ships without RLS.
 - The Supabase project URL, publishable key and OAuth client IDs are public
-  identifiers: they are allowed in client builds and currently live in
-  `supabase_config.dart` (P07 moves them to per-environment config). Secret /
+  identifiers: they are allowed in client builds, but never in source. They
+  come from the gitignored `env/<env>.json` via `--dart-define-from-file`
+  and are read only through `AppConfig` / `appConfigProvider`. Build defines
+  are extractable from the binary, so a secret never goes there. Secret /
   service-role keys and every other secret never enter the client or git;
-  they live only in server-side secret stores (e.g. Edge Function secrets).
+  they live only in server-side secret stores (Edge Function secrets or the
+  CI secret store). Policy: `docs/SECURITY.md` §2.
+- Check every change against the threat model in `docs/SECURITY.md` §4. If
+  a change adds a new data class, trust boundary or threat, update that
+  document in the same change.
 
 ## Decision boundaries — ask before proceeding
 
