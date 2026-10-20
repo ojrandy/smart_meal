@@ -3,7 +3,7 @@
 > Update this file every time a feature's status changes. Keep entries
 > honest — "in progress" means actively being worked on, not "started once."
 
-Last reviewed: **2026-10-15** (P06 — permanent app identity `com.ojtech.smartmeal`, on `p06-app-identity`; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
+Last reviewed: **2026-10-20** (P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
 
 > **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
 > and `docs/prompt-tracker.md` (status per prompt). Check them before picking
