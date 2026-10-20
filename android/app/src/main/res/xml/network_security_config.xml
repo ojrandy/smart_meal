@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- HTTPS only, trusting system CAs only (S8 in docs/prompt.md).
+     Applies to platform networking (Google Sign-In, Firebase, WebViews).
+     Dart's HttpClient does its own TLS (it does not trust user-installed
+     CAs) and must not be assumed to honor this file, so Dart code uses
+     https:// URLs only: AppConfig enforces it for Supabase, and image and
+     data URLs must be https too (docs/SECURITY.md §4). -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <!-- Debuggable builds only: also trust user CAs, for debugging
+         proxies. Release builds ignore this block. -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>
