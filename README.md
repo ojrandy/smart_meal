@@ -72,5 +72,7 @@ gitleaks git . --config .gitleaks.toml --redact
 |---|---|
 | [`AGENT.md`](AGENT.md) | Entry point for contributors and AI agents: reading order and non-negotiables |
 | [`context/`](context/) | Architecture, UI system, code standard, workflow rules, progress tracker |
+| [`docs/SECURITY.md`](docs/SECURITY.md) | Security model: secrets policy, data classification, threat model |
+| [`docs/RELEASE.md`](docs/RELEASE.md) | Release runbook: signing, obfuscated builds, symbols, rollout, rollback |
 | [`docs/prompt.md`](docs/prompt.md) | Remediation plan, task by task (P01–P20) |
 | [`docs/prompt-tracker.md`](docs/prompt-tracker.md) | Status of each remediation task |
