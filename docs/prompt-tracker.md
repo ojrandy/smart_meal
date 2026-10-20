@@ -2,7 +2,7 @@
 
 > Companion to [`prompt.md`](prompt.md). The executing agent updates this file at the end of **every** prompt and whenever it is blocked (protocol: `prompt.md` §0.7). Use absolute dates (`YYYY-MM-DD`). Keep entries honest — 🟡 means actively being worked on in the current session, not "started once".
 
-**Last updated:** 2026-10-16 — P01–P05 ✅, all on `main` (fast-forwarded to `67b1fa0` on the owner's instruction; CI run 38766137427 green: quality gate + debug APK, gitleaks, OSV). P06 ✅ on `p06-app-identity` (owner phone check 2026-10-20; iOS build pending, no Mac).
+**Last updated:** 2026-10-20 — P07 ⏸️ on `p07-env-config`: env config + `docs/SECURITY.md` done, waiting on owner review and a phone run. P01–P05 ✅, all on `main` (fast-forwarded to `67b1fa0` on the owner's instruction; CI run 38766137427 green: quality gate + debug APK, gitleaks, OSV). P06 ✅ on `p06-app-identity` (owner phone check 2026-10-20; iOS build pending, no Mac).
 
 ## Status legend
 
@@ -18,7 +18,7 @@
 | P04 | Dependency, asset and font diet | 1 | 🟡 Medium | P03 | ✅ | 2026-10-14 | 2026-10-15 | `6698dbf` `cfa83ff` `53e03c1` `1619800` `257f81c` `ac3f30a` + tracker commit (branch `p04-diet`, off `p03-ci-gates`; **not pushed** — needs the owner's GitHub credentials) | `tool/verify.sh` → all checks passed (analyze clean, 18 tests); removed packages absent from `pubspec.lock` (192 lines removed, 0 added); grep `bckimg\|img_login\|img_signup\|app logo` in `lib/` → none; 5 bundled Inter files SHA-256 = `google_fonts` 8.1.0 pins; shipped WebP byte-identical to the approved `compare.html` set; offline render test + engine screenshots (splash/onboarding/login/signup, fetching off) show bundled Inter and all images; release arm64 APK 35,074,878 → 20,873,226 B (−40.5 %) | Plan + WebP approved by owner (2026-10-14/15). Pushed to `main` with P05 (2026-10-15), CI green (run 38766137427); owner confirmed on their phone that everything works (2026-10-15). Size builds ran Gradle directly with `-x lintVital*` because local Android lint is broken (see Known issues) |
 | P05 | UI standards and accessibility cleanup | 1 | 🟡 Medium | P04 | ✅ | 2026-10-15 | 2026-10-15 | `3b429c5` widgets/theme · `f279b00` splash + onboarding · `3615750` auth screens + docs commit (branch `p05-ui-a11y`) | `tool/verify.sh` → all checks passed (analyze `--fatal-infos` clean, 48 tests, coverage 64.6 %); enforcement grep (word-bounded, see notes) → nothing; screenshots: splash pixel-identical, login/signup identical below the title apart from a 34 dp shift (title now Inter via `Text.rich`); onboarding now with owner-approved overlays; onboarding contrast test (real artwork, worst visible pixel) passes AA on all 3 slides at 3 sizes and fails on the old scrim; system-back, onboarding layout and button tests red on the old code, green on the new; owner verified on a phone (2026-10-15) | Started while P04 was ⏸️ — stacked like P04 on P03. Owner approved the 4 screen-reader labels, onboarding overlays, the visible primary loading spinner, and system back matching the on-screen back. The prompt's enforcement command (`Colors\.` has no word boundary) also matches every `AppColors.`; run it with `\bColors\.` instead. Still open: splash accent/subtitle contrast and `textHint` icons (need a color decision) |
 | P06 | Permanent app identity | 1 | 🟠 High | P03 | ✅ | 2026-10-15 | 2026-10-20 | `c8474ac` `54f556d` (branch `p06-app-identity`, off `p05-ui-a11y` = `main`) | `tool/verify.sh` → all checks passed (analyze clean, 48 tests); `flutter clean` + `flutter build apk --debug` → built; `aapt dump badging` → `package: name='com.ojtech.smartmeal'`, `application-label:'Smart Meal'`, launcher `com.ojtech.smartmeal.MainActivity`; built manifest `screenOrientation=0x1` (portrait); `git grep com.example` in `android/` `ios/` → none | Plan + inputs approved by owner (2026-10-15). Owner confirmed on their phone (2026-10-20) that the app installs and works under the new ID. iOS `flutter build ios --no-codesign` pending (no Mac). Desktop folders still carry `com.example` — out of scope (Known issue). Must run before P11, P12 and P19 |
-| P07 | Environment config, secrets policy, threat model | 1 | 🟠 High | P06 | ⬜ | | | | | Creates `docs/SECURITY.md` |
+| P07 | Environment config, secrets policy, threat model | 1 | 🟠 High | P06 | ⏸️ | 2026-10-20 | | `887db90` `5908e50` `dd7e815` + tracker commit (branch `p07-env-config`, off `p06-app-identity`) | `tool/verify.sh` → format clean, analyze no issues, 65 tests passed (17 new in `test/core/config/app_config_test.dart`); `flutter build apk --debug --dart-define-from-file=env/example.json` (the CI command) → built; validator: `env/dev.json` valid, `env/example.json` → 3 placeholder errors; no defines → `AppConfigException` listing 4 problems + fix (see log); value grep over `lib/` → none | Plan + inputs approved by owner (2026-10-20). **Waiting:** (1) owner review of `docs/SECURITY.md` (`SECURITY_DOC_REVIEW`); (2) owner runs **SmartMeal (dev)** from VS Code on their phone and confirms sign-in screens still load. iOS `Info.plist` per-env mechanism specified for P12 (`SECURITY.md` §2), not built (no Mac) |
 | P08 | Android and iOS platform hardening | 1 | 🟠 High | P06, P07 | ⬜ | | | | | Creates `docs/RELEASE.md` |
 | P09 | Encrypted session storage | 2 | 🟠 High | P08 | ⬜ | | | | | Authorizes `flutter_secure_storage` |
 | P10 | Auth hardening: errors, validation, state model | 2 | 🟠 High | P09 | ⬜ | | | | | Changes the documented auth pattern — plan approval required |
@@ -49,7 +49,7 @@ Add one row per screen built with the T1 template.
 
 | Key | Needed by | What it is | Value / decision | Status |
 |---|---|---|---|---|
-| `COMMIT_AUTHORIZATION` | every prompt | Whether agents may create commits in a session | P01, P02, P03, P04: authorized 2026-10-14 — commit and push to its own branch (ask again each prompt). P05: authorized 2026-10-15 — commit and push to `main`. P06: authorized 2026-10-15 — commit and push branch `p06-app-identity` | ✅ |
+| `COMMIT_AUTHORIZATION` | every prompt | Whether agents may create commits in a session | P01, P02, P03, P04: authorized 2026-10-14 — commit and push to its own branch (ask again each prompt). P05: authorized 2026-10-15 — commit and push to `main`. P06: authorized 2026-10-15 — commit and push branch `p06-app-identity`. P07: authorized 2026-10-20 — commit and push branch `p07-env-config` | ✅ |
 | `AGENT_SKILLS_IN_GIT` | P02 | Commit `.agents/` + `skills-lock.json`? | Yes (2026-10-14): commit `.agents/skills/` + `skills-lock.json`; ignore the duplicate `.claude/skills/` | ✅ |
 | `GIT_HOST` | P03 | Where CI runs (GitHub by default) | GitHub — `origin` is `github.com/ojrandy/smart_meal` (public). PR base for P03: `p02-repo-hygiene` (owner, 2026-10-14) | ✅ |
 | `IMAGE_RECOMPRESSION_APPROVAL` | P04 | Sign-off on WebP/resized hero images | Proposal ready: 5 heroes PNG → WebP q85 (no resize; all ≤ 1404 px wide), 10.27 MB → 0.89 MB, YUV PSNR 43–44 dB. Side-by-side page in the P04 session scratchpad (`webp-out/compare.html`); `app_logo.png` stays PNG (alpha, 9 KB). **Approved by owner 2026-10-15**; applied in `257f81c` (shipped files byte-identical to the reviewed set; masters kept in `design-assets/source/`) | ✅ |
@@ -57,9 +57,11 @@ Add one row per screen built with the T1 template.
 | `APP_DISPLAY_NAME` | P06 | Launcher name on both platforms | "Smart Meal" (owner, 2026-10-15) — same as `MaterialApp.title`; the splash "SmartMeal AI" wordmark is design and unchanged | ✅ |
 | `ORIENTATION_POLICY` | P06 | Default: portrait-only on phones | Portrait-only on phones (owner, 2026-10-15): Android activity `screenOrientation="portrait"`, iPhone `UISupportedInterfaceOrientations` = portrait; iPad list unchanged | ✅ |
 | `MACOS_ACCESS` | P06, P08, P12, P19, P20 | A Mac with Xcode, for iOS steps | None (owner, 2026-10-15). P06's `flutter build ios --no-codesign` is pending until a Mac is available | ⬜ |
-| `SUPABASE_ENVIRONMENTS` | P07 | Separate dev/staging Supabase project? | | ⬜ |
-| `LAUNCH_MARKETS` | P07 | Countries at launch (drives data-protection obligations) | | ⬜ |
-| `SECURITY_DOC_REVIEW` | P07 | Owner review of `docs/SECURITY.md` | | ⬜ |
+| `SUPABASE_ENVIRONMENTS` | P07 | Separate dev/staging Supabase project? | **One project only** (owner, 2026-10-20): every `APP_ENV` points at the current project. Risk logged in `docs/SECURITY.md` §9 + Known issues — create a separate prod project before public launch | ✅ |
+| `LAUNCH_MARKETS` | P07 | Countries at launch (drives data-protection obligations) | **Cameroon** only for now (owner, 2026-10-20). GDPR out of scope until EU residents are served | ✅ |
+| `SECURITY_DOC_REVIEW` | P07 | Owner review of `docs/SECURITY.md` | Written 2026-10-20 (`5908e50`); **owner review pending**. Disclosure contact set to the owner's email (owner, 2026-10-20) | ⏸️ |
+| `SECURITY_DOC_PLACEHOLDERS` | P07 → P20 | `{{ACK_DAYS}}` (acknowledge reports within N business days), `{{INCIDENT_LEAD}}`, `{{INCIDENT_CONTACTS_LOCATION}}` in `docs/SECURITY.md` §7 | | ⬜ |
+| `SUPABASE_AUTH_HARDENING` | P07 → P10, P13 | Owner applies `docs/SECURITY.md` §5 in the Supabase Dashboard and dates each item; CAPTCHA decision | | ⬜ |
 | `RELEASE_KEYSTORE` | P08 | Owner-held upload keystore + `key.properties` values (never in git) | | ⬜ |
 | `COPY_APPROVALS` | P10, P11, P16, P17, P18 | Approval of new user-facing messages | P05 screen-reader labels "Show password", "Hide password", "Add to favorites", "Remove from favorites": approved by owner 2026-10-15. Other prompts: pending | ⬜ |
 | `FIGMA_FORGOT_PASSWORD_URL` | P11 | Figma frame(s) | | ⬜ |
@@ -96,7 +98,7 @@ Add one row per screen built with the T1 template.
 | Metric | Baseline (2026-10-14) | Latest | Updated by |
 |---|---|---|---|
 | `flutter analyze` issues | 0 (stock `flutter_lints`) | 0 under strict modes + 9 extra lints, `--fatal-infos` (2026-10-14) | P03 |
-| Tests | 1 (placeholder `expect(true, isTrue)`) | 48 (2026-10-15): P04's 18 + 2 `AppColors` + 3 `CustomButton` + 2 `CustomTextField` + 1 `RecipeCard` + 7 onboarding + 3 onboarding contrast + 12 auth-screen a11y/navigation | P05 |
+| Tests | 1 (placeholder `expect(true, isTrue)`) | 65 (2026-10-20): P07 adds 17 `AppConfig` tests; earlier 48 (2026-10-15): P04's 18 + 2 `AppColors` + 3 `CustomButton` + 2 `CustomTextField` + 1 `RecipeCard` + 7 onboarding + 3 onboarding contrast + 12 auth-screen a11y/navigation | P07 |
 | Files failing `dart format --set-exit-if-changed` | not measured | 0 (2026-10-14, gated in CI) | P03 |
 | Coverage | not measured | 64.6 % lines (484/749, 2026-10-15; was 25.4 % on 2026-10-14) | P05 |
 | Bundled image assets | 14.7 MB (4.4 MB unused) | 0.90 MB, 6 files (5 WebP + logo PNG), 0 unused (2026-10-15) | P04 |
@@ -120,6 +122,29 @@ Inputs consumed: <keys>
 New inputs or decisions needed: <keys, or "none">
 Known issues added/closed: <list>
 ```
+
+### 2026-10-20 — P07 — ⏸️ Waiting (owner review of SECURITY.md + phone run with env/dev.json)
+Agent/session: Claude Code (Opus 5.5)
+Summary: `lib/core/config/supabase_config.dart` became `app_config.dart`. `AppConfig` reads `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `GOOGLE_WEB_CLIENT_ID`, `GOOGLE_IOS_CLIENT_ID` (optional until P12) and `APP_ENV` (`dev|staging|prod`) from `--dart-define-from-file=env/<env>.json`. `main()` validates them first and throws one `AppConfigException` listing every problem; `sb_secret_`/legacy JWT keys are refused with a rotate warning. `appConfigProvider` (overridden in `main()`) feeds `AuthRepository`. `env/example.json` is committed with placeholders; `/env/*.json` is gitignored. The owner's local `env/dev.json` holds the current values (not committed). Also: `.vscode/launch.json`, README *Run locally*, and CI builds with `env/example.json`. The gitleaks allow-list is unchanged (full-history scan still sees the old values) with updated comments. `docs/SECURITY.md` added and put on the AGENT.md reading list. The iOS `Info.plist` per-env xcconfig is specified for P12 in SECURITY.md §2, not built (no Mac; owner agreed).
+Commits: `887db90` config · `5908e50` SECURITY.md + context docs · `dd7e815` tooling · tracker commit. Branch `p07-env-config`.
+Verification:
+  `tool/verify.sh` → format 0 changed, `flutter analyze --fatal-infos` no issues, 65 tests passed → "All checks passed."
+  `flutter build apk --debug --dart-define-from-file=env/example.json` → `Built build\app\outputs\flutter-apk\app-debug.apk` (205 s)
+  `AppConfig.parse` on `env/dev.json` → valid (env=dev); on `env/example.json` → 3 "still holds the env/example.json placeholder" errors
+  `AppConfig.fromEnvironment()` with no defines (scratch `dart run`, same call as `main()`) →
+    AppConfigException: SmartMeal build configuration is invalid.
+      - SUPABASE_URL is empty.
+      - SUPABASE_PUBLISHABLE_KEY is empty.
+      - GOOGLE_WEB_CLIENT_ID is empty.
+      - APP_ENV must be one of: dev, staging, prod.
+    Run with --dart-define-from-file=env/<env>.json: copy env/example.json to env/dev.json and fill in real values (README → "Run locally").
+  same call with the four `env/dev.json` values as `-D` defines → OK
+  prompt's grep `supabase.co|sb_publishable|apps.googleusercontent` over `lib/` → 2 lines, neither a value: the `sb_publishable_` prefix check (it refuses secret keys) and a client-ID format hint in an error message. Value grep `https://[a-z0-9]+\.supabase\.co|sb_publishable_[A-Za-z0-9]{6,}|[0-9]+-[a-z0-9]{8,}\.apps\.googleusercontent` → none
+  `git check-ignore env/dev.json` → ignored by `.gitignore:53`; `env/example.json` → tracked
+  on-device run with `env/dev.json` → **owner's phone** (no usable emulator)
+Inputs consumed: `SUPABASE_ENVIRONMENTS` (one project), `LAUNCH_MARKETS` (Cameroon), disclosure contact (owner email), `COMMIT_AUTHORIZATION`
+New inputs or decisions needed: `SECURITY_DOC_REVIEW`, `SECURITY_DOC_PLACEHOLDERS`, `SUPABASE_AUTH_HARDENING`
+Known issues added/closed: closed — config hardcoded in source / no threat model (audit #31). Added — one Supabase project for every env (High before launch); Auth checklist not applied (High); SECURITY.md placeholders (Medium); iOS per-env xcconfig for P12 (Low).
 
 ### 2026-10-20 — P06 — ✅ Done
 Agent/session: Claude Code (Opus 5.5)
