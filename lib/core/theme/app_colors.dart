@@ -42,10 +42,11 @@ class AppColors {
   static const Color favorite = Color(0xFFF44336);
   static const Color placeholderIcon = Color(0xFF9E9E9E);
 
-  // Third-party brand marks on the social sign-in buttons
-  static const Color socialGoogle = Color(0xFFF44336);
+  // Third-party brand marks on the social sign-in buttons, in each brand's
+  // official color. Google's mark is multicolor, so it is an image
+  // (AppAssets.googleLogo), not a color.
   static const Color socialApple = Color(0xFF000000);
-  static const Color socialFacebook = Color(0xFF2196F3);
+  static const Color socialFacebook = Color(0xFF0866FF); // Meta "Facebook blue"
 
   // AI Chef Gradient Colors
   static const Color aiGradientStart = Color(0xFF1B5E20); // Dark Green

@@ -14,6 +14,11 @@ abstract final class AppAssets {
   static const String authLoginHero = '$_images/auth_login_hero.webp';
   static const String authSignupHero = '$_images/auth_signup_hero.webp';
 
+  // Official Google "G", cropped unmodified from Google's sign-in branding
+  // assets (design-assets/source/google-signin-assets.zip, Light theme,
+  // icon-only, 4x). White background: use it on white surfaces only.
+  static const String googleLogo = '$_images/google_g.png';
+
   /// Every image above; a test checks each one is in the asset bundle.
   static const List<String> all = [
     appLogo,
@@ -22,5 +27,6 @@ abstract final class AppAssets {
     onboardingDecide,
     authLoginHero,
     authSignupHero,
+    googleLogo,
   ];
 }

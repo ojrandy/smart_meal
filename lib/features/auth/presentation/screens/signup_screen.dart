@@ -312,10 +312,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   // Google Sign-In
                   SocialAuthButton(
                     text: 'Continue with Google',
-                    icon: const FaIcon(
-                      FontAwesomeIcons.google,
-                      color: AppColors.socialGoogle,
-                      size: 20,
+                    icon: Image.asset(
+                      AppAssets.googleLogo,
+                      width: 20,
+                      height: 20,
+                      excludeFromSemantics: true,
                     ),
                     onPressed: isLoading ? null : _signInWithGoogle,
                   ),

@@ -4,6 +4,11 @@ import 'package:smart_meal/core/theme/app_colors.dart';
 
 // P05 moved inline colors into tokens; the rendered values must not change.
 void main() {
+  test('social brand marks use the official brand colors', () {
+    expect(AppColors.socialFacebook.toARGB32(), 0xFF0866FF);
+    expect(AppColors.socialApple.toARGB32(), 0xFF000000);
+  });
+
   test('tokens keep the values they replaced', () {
     final replaced = <(Color, Color)>[
       (AppColors.onPrimary, Colors.white),
@@ -14,9 +19,7 @@ void main() {
       (AppColors.shadow, Colors.black),
       (AppColors.favorite, Colors.red),
       (AppColors.placeholderIcon, Colors.grey),
-      (AppColors.socialGoogle, Colors.red),
       (AppColors.socialApple, Colors.black),
-      (AppColors.socialFacebook, Colors.blue),
       (AppColors.splashGradientStart, const Color(0xFF188241)),
       (AppColors.splashGradientMid, const Color(0xFF289A45)),
       (AppColors.splashGradientEnd, const Color(0xFF86B93F)),
