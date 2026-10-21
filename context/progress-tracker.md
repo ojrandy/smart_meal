@@ -32,14 +32,14 @@ Last reviewed: **2026-10-20** (P08 — release hardening, on `main`, owner smoke
 
 | Item | Status | Notes |
 |---|---|---|
-| Splash screen UI/animation | ✅ | `flutter_animate` entrance sequence |
-| Session-aware routing | ⬜ | Currently *always* routes to `/onboarding` after 5s regardless of an existing session — needs a `shared_preferences` "onboarding seen" flag + auth-state check to skip straight to `/home` for returning users |
+| Splash screen UI/animation | ✅ | Redesigned 2026-10-21 (owner authority): solid `splashBackground` #05471F, logo + "SmartMeal AI" wordmark + "Your AI food companion" + "by OJ Tech", one ≤ 500 ms entrance, `holdDuration` 1.6 s (was 5 s with a looping glow and dots). Native launch screens use the same green (Android `launch_background`, API 31+ `windowSplashScreenBackground`; iOS `LaunchScreen.storyboard`, unverified without a Mac) |
+| Session-aware routing | ⬜ | Currently *always* routes to `/onboarding` after 1.6 s regardless of an existing session — needs a `shared_preferences` "onboarding seen" flag + auth-state check to skip straight to `/home` for returning users |
 
 ## Feature: Onboarding
 
 | Item | Status | Notes |
 |---|---|---|
-| 3-slide carousel UI | ✅ | |
+| 3-slide carousel UI | ✅ | Redesigned 2026-10-21 (owner authority): real Unsplash food photos (jollof, egusi, grilled fish + plantains; credits in `design-assets/source/PHOTO-CREDITS.md`) on top with 32 px rounded corners, dark text on cream below, fixed dots + `CustomButton`. Replaces the AI full-bleed art and its scrim |
 | Skip / Next / Get Started actions | ✅ | Routes to `/auth/login` |
 | "Seen onboarding" persistence | ⬜ | Not implemented — see Splash issue above, same root cause |
 
@@ -103,9 +103,11 @@ Last reviewed: **2026-10-20** (P08 — release hardening, on `main`, owner smoke
 | Plain `TextStyle(fontWeight: …)` without `GoogleFonts.inter(...)` inherits the theme's per-variant family (`Inter_regular`), so the engine fakes the weight from Regular instead of using the bundled Medium/SemiBold/Bold file (found in P04 by code reading; e.g. onboarding, auth screens, `AiChefCard`, `RecipeCard`) — not fixed in P05: using the real weight files visibly changes glyphs, so it needs the owner's sign-off (fix in `AppTheme`, e.g. a pubspec `Inter` family with weights) | Low | `lib/core/theme/app_theme.dart`, screens/widgets |
 | Release build on this dev machine fails in Android lint (`lintVital*`: `ClassNotFoundException: com.android.tools.lint.Main` / `UastEnvironment`) — environment issue, not project code; P04 size builds ran Gradle directly with `-x lintVital*`. CI's Linux runner is unaffected (it builds debug). Did **not** reproduce in P08 (2026-10-20): `flutter build appbundle --release` and `flutter build apk --release` both passed. Keep the workaround in `docs/RELEASE.md` §3 in case it returns. Release downloads also time out often on this network; re-run |  Low (dev env) | local `~/.gradle` |
 | Test coverage 62.8 % lines (2026-10-15): auth notifier/repository and router redirect logic are still untested | Low | `test/` |
-| WCAG AA contrast failures left after P05 (onboarding fixed): splash "AI"/"TECH" orange (`brandAccent`) on the green gradient 1.27:1 and white subtitle/"BY OJ" on the light end of the gradient 2.33:1 — an overlay can't fix orange-on-green, so this needs a color decision; `textHint` (2.54:1 on surface) used for `RecipeCard` meta icons (non-text needs 3:1) | Medium | `splash_screen.dart`, `app_colors.dart`, `recipe_card.dart` |
+| `textHint` (2.54:1 on surface) used for `RecipeCard` meta icons (non-text needs 3:1). (The splash contrast failures logged in P05 are fixed by the 2026-10-21 redesign: deep `splashBackground`, orange "AI" 3.8:1 as large text, white 10.9:1; pinned by `app_colors_test.dart`.) | Low | `recipe_card.dart` |
 | `CustomTextField`: only the 24 dp text line is tappable; taps on the rest of the 56 dp box (label, padding) do not focus the input (fails the 48 dp tap-target guideline) | Low | `lib/core/widgets/custom_text_field.dart` |
 | `docs/prompt.md` P05 enforcement command: its `Colors\.` alternative has no word boundary, so it also matches every `AppColors.`; use `\bColors\.` | Low (docs) | `docs/prompt.md` |
+| `assets/fonts/Inter-BlackItalic.ttf` (331 KB) is unused since the splash redesign dropped the "BY OJ TECH" black-italic footer. Remove the file, its pubspec entry and its `AppFonts.bundledInterVariants` entry (needs owner OK to delete) | Low | `assets/fonts/`, `lib/core/theme/app_fonts.dart` |
+| Figma / `Mockup/` still show the old AI artwork for splash, onboarding and the auth heroes; the code is the source of truth for those since 2026-10-21 (`ui-context.md`). Update Figma when convenient | Low | Figma |
 | `ios/Runner/PrivacyInfo.xcprivacy` exists but is not yet in the Runner target, so it does not ship until added in Xcode (*Target Membership*). P16 and P19 must add their data types | Medium (before App Store) | `ios/Runner/PrivacyInfo.xcprivacy` |
 | No real upload keystore yet: P08 was verified with a throwaway key. The owner creates it per `docs/RELEASE.md` §2 (outside the repo, two backups) before the first Play upload, then registers its SHA-1 and the Play App Signing SHA-1 for Google Sign-In (P12) | Medium (before first upload) | owner; `android/key.properties` |
 | The Supabase project is on the free tier and **paused itself** after inactivity (found 2026-10-21: the host stopped resolving, so every sign-in failed with `SocketException: Failed host lookup`; the owner restored it). It will pause again after ~7 idle days. Before launch: paid plan or a production project that never idles | High (before launch) | Supabase Dashboard; `docs/SECURITY.md` §9 |

@@ -5,6 +5,13 @@ implemented in code so new screens stay visually consistent without needing
 to re-derive values from Figma every time. If Figma and this file disagree,
 Figma wins and this file must be updated in the same change.
 
+**Exception (owner decision, 2026-10-21):** the owner judged the splash,
+onboarding and auth-hero artwork (AI-generated) too generic and gave the
+agent authority to redesign those screens. For **splash, onboarding and the
+login/signup hero images**, this file and the code are now the source of
+truth, not Figma or `Mockup/`. Update Figma to match when convenient. See
+"Imagery" below.
+
 ## Color system (`lib/core/theme/app_colors.dart`)
 
 | Token | Value | Usage |
@@ -23,17 +30,15 @@ Figma wins and this file must be updated in the same change.
 | `warning` | `#F59E0B` | Warnings, also used as a fallback icon color |
 | `aiChefGradient` | `#1B5E20 → #F59E0B` diagonal | AI Chef card background only |
 | `onPrimary` | `#FFFFFF` | Text/icons/spinner on `primary` fills |
-| `brandAccent` | `#FF6B00` | Logo orange; "AI"/"TECH" highlight on the splash |
+| `brandAccent` | `#FF6B00` | Logo orange; the "AI" in the splash wordmark (large text only: 3.8:1 on `splashBackground`) |
 | `onDark` | `#FFFFFF` | Text/icons on photos, gradients, dark fills (apply alpha at the call site, e.g. `0.9`) |
 | `onDarkMuted` | `#FFFFFF` @ 70 % (`0xB3FFFFFF`) | Secondary text on photos (onboarding subtitle) |
-| `onDarkSubtle` | `#FFFFFF` @ 54 % (`0x8AFFFFFF`) | Inactive page-indicator dots on photos |
 | `scrim` | `#000000` | Base for photo scrims / dark overlays; alpha at the call site |
 | `shadow` | `#000000` | Base for card shadows; alpha at the call site (`0.04`) |
 | `favorite` | `#F44336` | Active favorite heart |
 | `placeholderIcon` | `#9E9E9E` | Icon in `AppNetworkImage`'s missing-image fallback |
-| `socialGoogle` / `socialApple` / `socialFacebook` | `#F44336` / `#000000` / `#2196F3` | Brand marks on the social sign-in buttons only |
-| `splashGradient` | `#188241 → #289A45 → #86B93F`, stops 0 / 0.4 / 1, diagonal | Splash background only (`splashGradientStart/Mid/End`) |
-| `splashGlow` | `#F59E0B` | Pulsing glow behind the splash logo (at 40 %) |
+| `socialApple` / `socialFacebook` | `#000000` / `#0866FF` (official Facebook blue) | Brand marks on the social sign-in buttons only. Google's mark is multicolor, so it is the official image `AppAssets.googleLogo`, not a color |
+| `splashBackground` | `#05471F` | Splash background, and the Android (`values/colors.xml` `splash_background`, API 31+ `windowSplashScreenBackground`) and iOS (`LaunchScreen.storyboard`) native launch screens, which must match it |
 
 Rule: any new color need gets added to this table + `app_colors.dart`
 first. No inline hex values or raw `Colors.*` (except `Colors.transparent`)
@@ -79,8 +84,10 @@ values of tokens that replaced Material constants.
   convention already established in the bottom nav (outline for inactive,
   filled/bold variant for active — see `ScaffoldWithNavBar`).
 - **FontAwesome** (`font_awesome_flutter`) is reserved for third-party
-  brand logos only (Google, Apple, Facebook sign-in buttons). Don't use it
-  for generic UI icons.
+  brand logos only (the Apple and Facebook sign-in buttons). Don't use it
+  for generic UI icons. Google's "G" is multicolor, so it is the official
+  image `AppAssets.googleLogo` instead, from Google's branding assets and
+  never recolored or redrawn.
 - Material `Icons.*` should only appear where Iconsax has no equivalent
   (e.g. `Icons.arrow_back_ios_new` for the back chevron, `Icons.chevron_right`).
 
@@ -157,14 +164,14 @@ Established in P05 (2026-10-15); widget tests in `test/core/widgets/` and
   or ≥ 18.7 px bold) and for icons/controls. `primary` on `background` is
   5.10:1. Known failures are logged in `context/progress-tracker.md`; color
   changes need owner approval.
-- **Text on photos** (owner-approved overlay approach, 2026-10-15): anchor the
-  scrim to the text, not the screen — onboarding's `_TextScrim` is a 120 dp
-  fade above the title, then `scrim` 60 % → 85 % behind the text and CTA, so
-  it follows the text at any screen size or text scale. A lone control on
-  light art (Skip) gets a `scrim` 55 % pill instead of darkening the photo.
+- **Text and photos:** prefer putting text *next to* a photo, not on it.
+  Onboarding (since 2026-10-21) puts dark text on the cream background below
+  the photo. When text must sit on a photo, anchor a `scrim` gradient to the
+  text, not the screen. A lone control on a photo (Skip) gets a `scrim` 55 %
+  pill instead of darkening the photo.
   `test/features/onboarding/presentation/onboarding_contrast_test.dart`
-  renders the real artwork and fails if any visible text pixel drops below
-  AA — run it whenever artwork, overlays or text colors change.
+  renders the real screen and fails if any visible text pixel drops below
+  AA. Run it whenever artwork, overlays or text colors change.
 - **Safe areas:** never position content at a fixed offset from the screen
   edge without accounting for `MediaQuery.paddingOf(context)`.
 - **System back:** a screen with an on-screen back button wraps its
@@ -173,6 +180,31 @@ Established in P05 (2026-10-15); widget tests in `test/core/widgets/` and
 - **Loading buttons:** `CustomButton` keeps its normal fill while
   `isLoading` (it is disabled, but must not turn grey) so the spinner stays
   visible.
+
+## Imagery (owner decision, 2026-10-21)
+
+- **Real photography only**: no AI-generated art, no fake app screenshots
+  or logos baked into images. Show local food: Cameroonian / West African
+  dishes, ingredients and markets.
+- **Source:** free [Unsplash License](https://unsplash.com/license) photos
+  (never Unsplash+). Every photo is recorded with its crop in
+  `design-assets/source/PHOTO-CREDITS.md`.
+- **No identifiable faces** (free stock photos have no model releases), and
+  no visible brands, alcohol, signage or text. Hands are fine.
+- **Format:** WebP q80, at most 1440 px wide (the `AppAssets` test enforces
+  the width). Onboarding photos are 4:5 at 1080×1350; auth heroes are 16:10
+  at 1440×900.
+- **Patterns:**
+  - Onboarding: the photo fills about 72 % of the swipe area with 32 px
+    rounded bottom corners; the title and subtitle sit below it on
+    `background`, then the page dots (`primary` / `textHint`) and a
+    `CustomButton`.
+  - Auth heroes: a `ClipRRect` with 24 px radius and a 16:10 `AspectRatio`,
+    using `BoxFit.cover`.
+- **Splash:** solid `splashBackground` with the logo, the "SmartMeal AI"
+  wordmark, the "Your AI food companion" tagline and a "by OJ Tech" footer.
+  One entrance of ≤ 500 ms per element, then `/onboarding` after
+  `SplashScreen.holdDuration` (1.6 s). No looping animations.
 
 ## Motion
 

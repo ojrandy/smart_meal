@@ -123,6 +123,19 @@ New inputs or decisions needed: <keys, or "none">
 Known issues added/closed: <list>
 ```
 
+### 2026-10-21 — Owner request: first-run redesign (outside the pack) — ⏸️ Waiting (owner sees it on the phone)
+Agent/session: Claude Code (Opus 5.5)
+Summary: The owner judged the splash, onboarding and auth-hero art (AI-generated in Antigravity) too generic and gave the agent authority to redesign, overriding Figma for these screens. Owner choices: scope = splash + onboarding + auth heroes; photos = real local dishes, no faces; splash = minimal brand, fast. Five free Unsplash License photos (not Unsplash+), cropped server-side to WebP q80 with no faces, brands or signage; credits and exact crops in `design-assets/source/PHOTO-CREDITS.md`. Onboarding was relaid out: photo on top (32 px rounded corners), dark text on cream, fixed dots + `CustomButton`, with no scrim. Auth heroes are rounded 16:10 cover cards. Splash: solid `splashBackground` #05471F (new token; orange "AI" 3.8:1, white 10.9:1), one short entrance, 1.6 s hold (was 5 s with a looping glow and dots); tagline "Your AI food companion", footer "by OJ Tech". Native launch screens now use the same green (Android drawable + API 31+ `windowSplashScreenBackground`, iOS storyboard). Removed the unused `splashGradient*`, `splashGlow` and `onDarkSubtle` tokens. `ui-context.md` gains the Figma exception and an "Imagery" section.
+Commits: `5f92766` photos + onboarding + auth heroes · `ca0c36c` splash + tokens + native launch screens · docs/tracker commit. Branch `p09-secure-session`, pushed to `main`.
+Verification:
+  preview renders of every screen (throwaway test, deleted) → checked visually; copies in the session scratchpad `redesign-previews/`
+  `flutter test` → all pass after updating the smoke test's tagline (onboarding layout tests at 360×640/320×568 ×1.3/×2.0 and the pixel contrast test pass on the new layout)
+  `tool/verify.sh` → format 0 changed, analyze no issues, 78 tests passed
+  owner phone check → pending
+Inputs consumed: owner design authority + three choices (AskUserQuestion, 2026-10-21)
+New inputs or decisions needed: owner sees it on the phone; OK to delete the unused `Inter-BlackItalic.ttf` (331 KB) and the old AI masters in `design-assets/source/`
+Known issues added/closed: closed — splash contrast (P05 issue, splash part). Added — unused Inter-BlackItalic; Figma is out of date for these screens.
+
 ### 2026-10-21 — P09 — ⏸️ Waiting (owner phone checks)
 Agent/session: Claude Code (Opus 5.5)
 Summary: Verified in the package source that supabase_flutter 2.15.4 defaults to `SharedPreferencesLocalStorage` under `sb-<ref>-auth-token` and `SharedPreferencesGotrueAsyncStorage` for the PKCE verifier (`supabase.auth.token-code-verifier`), i.e. plaintext. Added `flutter_secure_storage` ^10.0.0 (authorized). v11.2.0 is the latest, but its `win32` dependency needs Dart 3.10, so v10 is the latest compatible with Flutter 3.35.7. `SecureSessionStorage` (a `LocalStorage`) and `SecurePkceStorage` (a `GotrueAsyncStorage`) are passed through `FlutterAuthClientOptions` in `main()`. Android: the package's default Keystore-wrapped AES-GCM (`resetOnError` on); iOS: `first_unlock_this_device`, not synchronizable. `initialize()` migrates a legacy plaintext session (write → read-back → delete plaintext; on mismatch it keeps plaintext for a retry), and on a fresh install with nothing to migrate it clears secure storage (iOS Keychain survives uninstall); a pre-P09 install with a plaintext session but no marker counts as an upgrade, not a fresh install. Any storage error → cleared and signed out, never thrown. Sign-out: supabase_flutter calls `removePersistedSession` on `signedOut` (verified in `supabase_auth.dart`). Docs: SECURITY.md (S7 row, credentials class, threat #1), architecture-context, project-overview stack table.
