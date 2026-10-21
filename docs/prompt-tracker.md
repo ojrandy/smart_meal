@@ -133,8 +133,8 @@ Verification:
   `tool/verify.sh` → format 0 changed, analyze no issues, 78 tests passed
   owner phone check → pending
 Inputs consumed: owner design authority + three choices (AskUserQuestion, 2026-10-21)
-New inputs or decisions needed: owner sees it on the phone; OK to delete the unused `Inter-BlackItalic.ttf` (331 KB) and the old AI masters in `design-assets/source/`
-Known issues added/closed: closed — splash contrast (P05 issue, splash part). Added — unused Inter-BlackItalic; Figma is out of date for these screens.
+New inputs or decisions needed: owner sees it on the phone. (Owner OK to delete, 2026-10-21: the unused `Inter-BlackItalic.ttf` (331 KB) and the five old AI masters in `design-assets/source/` were removed.)
+Known issues added/closed: closed — splash contrast (P05 issue, splash part); unused Inter-BlackItalic (deleted). Added — Figma is out of date for these screens.
 
 ### 2026-10-21 — P09 — ⏸️ Waiting (owner phone checks)
 Agent/session: Claude Code (Opus 5.5)

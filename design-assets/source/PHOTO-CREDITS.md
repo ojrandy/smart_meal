@@ -1,8 +1,8 @@
 # Photo credits
 
 Real photographs used in the app since the 2026-10-21 redesign. They replace
-the earlier AI-generated artwork, whose masters are the other files in this
-folder.
+the earlier AI-generated artwork (its masters were deleted on 2026-10-21,
+with the owner's OK; they remain in git history).
 
 **License:** every photo here is free under the
 [Unsplash License](https://unsplash.com/license): free for commercial use,

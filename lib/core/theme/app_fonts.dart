@@ -15,7 +15,6 @@ abstract final class AppFonts {
     (FontWeight.w500, FontStyle.normal),
     (FontWeight.w600, FontStyle.normal),
     (FontWeight.w700, FontStyle.normal),
-    (FontWeight.w900, FontStyle.italic),
   ];
 
   /// Call once in `main()` before `runApp`.
