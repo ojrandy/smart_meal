@@ -20,7 +20,7 @@
 | P06 | Permanent app identity | 1 | 🟠 High | P03 | ✅ | 2026-10-15 | 2026-10-20 | `c8474ac` `54f556d` (branch `p06-app-identity`, off `p05-ui-a11y` = `main`) | `tool/verify.sh` → all checks passed (analyze clean, 48 tests); `flutter clean` + `flutter build apk --debug` → built; `aapt dump badging` → `package: name='com.ojtech.smartmeal'`, `application-label:'Smart Meal'`, launcher `com.ojtech.smartmeal.MainActivity`; built manifest `screenOrientation=0x1` (portrait); `git grep com.example` in `android/` `ios/` → none | Plan + inputs approved by owner (2026-10-15). Owner confirmed on their phone (2026-10-20) that the app installs and works under the new ID. iOS `flutter build ios --no-codesign` pending (no Mac). Desktop folders still carry `com.example` — out of scope (Known issue). Must run before P11, P12 and P19 |
 | P07 | Environment config, secrets policy, threat model | 1 | 🟠 High | P06 | ⏸️ | 2026-10-20 | | `887db90` `5908e50` `dd7e815` + tracker commit (branch `p07-env-config`, off `p06-app-identity`) | `tool/verify.sh` → format clean, analyze no issues, 65 tests passed (17 new in `test/core/config/app_config_test.dart`); `flutter build apk --debug --dart-define-from-file=env/example.json` (the CI command) → built; validator: `env/dev.json` valid, `env/example.json` → 3 placeholder errors; no defines → `AppConfigException` listing 4 problems + fix (see log); value grep over `lib/` → none | Plan + inputs approved by owner (2026-10-20). **Waiting:** (1) owner review of `docs/SECURITY.md` (`SECURITY_DOC_REVIEW`); (2) owner runs **SmartMeal (dev)** from VS Code on their phone and confirms sign-in screens still load. iOS `Info.plist` per-env mechanism specified for P12 (`SECURITY.md` §2), not built (no Mac) |
 | P08 | Android and iOS platform hardening | 1 | 🟠 High | P06, P07 | 🟡 | 2026-10-20 | | | | Creates `docs/RELEASE.md`. Plan approved by owner (2026-10-20); started while P07 is still ⏸️ on owner-side checks (phone run, SECURITY.md review), on the owner's "continue" |
-| P09 | Encrypted session storage | 2 | 🟠 High | P08 | ⬜ | | | | | Authorizes `flutter_secure_storage` |
+| P09 | Encrypted session storage | 2 | 🟠 High | P08 | 🟡 | 2026-10-21 | | | | Authorizes `flutter_secure_storage`. Plan approved by owner (2026-10-21); started while P08 waits on the owner smoke test, on the owner's instruction |
 | P10 | Auth hardening: errors, validation, state model | 2 | 🟠 High | P09 | ⬜ | | | | | Changes the documented auth pattern — plan approval required |
 | P11 | Password recovery and auth deep links | 2 | 🟠 High | P10, P06 | ⬜ | | | | | Needs Figma frames |
 | P12 | Social sign-in completion | 2 | 🟠 High | P06, P10 | ⬜ | | | | | Authorizes `sign_in_with_apple` (+ `crypto` if needed) |
@@ -122,6 +122,30 @@ Inputs consumed: <keys>
 New inputs or decisions needed: <keys, or "none">
 Known issues added/closed: <list>
 ```
+
+### 2026-10-21 — P09 — ⏸️ Waiting (owner phone checks)
+Agent/session: Claude Code (Opus 5.5)
+Summary: Verified in the package source that supabase_flutter 2.15.4 defaults to `SharedPreferencesLocalStorage` under `sb-<ref>-auth-token` and `SharedPreferencesGotrueAsyncStorage` for the PKCE verifier (`supabase.auth.token-code-verifier`), i.e. plaintext. Added `flutter_secure_storage` ^10.0.0 (authorized). v11.2.0 is the latest, but its `win32` dependency needs Dart 3.10, so v10 is the latest compatible with Flutter 3.35.7. `SecureSessionStorage` (a `LocalStorage`) and `SecurePkceStorage` (a `GotrueAsyncStorage`) are passed through `FlutterAuthClientOptions` in `main()`. Android: the package's default Keystore-wrapped AES-GCM (`resetOnError` on); iOS: `first_unlock_this_device`, not synchronizable. `initialize()` migrates a legacy plaintext session (write → read-back → delete plaintext; on mismatch it keeps plaintext for a retry), and on a fresh install with nothing to migrate it clears secure storage (iOS Keychain survives uninstall); a pre-P09 install with a plaintext session but no marker counts as an upgrade, not a fresh install. Any storage error → cleared and signed out, never thrown. Sign-out: supabase_flutter calls `removePersistedSession` on `signedOut` (verified in `supabase_auth.dart`). Docs: SECURITY.md (S7 row, credentials class, threat #1), architecture-context, project-overview stack table.
+Commits: `a77233f` adapter + tests · `4f4ad1d` docs · `e63ffbb` regenerated desktop plugin registrants · tracker commit. Branch `p09-secure-session`.
+Verification:
+  `flutter test test/core/services/secure_session_storage_test.dart` → 12 passed (round-trip + sign-out removal; migration moves + deletes plaintext; upgrade without marker stays signed in; no legacy → no-op; run twice → no-op; legacy PKCE verifier removed; fresh install clears a surviving session; failed read → null + cleared, no throw; failed migration → no throw, plaintext kept; PKCE round-trip; PKCE failed read → null)
+  `tool/verify.sh` → format clean, analyze no issues, 78 tests passed
+  `flutter build apk --debug --dart-define-from-file=env/dev.json` → built
+  owner phone: `adb shell run-as com.ojtech.smartmeal cat shared_prefs/FlutterSharedPreferences.xml` has no token; restart → still signed in; upgrade from the pre-P09 build → still signed in, plaintext gone → **pending**
+Inputs consumed: plan approval, `COMMIT_AUTHORIZATION`
+New inputs or decisions needed: owner phone checks
+Known issues added/closed: none closed until the phone checks pass.
+
+### 2026-10-21 — Owner request (outside the pack) — ⏸️ Waiting (owner sees it on the phone)
+Agent/session: Claude Code (Opus 5.5)
+Summary: (1) Owner reported a sign-in error showing raw `ClientException with SocketException: Failed host lookup: 'svrelfdfonxwlfcljrag.supabase.co'`. Diagnosis: the free-tier Supabase project had paused; its host returned NXDOMAIN from the local resolver and from 8.8.8.8, while `supabase.co` resolved. The owner restored it; `/auth/v1/health` with the publishable key → HTTP 200. No app change needed. The raw error on screen breaks S5 and is P10's job (error mapping). (2) Owner asked for real brand logos on the social buttons: Google now uses the official multicolor "G" (`assets/images/google_g.png`, cropped unmodified from Google's official sign-in assets, kept in `design-assets/source/google-signin-assets.zip`) instead of a one-color red Font Awesome glyph; Facebook uses official Facebook blue `#0866FF` (was Material blue); Apple's black was already correct. `AppColors.socialGoogle` removed (unused).
+Commits: not yet (awaiting owner authorization).
+Verification:
+  `tool/verify.sh` → format 0 changed, analyze no issues, 66 tests passed (new: social brand colors; `AppAssets` bundle tests cover the new image)
+  `flutter build apk --debug` → built; install on the owner's phone → pending (phone disconnected)
+Inputs consumed: owner request
+New inputs or decisions needed: owner confirms the logos on the phone; commit authorization
+Known issues added/closed: added — Supabase free-tier auto-pause (High before launch).
 
 ### 2026-10-20 — P08 — ⏸️ Waiting (owner smoke-test results; Xcode step pending)
 Agent/session: Claude Code (Opus 5.5)
