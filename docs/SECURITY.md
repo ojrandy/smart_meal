@@ -26,7 +26,7 @@
  ┌──────────────── user's device (UNTRUSTED) ────────────────┐
  │  SmartMeal app (Flutter, Android + iOS)                   │
  │  · build defines: public identifiers only (§2)            │
- │  · session tokens: platform secure storage (P09)          │
+ │  · session tokens: platform secure storage (P09, done)    │
  └───────┬───────────────────────┬───────────────────┬───────┘
          │ HTTPS only (S8)       │ native SDKs       │ push
 ═════════╪═══ trust boundary ════╪═══════════════════╪═════════
@@ -62,6 +62,7 @@
 |---|---|---|---|
 | Public identifiers | Supabase project URL, publishable key (`sb_publishable_…`), Google OAuth client IDs, `APP_ENV` | `env/<env>.json`, passed with `--dart-define-from-file` and read by `AppConfig` (`lib/core/config/app_config.dart`) | Only `env/example.json` (placeholders). Real files are gitignored |
 | Secrets | Supabase secret / service-role key, database password, FCM service account, OAuth client **secrets**, Apple Sign in key (`.p8`), APNs key, payment-provider keys, webhook signing secrets | Supabase Edge Function secrets (`supabase secrets set`) or the CI secret store (GitHub Actions encrypted secrets) | **Never** |
+| Session credentials (S7) | Supabase access + refresh tokens, PKCE verifier | On the device **only** in platform secure storage through `SecureSessionStorage` / `SecurePkceStorage` (Keychain / Keystore). Never `shared_preferences`, files or logs | **Never** |
 | Signing material | Android upload keystore + `key.properties`, iOS certificates/profiles | Owner-held, outside the repo (P08 / `docs/RELEASE.md`) | **Never** |
 
 **Build defines are compiled into the binary and are extractable.** Anyone
@@ -134,7 +135,7 @@ They become binding when P13/P14 implement them.
 | **Public** | Recipe catalog, images, nutrition facts | Postgres + Storage (public bucket or read-only RLS) | Indefinite | Everyone, read-only. Writes are admin-only (service role in Edge Functions / migrations) | Admin removal |
 | **Personal** | Email, display name, avatar, push (FCM) tokens, favorites, meal plans | Supabase Auth (`auth.users`), owner-scoped tables, private Storage bucket; push token on device + `push_tokens` table (P19) | While the account exists. Push tokens are removed on sign-out (S12) and when FCM reports them invalid (*proposed*) | Owner only (RLS `user_id = (select auth.uid())`) | Account deletion (P14) cascades; tokens are cleared on sign-out (P15/P19) |
 | **Sensitive personal** (S6) | Allergies, dietary restrictions, health goals, household size, budget | Owner-scoped tables, RLS, explicit consent recorded (P16) | While the account exists; deleted on account deletion or consent withdrawal (*proposed*) | Owner only. Used server-side only for the owner's recommendations (P17). Never logged (S4), never in analytics, never shared with third parties | Account deletion (P14); consent withdrawal clears the data (P16/P14) |
-| **Credentials** | Supabase access + refresh tokens, OAuth ID tokens (transient) | Platform secure storage only: Keychain / Android Keystore (P09, S7). ID tokens are held in memory only, for the exchange | Access JWT ≤ 1 h; refresh tokens rotate (§5) | The device holder; Supabase Auth | Sign-out revokes the session and wipes storage (P15); account deletion revokes all sessions (P14) |
+| **Credentials** | Supabase access + refresh tokens, OAuth ID tokens (transient) | Platform secure storage only, via `SecureSessionStorage` (`lib/core/services/secure_session_storage.dart`, P09): Android Keystore-wrapped AES-GCM; iOS Keychain `first_unlock_this_device` (no iCloud sync). The PKCE verifier too. Legacy plaintext sessions are migrated and deleted; a session surviving an iOS reinstall is cleared; storage errors mean signed out (S7). ID tokens are held in memory only, for the exchange | Access JWT ≤ 1 h; refresh tokens rotate (§5) | The device holder; Supabase Auth | Sign-out revokes the session and wipes storage (P15); account deletion revokes all sessions (P14) |
 | **Secrets** | Server keys (§2) | Edge Function secrets, CI secret store | Rotate on any suspected exposure, and at least yearly (*proposed*) | Owner and deploy pipeline only | Rotation + revocation at the provider |
 
 Logs, crash reports and analytics may carry **no** credentials, emails,
@@ -148,7 +149,7 @@ D = Denial of service · E = Elevation of privilege.
 
 | # | STRIDE | Threat | Mitigation | Owner prompt |
 |---|---|---|---|---|
-| 1 | I, S | Token theft from the device (backup, rooted device, other app) | Encrypted session storage (Keychain / Keystore); no tokens in `shared_preferences`, files or logs; backup exclusions | P09, P08 |
+| 1 | I, S | Token theft from the device (backup, rooted device, other app) | Encrypted session storage (Keychain / Keystore) — **done in P09**; no tokens in `shared_preferences`, files or logs; backup and device transfer excluded — **done in P08** | P09, P08 |
 | 2 | I, E | IDOR through PostgREST: reading or writing another user's rows by changing an ID | RLS on every table in the migration that creates it, scoped by `(select auth.uid())`; pgTAP cross-user isolation tests | P13 |
 | 3 | S | Password-reset link interception (another app claims the scheme, or a mail scanner opens the link) | PKCE flow, then verified App Links / Universal Links; exact redirect allow-list (§5) | P11 |
 | 4 | I | Account enumeration through sign-up / sign-in / reset responses | Neutral, identical copy whether or not the account exists; rate limits | P10, P11 |

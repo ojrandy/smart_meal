@@ -30,6 +30,12 @@ lib/
                                   # Also holds AppLogger, the debug-only logger (a no-op in
                                   # profile/release builds). Log through it, never through
                                   # print/developer.log, and never log tokens or personal data.
+                                  # SecureSessionStorage / SecurePkceStorage: the Supabase
+                                  # session and PKCE verifier in Keychain/Keystore (P09),
+                                  # passed to Supabase.initialize via FlutterAuthClientOptions.
+                                  # They migrate a legacy plaintext session, clear a session
+                                  # surviving an iOS reinstall, and treat any storage error
+                                  # as signed out. Never persist credentials anywhere else.
     theme/                       # AppColors, AppTheme
     widgets/                     # Reusable, feature-agnostic UI (CustomButton, RecipeCard...)
   features/

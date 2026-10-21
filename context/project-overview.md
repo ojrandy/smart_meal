@@ -86,7 +86,8 @@ taken anyway, it must be logged in `progress-tracker.md`, not left silent.
 | Loading states | `shimmer` |
 | Images | `cached_network_image`; `image_picker` *removed in P04 — re-added with iOS purpose strings in the avatar-upload task (T1-Profile)* |
 | Icons | `iconsax` (primary), `font_awesome_flutter` (social auth only) |
-| Local KV storage | `shared_preferences` *planned — first use in P15 (onboarding-seen flag); never for credentials (S7)* |
+| Local KV storage | `shared_preferences` for non-sensitive flags only (P09's `smartmeal.installed` marker; P15's onboarding-seen flag); never for credentials (S7) |
+| Secure storage | `flutter_secure_storage` ^10 (P09). **Why:** supabase_flutter's default keeps the access and refresh tokens (and the PKCE verifier) in plaintext SharedPreferences, readable on rooted/jailbroken devices and from unencrypted backups. Keystore-wrapped AES-GCM on Android, a this-device-only Keychain item on iOS. v11 needs Dart 3.10 (via `win32`), so v10 is the latest compatible with Flutter 3.35 |
 | Formatting | `intl` *planned — first use in P16/P18 (dates + XAF currency)* |
 
 **Firebase caveat:** Firebase is used for push notifications only
