@@ -174,17 +174,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Hero Image
-                  Center(
-                    child: Image.asset(
-                      AppAssets.authLoginHero,
-                      width: double.infinity,
-                      fit: BoxFit.fitWidth,
-                      excludeFromSemantics: true,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        height: 200,
-                        width: double.infinity,
-                        color: AppColors.surfaceVariant,
+                  // Hero photo: rounded 16:10 card, cropped to fill.
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: AspectRatio(
+                      aspectRatio: 16 / 10,
+                      child: Image.asset(
+                        AppAssets.authLoginHero,
+                        fit: BoxFit.cover,
+                        excludeFromSemantics: true,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const ColoredBox(color: AppColors.surfaceVariant),
                       ),
                     ),
                   ),

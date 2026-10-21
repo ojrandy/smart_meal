@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/custom_button.dart';
 
 class _OnboardingSlide {
   final String title;
@@ -17,6 +18,10 @@ class _OnboardingSlide {
   });
 }
 
+/// First-run carousel: a real food photo on top (rounded bottom corners),
+/// the message below on the cream background, and fixed page dots + CTA at
+/// the bottom. Owner-approved redesign (2026-10-21) replacing the AI
+/// full-bleed artwork; photo credits in design-assets/source/PHOTO-CREDITS.md.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -41,14 +46,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _OnboardingSlide(
       title: 'Smarter Food Decisions',
       subtitle:
-          'Get personalized recommendations and insights to make healthier food choices',
+          'Get personalized recommendations and insights to make healthier food choices.',
       image: AppAssets.onboardingDecide,
     ),
   ];
 
-  // Translucent pill behind Skip: keeps the white label readable on light
-  // artwork without darkening the whole top of the photo.
+  // Translucent pill behind Skip: keeps the white label readable on any
+  // photo without darkening the photo itself.
   static const _skipPillAlpha = 0.55;
+
+  /// The photo takes this share of the swipeable area, but never gets
+  /// taller than width / 0.72, so the 4:5 crops are upscaled at most ~11 %.
+  static const _photoShare = 0.72;
+  static const _photoAspect = 0.72;
 
   final PageController _pageController = PageController();
   int _currentIndex = 0;
@@ -77,62 +87,48 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final insets = MediaQuery.paddingOf(context);
-    // The design places Skip 60 dp from the top; keep that on typical phones
-    // and move it below taller status bars and notches.
+    // Skip sits 60 dp from the top on typical phones and moves below
+    // taller status bars and notches.
     final skipTop = math.max(60.0, insets.top + 8);
     // Room for the Skip button, which grows with the system text size.
     final skipHeight = MediaQuery.textScalerOf(context).scale(48);
+    final isLastSlide = _currentIndex == _slides.length - 1;
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            itemCount: _slides.length,
-            itemBuilder: (context, index) => Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(
-                  _slides[index].image,
-                  fit: BoxFit.cover,
-                  excludeFromSemantics: true,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const ColoredBox(color: AppColors.primaryDark),
-                ),
-                // Bottom-aligned as designed; scrolls instead of overflowing
-                // on short screens or with large system text.
-                Positioned(
-                  top: skipTop + skipHeight,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) => SingleChildScrollView(
-                      reverse: true,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            _TextScrim(child: _buildSlideContent(index)),
-                          ],
-                        ),
-                      ),
-                    ),
+          Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (index) =>
+                      setState(() => _currentIndex = index),
+                  itemCount: _slides.length,
+                  itemBuilder: (context, index) => _SlidePage(
+                    slide: _slides[index],
+                    // The title never starts under Skip, even when the
+                    // photo is short (small screens, large text).
+                    minPhotoHeight: skipTop + skipHeight,
                   ),
                 ),
-              ],
-            ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(24, 8, 24, 24 + insets.bottom),
+                child: Column(
+                  children: [
+                    _PageDots(count: _slides.length, current: _currentIndex),
+                    const SizedBox(height: 24),
+                    CustomButton(
+                      text: isLastSlide ? 'Get started' : 'Next',
+                      onPressed: _onNext,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-
-          // Skip Button at Top Right
           Positioned(
             top: skipTop,
             right: 24 + insets.right,
@@ -149,7 +145,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 'Skip',
                 style: TextStyle(
                   color: AppColors.onDark,
-                  fontSize: 20,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -159,142 +155,107 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
+}
 
-  Widget _buildSlideContent(int index) {
-    final slide = _slides[index];
-    final isLastSlide = _currentIndex == _slides.length - 1;
+class _SlidePage extends StatelessWidget {
+  final _OnboardingSlide slide;
+  final double minPhotoHeight;
+
+  const _SlidePage({required this.slide, required this.minPhotoHeight});
+
+  @override
+  Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
-      child: Column(
-        children: [
-          Text(
-            slide.title,
-            style: textTheme.headlineMedium?.copyWith(
-              color: AppColors.onDark,
-              fontWeight: FontWeight.bold,
-              fontSize: 36,
-            ),
-            textAlign: TextAlign.center,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final photoHeight = math.max(
+          minPhotoHeight,
+          math.min(
+            constraints.maxHeight * _OnboardingScreenState._photoShare,
+            constraints.maxWidth / _OnboardingScreenState._photoAspect,
           ),
-          const SizedBox(height: 16),
-          Text(
-            slide.subtitle,
-            style: textTheme.bodyLarge?.copyWith(
-              color: AppColors.onDarkMuted,
-              fontSize: 20,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 56),
-          // Page Indicator
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(
-              _slides.length,
-              (indicatorIndex) => AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                height: 8,
-                width: _currentIndex == indicatorIndex ? 24 : 8,
-                decoration: BoxDecoration(
-                  color: _currentIndex == indicatorIndex
-                      ? AppColors.primary
-                      : AppColors.onDarkSubtle,
-                  borderRadius: BorderRadius.circular(4),
+        );
+
+        return Column(
+          children: [
+            SizedBox(
+              height: photoHeight,
+              width: double.infinity,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(32),
+                ),
+                child: Image.asset(
+                  slide.image,
+                  fit: BoxFit.cover,
+                  excludeFromSemantics: true,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const ColoredBox(color: AppColors.primaryLight),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 32),
-          // Next / Start Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _onNext,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    isLastSlide ? 'Get started' : 'Next',
-                    style: const TextStyle(
-                      color: AppColors.onPrimary,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+            // Scrolls instead of overflowing on short screens or with
+            // large system text.
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 8),
+                child: Column(
+                  children: [
+                    Text(
+                      slide.title,
+                      style: textTheme.headlineMedium?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                        height: 1.2,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  if (isLastSlide) ...[
-                    const SizedBox(width: 8),
-                    const Icon(
-                      Icons.arrow_forward,
-                      color: AppColors.onPrimary,
-                      size: 20,
+                    const SizedBox(height: 12),
+                    Text(
+                      slide.subtitle,
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 16,
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
-                ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 }
 
-/// Darkens the photo behind the slide text wherever the text ends up (any
-/// screen size or text scale), so the white text keeps WCAG AA contrast: a
-/// soft fade above the title, then a scrim that deepens towards the bottom.
-class _TextScrim extends StatelessWidget {
-  final Widget child;
+class _PageDots extends StatelessWidget {
+  final int count;
+  final int current;
 
-  const _TextScrim({required this.child});
-
-  static const _fadeHeight = 120.0;
-  static const _topAlpha = 0.6;
-  static const _bottomAlpha = 0.85;
+  const _PageDots({required this.count, required this.current});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: _fadeHeight,
-          width: double.infinity,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.scrim.withValues(alpha: 0),
-                  AppColors.scrim.withValues(alpha: _topAlpha),
-                ],
-              ),
-            ),
-          ),
-        ),
-        DecoratedBox(
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        count,
+        (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          height: 8,
+          width: current == index ? 24 : 8,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.scrim.withValues(alpha: _topAlpha),
-                AppColors.scrim.withValues(alpha: _bottomAlpha),
-              ],
-            ),
+            color: current == index ? AppColors.primary : AppColors.textHint,
+            borderRadius: BorderRadius.circular(4),
           ),
-          child: child,
         ),
-      ],
+      ),
     );
   }
 }

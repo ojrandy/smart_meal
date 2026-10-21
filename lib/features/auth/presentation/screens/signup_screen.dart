@@ -196,16 +196,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   const SizedBox(height: 32),
 
                   // Hero Image
-                  Center(
-                    child: Image.asset(
-                      AppAssets.authSignupHero,
-                      width: double.infinity,
-                      fit: BoxFit.fitWidth,
-                      excludeFromSemantics: true,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        height: 200,
-                        width: double.infinity,
-                        color: AppColors.surfaceVariant,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: AspectRatio(
+                      aspectRatio: 16 / 10,
+                      child: Image.asset(
+                        AppAssets.authSignupHero,
+                        fit: BoxFit.cover,
+                        excludeFromSemantics: true,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const ColoredBox(color: AppColors.surfaceVariant),
                       ),
                     ),
                   ),
