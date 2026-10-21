@@ -9,7 +9,7 @@ class AppColors {
   static const Color primaryLight = Color(0xFFE6F4EA);
   static const Color onPrimary = Color(0xFFFFFFFF);
 
-  // Orange of the logo; the "AI" / "TECH" highlight on the splash.
+  // Orange of the logo; the "AI" in the splash wordmark (large text only).
   static const Color brandAccent = Color(0xFFFF6B00);
 
   // Background Colors
@@ -29,7 +29,6 @@ class AppColors {
   // Content on photos, gradients and other dark backgrounds
   static const Color onDark = Color(0xFFFFFFFF);
   static const Color onDarkMuted = Color(0xB3FFFFFF); // white 70 %
-  static const Color onDarkSubtle = Color(0x8AFFFFFF); // white 54 %
 
   // Base colors for overlays; apply alpha at the call site.
   static const Color scrim = Color(0xFF000000);
@@ -58,16 +57,8 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
-  // Splash
-  static const Color splashGradientStart = Color(0xFF188241);
-  static const Color splashGradientMid = Color(0xFF289A45);
-  static const Color splashGradientEnd = Color(0xFF86B93F);
-  static const Color splashGlow = Color(0xFFF59E0B);
-
-  static const LinearGradient splashGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [splashGradientStart, splashGradientMid, splashGradientEnd],
-    stops: [0.0, 0.4, 1.0],
-  );
+  // Splash (and the native launch screens, which must match it): a deep
+  // brand green dark enough for the orange "AI" to pass WCAG AA for large
+  // text (3.8:1) and white text 10.9:1.
+  static const Color splashBackground = Color(0xFF05471F);
 }

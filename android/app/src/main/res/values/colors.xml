@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Must match AppColors.splashBackground, so the native launch screen
+         and the Flutter splash show one continuous color. -->
+    <color name="splash_background">#05471F</color>
+</resources>

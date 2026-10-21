@@ -5,8 +5,16 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 
+/// Minimal brand splash (owner-approved redesign, 2026-10-21): the logo
+/// and wordmark on the deep brand green, one short entrance, then onward.
+/// The native launch screens use the same green, so there is no flash
+/// between them and this first Flutter frame.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
+  /// Long enough for the entrance to finish and register, short enough
+  /// that the splash never feels like a wait.
+  static const holdDuration = Duration(milliseconds: 1600);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -16,163 +24,83 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Navigate to onboarding after 5 seconds
-    Future.delayed(const Duration(seconds: 5), () {
-      if (mounted) {
-        context.go('/onboarding');
-      }
+    // Session-aware routing replaces this fixed hop in P15.
+    Future.delayed(SplashScreen.holdDuration, () {
+      if (mounted) context.go('/onboarding');
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(gradient: AppColors.splashGradient),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Center glow behind logo
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.3,
-              child:
-                  Container(
-                        width: 250,
-                        height: 250,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.splashGlow.withValues(
-                                alpha: 0.4,
-                              ),
-                              blurRadius: 100,
-                              spreadRadius: 40,
-                            ),
-                          ],
-                        ),
-                      )
-                      .animate(
-                        onPlay: (controller) =>
-                            controller.repeat(reverse: true),
-                      )
-                      .scale(
-                        begin: const Offset(0.8, 0.8),
-                        end: const Offset(1.1, 1.1),
-                        duration: 2.seconds,
-                      )
-                      .fade(begin: 0.5, end: 1.0, duration: 2.seconds),
-            ),
-
-            // Main Content
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(flex: 3),
-
-                // Logo
-                Image.asset(
-                      AppAssets.appLogo,
-                      width: 140,
-                      height: 140,
-                      excludeFromSemantics: true,
-                    )
-                    .animate()
-                    .fade(duration: 800.ms)
-                    .scale(duration: 800.ms, curve: Curves.easeOutBack),
-
-                const SizedBox(height: 16),
-
-                // SmartMeal AI Text
-                Text.rich(
-                      TextSpan(
-                        style: GoogleFonts.inter(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -1.5,
-                        ),
-                        children: const [
-                          TextSpan(
-                            text: 'SmartMeal ',
-                            style: TextStyle(color: AppColors.onDark),
-                          ),
-                          TextSpan(
-                            text: 'AI',
-                            style: TextStyle(color: AppColors.brandAccent),
-                          ),
-                        ],
-                      ),
-                    )
-                    .animate()
-                    .fade(delay: 400.ms, duration: 600.ms)
-                    .slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
-
-                const SizedBox(height: 12),
-
-                // Subtitle
-                Text(
-                  'AI POWERED FOOD COMPANION',
-                  style: GoogleFonts.inter(
-                    color: AppColors.onDark.withValues(alpha: 0.9),
-                    fontSize: 13,
-                    letterSpacing: 1.5,
-                    fontWeight: FontWeight.w500,
+      backgroundColor: AppColors.splashBackground,
+      body: SafeArea(
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            children: [
+              const Spacer(),
+              Image.asset(
+                    AppAssets.appLogo,
+                    width: 112,
+                    height: 112,
+                    excludeFromSemantics: true,
+                  )
+                  .animate()
+                  .fade(duration: 500.ms)
+                  .scale(
+                    begin: const Offset(0.9, 0.9),
+                    duration: 500.ms,
+                    curve: Curves.easeOutCubic,
                   ),
-                ).animate().fade(delay: 600.ms, duration: 600.ms),
-
-                const SizedBox(height: 50),
-
-                // 3 Dots Loading Indicator
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(3, (index) {
-                    return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 6),
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: AppColors.onDark.withValues(alpha: 0.9),
-                            shape: BoxShape.circle,
-                          ),
-                        )
-                        .animate(onPlay: (controller) => controller.repeat())
-                        .fadeIn(duration: 400.ms, delay: (index * 200).ms)
-                        .fadeOut(
-                          duration: 400.ms,
-                          delay: ((index * 200) + 400).ms,
-                        );
-                  }),
-                ).animate().fade(delay: 1000.ms),
-
-                const Spacer(flex: 2),
-
-                // Bottom Text
-                Text.rich(
-                  TextSpan(
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      fontStyle: FontStyle.italic,
-                      letterSpacing: 2,
+              const SizedBox(height: 20),
+              Text.rich(
+                    TextSpan(
+                      style: GoogleFonts.inter(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -1.5,
+                        height: 1.1,
+                      ),
+                      children: const [
+                        TextSpan(
+                          text: 'SmartMeal ',
+                          style: TextStyle(color: AppColors.onDark),
+                        ),
+                        TextSpan(
+                          text: 'AI',
+                          style: TextStyle(color: AppColors.brandAccent),
+                        ),
+                      ],
                     ),
-                    children: const [
-                      TextSpan(
-                        text: 'BY OJ ',
-                        style: TextStyle(color: AppColors.onDark),
-                      ),
-                      TextSpan(
-                        text: 'TECH',
-                        style: TextStyle(color: AppColors.brandAccent),
-                      ),
-                    ],
-                  ),
-                ).animate().fade(delay: 800.ms),
-
-                const SizedBox(height: 48),
-              ],
-            ),
-          ],
+                    textAlign: TextAlign.center,
+                  )
+                  .animate()
+                  .fade(delay: 200.ms, duration: 500.ms)
+                  .slideY(begin: 0.2, end: 0, curve: Curves.easeOutCubic),
+              const SizedBox(height: 10),
+              Text(
+                'Your AI food companion',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  color: AppColors.onDarkMuted,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ).animate().fade(delay: 400.ms, duration: 500.ms),
+              const Spacer(),
+              Text(
+                'by OJ Tech',
+                style: GoogleFonts.inter(
+                  color: AppColors.onDarkMuted,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ).animate().fade(delay: 400.ms, duration: 500.ms),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );

@@ -32,7 +32,7 @@ void main() {
     await tester.pump();
 
     expect(find.byType(SplashScreen), findsOneWidget);
-    expect(find.text('AI POWERED FOOD COMPANION'), findsOneWidget);
+    expect(find.text('Your AI food companion'), findsOneWidget);
 
     // Unmount so the splash's delayed navigation is not left pending.
     await tester.pumpWidget(const SizedBox.shrink());
