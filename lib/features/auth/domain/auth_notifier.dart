@@ -1,68 +1,42 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
+import '../../../core/services/app_logger.dart';
 import '../data/auth_repository.dart';
 import 'auth_state.dart';
 
 /// Auth Notifier — Domain Layer
 ///
-/// Manages the global authentication state for SmartMeal.
-/// Listens to Supabase auth state changes via a stream subscription
-/// so the state stays in sync even when sessions expire or are refreshed.
+/// Runs the auth operations screens start and reports their progress as a
+/// [SmartMealAuthState]. It never decides where the user is: a successful
+/// operation changes the Supabase session, `authSessionProvider` picks that
+/// up, and the router redirects.
 ///
 /// Exposed methods:
 /// - [signIn]            — email & password sign-in
 /// - [signUp]            — email & password account creation
 /// - [signInWithGoogle]  — Google OAuth via Supabase
 /// - [signOut]           — sign out from all providers
+/// - [resetPassword]     — request a password reset email
 class AuthNotifier extends Notifier<SmartMealAuthState> {
-  late StreamSubscription<sb.AuthState> _authSubscription;
-
   @override
-  SmartMealAuthState build() {
-    final repo = ref.watch(authRepositoryProvider);
+  SmartMealAuthState build() => AuthIdle();
 
-    // ── Subscribe to real-time Supabase auth state changes ────────────────
-    // This keeps our state in sync with the Supabase session automatically,
-    // including token refreshes and session expiration.
-    _authSubscription = repo.authStateChanges.listen((supabaseAuthState) {
-      final session = supabaseAuthState.session;
-      if (session != null) {
-        state = AuthAuthenticated(session.user);
-      } else {
-        state = AuthUnauthenticated();
-      }
-    });
-
-    ref.onDispose(() => _authSubscription.cancel());
-
-    // ── Resolve the initial state synchronously ────────────────────────────
-    // If a persisted session exists (user previously logged in), we start
-    // in AuthAuthenticated to avoid a flash of the login screen.
-    final currentUser = repo.currentUser;
-    if (currentUser != null) {
-      return AuthAuthenticated(currentUser);
-    }
-    return AuthUnauthenticated();
-  }
+  AuthRepository get _repo => ref.read(authRepositoryProvider);
 
   // ── Email & Password Sign-In ───────────────────────────────────────────────
 
   Future<void> signIn({required String email, required String password}) async {
     state = AuthLoading();
     try {
-      final response = await ref
-          .read(authRepositoryProvider)
-          .signIn(email: email, password: password);
-      if (response.user != null) {
-        state = AuthAuthenticated(response.user!);
-      } else {
-        state = AuthError('Sign in failed. Please check your credentials.');
-      }
-    } on sb.AuthException catch (e) {
-      state = AuthError(_formatAuthError(e));
-    } catch (_) {
-      state = AuthError('An unexpected error occurred. Please try again.');
+      final response = await _repo.signIn(email: email, password: password);
+      state = response.session != null
+          ? AuthIdle()
+          : AuthError(formatAuthError(null));
+    } catch (error, stackTrace) {
+      state = _failure('signIn', error, stackTrace);
     }
   }
 
@@ -71,26 +45,15 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
   Future<void> signUp({required String email, required String password}) async {
     state = AuthLoading();
     try {
-      final response = await ref
-          .read(authRepositoryProvider)
-          .signUp(email: email, password: password);
-
-      if (response.user == null) {
-        state = AuthError('Account creation failed. Please try again.');
-        return;
-      }
-
-      if (response.session != null) {
-        // Email confirmation is OFF in Supabase — user is immediately active.
-        state = AuthAuthenticated(response.user!);
-      } else {
-        // Email confirmation is ON — user must verify their email first.
-        state = AuthUnauthenticated();
-      }
-    } on sb.AuthException catch (e) {
-      state = AuthError(_formatAuthError(e));
-    } catch (_) {
-      state = AuthError('An unexpected error occurred. Please try again.');
+      final response = await _repo.signUp(email: email, password: password);
+      // With a session, email confirmation is off and the user is in. Without
+      // one, confirmation is on — or the email was already registered, which
+      // Supabase deliberately reports the same way.
+      state = response.session != null
+          ? AuthIdle()
+          : AuthAwaitingEmailConfirmation();
+    } catch (error, stackTrace) {
+      state = _failure('signUp', error, stackTrace);
     }
   }
 
@@ -99,22 +62,13 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
   Future<void> signInWithGoogle() async {
     state = AuthLoading();
     try {
-      final response = await ref
-          .read(authRepositoryProvider)
-          .signInWithGoogle();
-      if (response.user != null) {
-        state = AuthAuthenticated(response.user!);
-      } else {
-        state = AuthError('Google sign-in failed. Please try again.');
-      }
-    } on sb.AuthException catch (e) {
-      state = AuthError(_formatAuthError(e));
-    } catch (e) {
-      // Handles user-cancelled Google picker and unexpected failures.
-      final message = e.toString().contains('cancelled')
-          ? 'Sign-in cancelled.'
-          : 'Google sign-in failed. Please try again.';
-      state = AuthError(message);
+      await _repo.signInWithGoogle();
+      state = AuthIdle();
+    } on GoogleSignInCancelled {
+      // Closing the picker is a choice, not an error: no message.
+      state = AuthIdle();
+    } catch (error, stackTrace) {
+      state = _failure('signInWithGoogle', error, stackTrace);
     }
   }
 
@@ -123,10 +77,22 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
   Future<void> signOut() async {
     state = AuthLoading();
     try {
-      await ref.read(authRepositoryProvider).signOut();
-      state = AuthUnauthenticated();
-    } catch (_) {
-      state = AuthError('Sign out failed. Please try again.');
+      await _repo.signOut();
+      state = AuthIdle();
+    } catch (error, stackTrace) {
+      // Supabase drops the local session before revoking it on the server,
+      // so a failed revoke has still signed this device out: nothing to show.
+      // Only a session that is still here (e.g. the Google step failed)
+      // means the user is still signed in and should hear about it.
+      state = _repo.currentUser == null
+          ? AuthIdle()
+          : AuthError('Sign out failed. Please try again.');
+      AppLogger.log(
+        'signOut failed',
+        name: 'auth',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -135,36 +101,71 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
   Future<void> resetPassword(String email) async {
     state = AuthLoading();
     try {
-      await ref.read(authRepositoryProvider).resetPassword(email);
-      // Return to unauthenticated — let the UI show a success message.
-      state = AuthUnauthenticated();
-    } on sb.AuthException catch (e) {
-      state = AuthError(_formatAuthError(e));
-    } catch (_) {
-      state = AuthError('Failed to send reset email. Please try again.');
+      await _repo.resetPassword(email);
+      state = AuthResetEmailSent();
+    } catch (error, stackTrace) {
+      state = _failure('resetPassword', error, stackTrace);
     }
   }
 
   // ── Helper ─────────────────────────────────────────────────────────────────
 
-  /// Maps Supabase [AuthException] codes to user-friendly messages.
-  String _formatAuthError(sb.AuthException e) {
-    switch (e.code) {
-      case 'invalid_credentials':
-        return 'Incorrect email or password. Please try again.';
-      case 'user_already_exists':
-        return 'An account with this email already exists.';
-      case 'weak_password':
-        return 'Password is too weak. Use at least 8 characters.';
-      case 'email_not_confirmed':
-        return 'Please confirm your email before signing in.';
-      case 'over_email_send_rate_limit':
-        return 'Too many requests. Please wait a moment and try again.';
-      default:
-        return e.message.isNotEmpty
-            ? e.message
-            : 'Authentication failed. Please try again.';
-    }
+  AuthError _failure(String operation, Object error, StackTrace stackTrace) {
+    // The raw error goes to the debug log only; the UI gets a safe message.
+    AppLogger.log(
+      '$operation failed',
+      name: 'auth',
+      error: error,
+      stackTrace: stackTrace,
+    );
+    return AuthError(formatAuthError(error));
+  }
+}
+
+const _genericAuthError = 'Something went wrong. Please try again.';
+
+/// Maps any auth failure to a user-safe message. The one error mapper for
+/// auth: extend its switch when a new Supabase error code shows up, and
+/// never return the error's own text.
+///
+/// Codes: https://supabase.com/docs/guides/auth/debugging/error-codes
+@visibleForTesting
+String formatAuthError(Object? error) {
+  switch (error) {
+    // Checked before the code switch: it carries no code.
+    case sb.AuthRetryableFetchException():
+    case SocketException():
+    case TimeoutException():
+    case GoogleSignInNetworkFailure():
+      return 'No connection. Check your internet and try again.';
+    case GoogleSignInFailed():
+      return 'Google sign-in failed. Please try again.';
+    case sb.AuthException(:final code):
+      return switch (code) {
+        'invalid_credentials' =>
+          'Incorrect email or password. Please try again.',
+        'email_exists' || 'user_already_exists' =>
+          'An account with this email already exists. Try signing in.',
+        'weak_password' =>
+          'Choose a stronger password: at least 8 characters with upper- '
+              'and lowercase letters, a number and a symbol.',
+        'email_not_confirmed' => 'Please confirm your email before signing in.',
+        'over_email_send_rate_limit' || 'over_request_rate_limit' =>
+          'Too many attempts. Please wait a moment and try again.',
+        'signup_disabled' =>
+          'New sign-ups are paused right now. Please try again later.',
+        'email_address_invalid' =>
+          "That email address can't be used. Please check it and try again.",
+        'validation_failed' => 'Please check your details and try again.',
+        'same_password' =>
+          'Your new password must be different from your current one.',
+        'session_expired' || 'refresh_token_not_found' =>
+          'Your session has expired. Please sign in again.',
+        'user_banned' => "This account can't sign in right now.",
+        _ => _genericAuthError,
+      };
+    default:
+      return _genericAuthError;
   }
 }
 

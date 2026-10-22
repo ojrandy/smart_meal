@@ -1,42 +1,37 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-/// Sealed class representing all possible authentication states
-/// in the SmartMeal application.
+/// The state of the auth *operation* a screen started (sign-in, sign-up,
+/// sign-out, password reset). Whether someone is signed in is not here: that
+/// comes from the Supabase session through `authSessionProvider`, which is
+/// all the router reads.
 ///
-/// Use pattern matching to handle each case in the UI:
 /// ```dart
 /// switch (authState) {
-///   case AuthInitial()       => ...
-///   case AuthLoading()       => show CircularProgressIndicator
-///   case AuthAuthenticated() => navigate to /home
-///   case AuthUnauthenticated() => navigate to /auth/login
-///   case AuthError()         => show SnackBar with message
+///   case AuthIdle()                       => ...
+///   case AuthLoading()                    => disable buttons, show spinner
+///   case AuthError()                      => show SnackBar with message
+///   case AuthAwaitingEmailConfirmation()  => tell the user to check email
+///   case AuthResetEmailSent()             => confirm the reset email
 /// }
 /// ```
 sealed class SmartMealAuthState {}
 
-/// The initial state before any auth check has been resolved.
-class AuthInitial extends SmartMealAuthState {}
+/// Nothing in progress. Success also returns here; the session change
+/// moves the router.
+class AuthIdle extends SmartMealAuthState {}
 
-/// An auth operation is in progress (sign-in, sign-up, sign-out).
-/// Show a loading indicator while in this state.
+/// An auth operation is in progress. Disable every auth action.
 class AuthLoading extends SmartMealAuthState {}
 
-/// The user is authenticated and the session is active.
-class AuthAuthenticated extends SmartMealAuthState {
-  /// The authenticated Supabase user.
-  final User user;
-
-  AuthAuthenticated(this.user);
-}
-
-/// The user is not authenticated. Redirect to the login screen.
-class AuthUnauthenticated extends SmartMealAuthState {}
-
-/// An error occurred during an auth operation.
-/// [message] is a user-friendly string safe to display in the UI.
+/// An operation failed. [message] is user-safe; never raw server text.
 class AuthError extends SmartMealAuthState {
   final String message;
 
   AuthError(this.message);
 }
+
+/// Sign-up succeeded without a session: email confirmation is on. Supabase
+/// answers the same way for an already-registered email, so copy shown for
+/// this state must be true in both cases.
+class AuthAwaitingEmailConfirmation extends SmartMealAuthState {}
+
+/// A password reset email was requested.
+class AuthResetEmailSent extends SmartMealAuthState {}

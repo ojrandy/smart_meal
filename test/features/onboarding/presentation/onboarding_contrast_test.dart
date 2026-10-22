@@ -8,6 +8,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smart_meal/core/theme/app_fonts.dart';
@@ -74,9 +75,11 @@ void main() {
       await tester.pumpWidget(
         RepaintBoundary(
           key: boundary,
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: const OnboardingScreen(),
+          child: ProviderScope(
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              home: const OnboardingScreen(),
+            ),
           ),
         ),
       );

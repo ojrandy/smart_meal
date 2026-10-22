@@ -1,8 +1,32 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/app_config_provider.dart';
 import '../../../core/providers/supabase_provider.dart';
+
+/// Why the native Google step failed, typed so callers never match on
+/// error text. Supabase failures after Google succeeds stay [AuthException].
+sealed class GoogleSignInFailure implements Exception {
+  const GoogleSignInFailure();
+}
+
+/// The user closed the account picker. Not an error.
+class GoogleSignInCancelled extends GoogleSignInFailure {
+  const GoogleSignInCancelled();
+}
+
+class GoogleSignInNetworkFailure extends GoogleSignInFailure {
+  const GoogleSignInNetworkFailure();
+}
+
+/// Anything else, including a misconfigured OAuth client (no ID token).
+class GoogleSignInFailed extends GoogleSignInFailure {
+  const GoogleSignInFailed(this.reason);
+
+  /// Developer-facing detail for the debug log only, never the UI.
+  final String reason;
+}
 
 /// Auth Repository — Data Layer
 ///
@@ -63,23 +87,27 @@ class AuthRepository {
   /// Initiates the native Google Sign-In flow, then exchanges the Google
   /// ID token with Supabase to create or sign in the Supabase user.
   ///
-  /// Throws [AuthException] if Google token retrieval fails.
-  /// Throws a general [Exception] if the user cancels the Google picker.
+  /// Throws a [GoogleSignInFailure] if the Google step fails or is
+  /// cancelled, and [AuthException] if Supabase rejects the token.
   Future<AuthResponse> signInWithGoogle() async {
-    final googleUser = await _googleSignIn.signIn();
-
-    if (googleUser == null) {
-      // The user closed the Google sign-in picker without selecting an account.
-      throw Exception('Google sign-in was cancelled.');
+    final GoogleSignInAccount? googleUser;
+    final GoogleSignInAuthentication googleAuth;
+    try {
+      googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) throw const GoogleSignInCancelled();
+      googleAuth = await googleUser.authentication;
+    } on PlatformException catch (e) {
+      throw switch (e.code) {
+        GoogleSignIn.kSignInCanceledError => const GoogleSignInCancelled(),
+        GoogleSignIn.kNetworkError => const GoogleSignInNetworkFailure(),
+        _ => GoogleSignInFailed('PlatformException ${e.code}'),
+      };
     }
 
-    final googleAuth = await googleUser.authentication;
     final idToken = googleAuth.idToken;
-
     if (idToken == null) {
-      throw const AuthException(
-        'Failed to retrieve a Google ID token. '
-        'Ensure your Google Cloud OAuth client is configured correctly.',
+      throw const GoogleSignInFailed(
+        'No Google ID token: check the OAuth client configuration.',
       );
     }
 

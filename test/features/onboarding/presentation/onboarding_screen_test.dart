@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_meal/core/providers/shared_preferences_provider.dart';
 import 'package:smart_meal/core/theme/app_fonts.dart';
 import 'package:smart_meal/core/theme/app_theme.dart';
+import 'package:smart_meal/features/onboarding/data/onboarding_repository.dart';
 import 'package:smart_meal/features/onboarding/presentation/onboarding_screen.dart';
 
 const _titles = [
@@ -12,7 +16,7 @@ const _titles = [
   'Smarter Food Decisions',
 ];
 
-Future<void> _pump(
+Future<SharedPreferences> _pump(
   WidgetTester tester, {
   Size size = const Size(393, 873),
   double textScale = 1.0,
@@ -39,11 +43,21 @@ Future<void> _pump(
   );
   addTearDown(router.dispose);
 
+  SharedPreferences.setMockInitialValues({});
+  final prefs = await SharedPreferences.getInstance();
+
   await tester.pumpWidget(
-    MaterialApp.router(theme: AppTheme.lightTheme, routerConfig: router),
+    ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      child: MaterialApp.router(
+        theme: AppTheme.lightTheme,
+        routerConfig: router,
+      ),
+    ),
   );
   await tester.runAsync(GoogleFonts.pendingFonts);
   await tester.pump();
+  return prefs;
 }
 
 void main() {
@@ -52,7 +66,7 @@ void main() {
   testWidgets('shows 3 slides; Next becomes Get started on the last', (
     tester,
   ) async {
-    await _pump(tester);
+    final prefs = await _pump(tester);
 
     for (var i = 0; i < _titles.length; i++) {
       expect(find.text(_titles[i]), findsOneWidget);
@@ -65,9 +79,20 @@ void main() {
       }
     }
 
+    expect(prefs.getBool(OnboardingRepository.seenKey), isNull);
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
     expect(find.text('login'), findsOneWidget);
+    expect(prefs.getBool(OnboardingRepository.seenKey), isTrue);
+  });
+
+  testWidgets('Skip marks onboarding seen and goes to sign-in', (tester) async {
+    final prefs = await _pump(tester);
+
+    await tester.tap(find.text('Skip'));
+    await tester.pumpAndSettle();
+    expect(find.text('login'), findsOneWidget);
+    expect(prefs.getBool(OnboardingRepository.seenKey), isTrue);
   });
 
   for (final (size, scale) in [

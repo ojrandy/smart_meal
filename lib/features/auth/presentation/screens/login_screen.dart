@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/validation/validators.dart';
+import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/social_auth_button.dart';
@@ -66,26 +67,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   ) {
     if (!mounted) return;
 
-    if (next is AuthAuthenticated) {
-      context.go('/home');
-    } else if (next is AuthError) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(next.message),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-    } else if (next is AuthUnauthenticated && previous is AuthLoading) {
-      // Sign-up with email confirmation — let the user know to check email.
-      // This case won't normally hit on login, but is a safety net.
-    }
+    // A successful sign-in needs nothing here: the session change makes the
+    // router redirect to /home.
+    if (next is AuthError) showAppSnackBar(context, next.message);
   }
 
   @override
@@ -197,18 +181,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     prefixIcon: Iconsax.sms,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      final emailRegex = RegExp(
-                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                      );
-                      if (!emailRegex.hasMatch(value.trim())) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
+                    validator: validateEmail,
                   ),
                   const SizedBox(height: 16),
 
@@ -219,15 +192,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     prefixIcon: Iconsax.lock,
                     isPassword: true,
                     controller: _passwordController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
+                    validator: validateLoginPassword,
                   ),
 
                   // Forgot Password
@@ -297,48 +262,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       excludeFromSemantics: true,
                     ),
                     onPressed: isLoading ? null : _signInWithGoogle,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Apple Sign-In (placeholder — requires Apple Developer account)
-                  SocialAuthButton(
-                    text: 'Continue with Apple',
-                    icon: const FaIcon(
-                      FontAwesomeIcons.apple,
-                      color: AppColors.socialApple,
-                      size: 24,
-                    ),
-                    onPressed: isLoading
-                        ? null
-                        : () {
-                            // TODO: Implement Apple Sign-In (requires Apple Developer account)
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Apple Sign-In coming soon'),
-                              ),
-                            );
-                          },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Facebook Sign-In (placeholder)
-                  SocialAuthButton(
-                    text: 'Continue with Facebook',
-                    icon: const FaIcon(
-                      FontAwesomeIcons.facebook,
-                      color: AppColors.socialFacebook,
-                      size: 24,
-                    ),
-                    onPressed: isLoading
-                        ? null
-                        : () {
-                            // TODO: Implement Facebook Sign-In
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Facebook Sign-In coming soon'),
-                              ),
-                            );
-                          },
                   ),
                   const SizedBox(height: 32),
 

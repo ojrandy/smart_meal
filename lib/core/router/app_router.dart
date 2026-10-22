@@ -6,8 +6,11 @@ import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
-import '../../features/auth/domain/auth_notifier.dart';
-import '../../features/auth/domain/auth_state.dart';
+import '../../features/auth/domain/auth_session.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/onboarding/domain/onboarding_notifier.dart';
+import '../../features/splash/domain/launch_ready_notifier.dart';
+import 'launch_redirect.dart';
 
 // Placeholder screen — replace each one as features are built
 class PlaceholderScreen extends StatelessWidget {
@@ -31,26 +34,25 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
 
 // ── Router Refresh Notifier ────────────────────────────────────────────────
 //
-// A ChangeNotifier that bridges Riverpod auth state changes to GoRouter's
-// refreshListenable. When auth state changes, this notifier fires and
-// GoRouter re-evaluates its redirect function.
+// A ChangeNotifier that bridges the Riverpod state routing depends on to
+// GoRouter's refreshListenable. When any of it changes, this notifier fires
+// and GoRouter re-evaluates its redirect function. New routing inputs are
+// added here, never as a second refresh mechanism.
 
 class _RouterRefreshNotifier extends ChangeNotifier {
-  final Ref _ref;
-
-  _RouterRefreshNotifier(this._ref) {
-    // Listen to auth state changes and notify GoRouter to re-evaluate.
-    _ref.listen<SmartMealAuthState>(authNotifierProvider, (_, __) {
-      notifyListeners();
-    });
+  _RouterRefreshNotifier(Ref ref) {
+    void refresh(_, _) => notifyListeners();
+    ref.listen(authSessionProvider, refresh);
+    ref.listen(onboardingSeenProvider, refresh);
+    ref.listen(launchReadyProvider, refresh);
   }
 }
 
 // ── Router Provider ────────────────────────────────────────────────────────
 
 /// The main GoRouter instance exposed as a Riverpod provider.
-/// Watches [authNotifierProvider] via [_RouterRefreshNotifier] so it
-/// automatically re-evaluates redirects when the auth state changes.
+/// Watches the session, onboarding and launch-ready providers via
+/// [_RouterRefreshNotifier] so it re-evaluates redirects when they change.
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = _RouterRefreshNotifier(ref);
   ref.onDispose(notifier.dispose);
@@ -61,30 +63,15 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: notifier,
 
     // ── Auth Guard ─────────────────────────────────────────────────────────
-    redirect: (context, state) {
-      final authState = ref.read(authNotifierProvider);
-      final isAuthenticated = authState is AuthAuthenticated;
-      final loc = state.matchedLocation;
-
-      // Public routes — never redirect away from these
-      final isPublic =
-          loc == '/splash' || loc == '/onboarding' || loc.startsWith('/auth');
-
-      if (isPublic) {
-        // If authenticated and trying to access auth screens → go home
-        if (isAuthenticated && loc.startsWith('/auth')) {
-          return '/home';
-        }
-        return null; // Allow through
-      }
-
-      // Protected routes — require authentication
-      if (!isAuthenticated) {
-        return '/auth/login';
-      }
-
-      return null; // Authenticated, allow through
-    },
+    // The whole decision lives in resolveRedirect (launch_redirect.dart).
+    redirect: (context, state) => resolveRedirect(
+      LaunchSnapshot(
+        location: state.matchedLocation,
+        isReady: ref.read(launchReadyProvider),
+        isSignedIn: ref.read(authSessionProvider) != null,
+        isOnboardingSeen: ref.read(onboardingSeenProvider),
+      ),
+    ),
 
     routes: [
       // ── Authentication & Onboarding ──────────────────────────────────────
@@ -143,8 +130,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/home',
-                builder: (context, state) =>
-                    const PlaceholderScreen(title: 'Home Screen'),
+                builder: (context, state) => const HomeScreen(),
                 routes: [
                   GoRoute(
                     path: 'recipe/:id',

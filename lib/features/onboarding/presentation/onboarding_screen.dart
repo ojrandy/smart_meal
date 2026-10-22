@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_button.dart';
+import '../domain/onboarding_notifier.dart';
 
 class _OnboardingSlide {
   final String title;
@@ -22,14 +25,14 @@ class _OnboardingSlide {
 /// the message below on the cream background, and fixed page dots + CTA at
 /// the bottom. Owner-approved redesign (2026-10-21) replacing the AI
 /// full-bleed artwork; photo credits in design-assets/source/PHOTO-CREDITS.md.
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   static const _slides = [
     _OnboardingSlide(
       title: 'Welcome to SmartMeal',
@@ -69,13 +72,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _onSkip() {
+  // Skip and Get started both count as seen: onboarding shows once.
+  void _finish() {
+    unawaited(ref.read(onboardingSeenProvider.notifier).markSeen());
     context.go('/auth/login');
   }
 
+  void _onSkip() => _finish();
+
   void _onNext() {
     if (_currentIndex == _slides.length - 1) {
-      context.go('/auth/login');
+      _finish();
     } else {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),

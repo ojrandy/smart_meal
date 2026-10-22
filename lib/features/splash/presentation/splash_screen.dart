@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
@@ -9,26 +8,11 @@ import '../../../core/theme/app_colors.dart';
 /// and wordmark on the deep brand green, one short entrance, then onward.
 /// The native launch screens use the same green, so there is no flash
 /// between them and this first Flutter frame.
-class SplashScreen extends StatefulWidget {
+///
+/// It only animates: the router leaves it once `launchReadyProvider` says
+/// the hold is over, choosing home, onboarding or sign-in.
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
-
-  /// Long enough for the entrance to finish and register, short enough
-  /// that the splash never feels like a wait.
-  static const holdDuration = Duration(milliseconds: 1600);
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Session-aware routing replaces this fixed hop in P15.
-    Future.delayed(SplashScreen.holdDuration, () {
-      if (mounted) context.go('/onboarding');
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
