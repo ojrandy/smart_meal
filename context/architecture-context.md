@@ -19,9 +19,11 @@ lib/
                                   # APP_ENV). Built once in main(); read via appConfigProvider.
     constants/                   # Compile-time app constants: AppAssets (every bundled
                                   # image path). Never hard-code an 'assets/...' string elsewhere.
-    providers/                   # App-wide Riverpod providers (e.g. supabaseClientProvider,
-                                  # appConfigProvider — overridden in main()'s ProviderScope)
-    router/                      # go_router setup, shell scaffold, nav bar
+    providers/                   # App-wide Riverpod providers (e.g. supabaseClientProvider;
+                                  # appConfigProvider and sharedPreferencesProvider are
+                                  # overridden in main()'s ProviderScope)
+    router/                      # go_router setup, shell scaffold, nav bar; the guard's
+                                  # decision is the pure resolveRedirect in launch_redirect.dart
     services/                    # App-lifecycle bootstrap classes with no reactive state
                                   # to watch (e.g. PushNotificationService) — called directly
                                   # from main(), not exposed via a Riverpod provider. If a
@@ -37,7 +39,11 @@ lib/
                                   # surviving an iOS reinstall, and treat any storage error
                                   # as signed out. Never persist credentials anywhere else.
     theme/                       # AppColors, AppTheme
-    widgets/                     # Reusable, feature-agnostic UI (CustomButton, RecipeCard...)
+    validation/                  # Pure form validators (validateEmail, validateNewPassword,
+                                  # ...) returning null or a user-facing message. Every form
+                                  # uses these; no inline regex in screens.
+    widgets/                     # Reusable, feature-agnostic UI (CustomButton, RecipeCard,
+                                  # showAppSnackBar...)
   features/
     <feature_name>/
       data/                      # Repositories — raw SDK/API calls only, no state
@@ -57,22 +63,35 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
 - **No Riverpod state, no UI logic.** Pure async methods that throw on
   failure (`AuthException` or plain `Exception`) and return plain SDK models
   or DTOs.
+- Translate platform failures into **typed** exceptions here (see
+  `GoogleSignInFailure` in `auth_repository.dart`: cancelled / network /
+  failed, mapped from `PlatformException.code`), so nothing above ever
+  matches on error text.
 - Exposed via a single `Provider<XRepository>` at the bottom of the file
   (see `authRepositoryProvider` in `auth_repository.dart`).
 - Constructor-inject the `SupabaseClient` (via `supabaseClientProvider`),
   never call `Supabase.instance.client` directly outside `core/providers`.
 
 ### `domain/` — State + Notifier layer
-- A **sealed class** hierarchy describing every state the feature can be in
-  (see `SmartMealAuthState`: `Initial`, `Loading`, `Authenticated`,
-  `Unauthenticated`, `Error`). Prefer sealed classes over booleans/enums +
-  nullable fields — it forces exhaustive handling in the UI.
-- One `Notifier<TState>` per feature exposing intent methods (`signIn`,
-  `signUp`, ...), each following the pattern:
+- Keep **long-lived truth** and **operation progress** in separate
+  notifiers. Auth is the reference:
+  - `authSessionProvider` (`auth_session.dart`): the signed-in `User?`,
+    straight from the Supabase session stream. The router reads this and
+    nothing else, so a loading or failed operation never moves the user.
+  - `authNotifierProvider` (`auth_notifier.dart`): the operation a screen
+    started, as the sealed `SmartMealAuthState` — `AuthIdle`, `AuthLoading`,
+    `AuthError`, `AuthAwaitingEmailConfirmation`, `AuthResetEmailSent`.
+    Success returns to `AuthIdle`; the session change does the navigating.
+- Prefer sealed classes over booleans/enums + nullable fields — it forces
+  exhaustive handling in the UI.
+- One operation `Notifier<TState>` per feature exposing intent methods
+  (`signIn`, `signUp`, ...), each following the pattern:
   1. set `state = Loading`
   2. call the repository
   3. map success/failure to a concrete state
-  4. catch SDK-specific exceptions first, generic `Exception` last
+  4. catch typed expected outcomes first (e.g. `GoogleSignInCancelled` →
+     idle, no message), then everything else through the feature's one
+     error mapper (`formatAuthError`), logging the raw error via `AppLogger`
 - Exposed via a single `NotifierProvider` at the bottom of the file.
 - Long-lived subscriptions (auth stream, realtime channels) are opened in
   `build()` and cancelled via `ref.onDispose`.
@@ -82,10 +101,11 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
   or a `GlobalKey<FormState>`; `ConsumerWidget` otherwise.
 - Screens **read** notifiers via `ref.read(...).notifier` for actions and
   **watch** state via `ref.watch(...)` for rendering.
-- Side effects (navigation, snackbars) go through `ref.listen` in `build()`,
-  never inside the state class and never inside `onPressed` callbacks
-  directly — see `_onAuthStateChanged` in `login_screen.dart` as the
-  template.
+- Side effects (snackbars, non-gating navigation such as signup → login
+  after a confirmation email) go through `ref.listen` in `build()`, never
+  inside the state class and never inside `onPressed` callbacks directly —
+  see `_onAuthStateChanged` in `signup_screen.dart` as the template. Screens
+  never navigate to `/home` after sign-in: that is the router's job.
 - Screens must not talk to a repository or Supabase directly — always
   through a notifier.
 
@@ -96,11 +116,17 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
 - Auth gating is centralized in one `redirect` callback — do not add
   per-screen auth checks. Routes are classified as public
   (`/splash`, `/onboarding`, `/auth/*`) or protected (everything else).
-- `_RouterRefreshNotifier` bridges Riverpod state changes into GoRouter's
+- The decision itself is the pure `resolveRedirect(LaunchSnapshot)` in
+  `core/router/launch_redirect.dart`, table-tested. Its inputs: the session
+  (`authSessionProvider`), onboarding seen (`onboardingSeenProvider`,
+  persisted in SharedPreferences) and launch readiness (`launchReadyProvider`,
+  the splash hold). The splash only animates; the router leaves it for
+  `/home`, `/onboarding` or `/auth/login`.
+- `_RouterRefreshNotifier` bridges those providers into GoRouter's
   `refreshListenable` — this is what makes the redirect re-evaluate live
-  when auth state changes. Any new global state that should affect routing
-  (e.g. "has completed setup flow") should extend this same notifier rather
-  than creating a second refresh mechanism.
+  when they change. Any new global state that should affect routing
+  (e.g. "has completed setup flow", P15) extends this same notifier and
+  `LaunchSnapshot` rather than creating a second refresh mechanism.
 - The 5-tab shell (`Home`, `Discover`, `Planner`, `Favorites`, `Profile`)
   uses `StatefulShellRoute.indexedStack` so each tab keeps its own
   navigation stack and scroll position. New top-level tabs go here; detail

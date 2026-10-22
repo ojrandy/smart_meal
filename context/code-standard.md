@@ -42,7 +42,7 @@ change done.
   matching the file's primary export: `authRepositoryProvider`,
   `authNotifierProvider`, `routerProvider`.
 - Sealed state classes: `<Feature>State` base, concrete states prefixed with
-  the feature: `AuthLoading`, `AuthAuthenticated` — not generic `Loading`,
+  the feature: `AuthLoading`, `AuthAwaitingEmailConfirmation` — not generic `Loading`,
   `Success` (these collide across features and are ambiguous in imports).
 - Booleans read as questions: `isLoading`, `isPassword`, `isFavorite`.
 
@@ -69,7 +69,7 @@ change done.
 - Notifiers catch the specific SDK exception type first, then a generic
   `catch (_)` as a last resort, and always translate to a user-safe message
   string. Never surface a raw exception message to the UI (see
-  `_formatAuthError` in `auth_notifier.dart` as the template — extend that
+  `formatAuthError` in `auth_notifier.dart` as the template — extend that
   switch statement per Supabase error code as new ones are hit, don't create
   a second error-formatting helper elsewhere).
 - Never let an unhandled exception reach the widget tree from an async

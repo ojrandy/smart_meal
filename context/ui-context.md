@@ -203,8 +203,8 @@ Established in P05 (2026-10-15); widget tests in `test/core/widgets/` and
     using `BoxFit.cover`.
 - **Splash:** solid `splashBackground` with the logo, the "SmartMeal AI"
   wordmark, the "Your AI food companion" tagline and a "by OJ Tech" footer.
-  One entrance of ≤ 500 ms per element, then `/onboarding` after
-  `SplashScreen.holdDuration` (1.6 s). No looping animations.
+  One entrance of ≤ 500 ms per element, then the router moves on (home, onboarding or sign-in) after
+  `LaunchReadyNotifier.splashHold` (1.6 s). No looping animations.
 
 ## Motion
 
@@ -228,7 +228,7 @@ Established in P05 (2026-10-15); widget tests in `test/core/widgets/` and
 - AI Chef copy always explains the *why* behind a recommendation — never a
   bare label. See `project-overview.md` for the good/bad example.
 - Error messages are short, actionable, and never expose raw backend/SDK
-  error text to the user (see `_formatAuthError`).
+  error text to the user (see `formatAuthError`).
 
 ## Assets
 

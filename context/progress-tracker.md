@@ -3,7 +3,7 @@
 > Update this file every time a feature's status changes. Keep entries
 > honest — "in progress" means actively being worked on, not "started once."
 
-Last reviewed: **2026-10-20** (P08 — release hardening, on `main`, owner smoke test pending; P07 — env config + `docs/SECURITY.md`, on `p07-env-config`; P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
+Last reviewed: **2026-10-21** (P10 — auth flow + launch routing, on `p10-auth-flow`, owner phone check pending; P08 — release hardening ✅, owner smoke-tested the release APK, Xcode step waits for a Mac; P07 — env config + `docs/SECURITY.md`, on `p07-env-config`; P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
 
 > **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
 > and `docs/prompt-tracker.md` (status per prompt). Check them before picking
@@ -23,7 +23,7 @@ Last reviewed: **2026-10-20** (P08 — release hardening, on `main`, owner smoke
 | Shared widget library | ✅ | `CustomButton`, `CustomTextField`, `SocialAuthButton`, `RecipeCard`, `AiChefCard`, `AppNetworkImage` exist. `RecipeCard` now renders real network images via `AppNetworkImage` (shimmer while loading, icon fallback on error) instead of a static placeholder tile. `flutter analyze` clean. |
 | Supabase client bootstrap | ✅ | `Supabase.initialize(url:, publishableKey:)` in `main.dart` (switched from the deprecated `anonKey:` parameter in P02, 2026-10-14). URL and key come from `AppConfig` since P07 (2026-10-20) |
 | Environment configuration | ✅ | P07 (2026-10-20). `AppConfig` (`lib/core/config/app_config.dart`) reads `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `GOOGLE_WEB_CLIENT_ID`, `GOOGLE_IOS_CLIENT_ID` (empty until P12) and `APP_ENV` from `--dart-define-from-file=env/<env>.json`. `main()` validates them before anything else and throws `AppConfigException` listing every bad key; secret/legacy-JWT keys are rejected. Exposed via `appConfigProvider` (overridden in `main()`). `env/example.json` is committed with placeholders; real files are gitignored. VS Code configs in `.vscode/launch.json`; CI builds with `env/example.json`. Tests: `test/core/config/app_config_test.dart` |
-| Release hardening (Android + iOS) | 🟡 | P08 (2026-10-20). Release signs only from `android/key.properties` (fails clearly without it, no debug fallback); R8 minify + resource shrinking; backup and device transfer off; cleartext off, system CAs only; obfuscated builds with split debug info; iOS `PrivacyInfo.xcprivacy` (no tracking; email, name, user ID). Runbook: `docs/RELEASE.md`. Pending: owner smoke test of the release build, the real upload keystore (owner), and Xcode target membership for the privacy manifest (Mac) |
+| Release hardening (Android + iOS) | ✅ | P08 (2026-10-20). Release signs only from `android/key.properties` (fails clearly without it, no debug fallback); R8 minify + resource shrinking; backup and device transfer off; cleartext off, system CAs only; obfuscated builds with split debug info; iOS `PrivacyInfo.xcprivacy` (no tracking; email, name, user ID). Runbook: `docs/RELEASE.md`. Owner smoke-tested the obfuscated release APK (2026-10-21). Pending: the real upload keystore (owner) and Xcode target membership for the privacy manifest (when the owner has a Mac) |
 | Security model | ✅ | `docs/SECURITY.md` (P07, 2026-10-20): trust boundaries, secrets policy, data classification, STRIDE table with owning prompts, Supabase Auth checklist (owner applies), commerce baseline, disclosure + incident response, Cameroon compliance pointers. Owner review pending (`SECURITY_DOC_REVIEW`) |
 | Firebase (push notifications) | 🟡 | `PushNotificationService` (`lib/core/services/push_notification_service.dart`). `main()` starts `initialize()` without awaiting it, so push can never delay or block the first frame. `initialize()` touches no Firebase API until `Firebase.initializeApp()` succeeds, never throws and never prompts; it registers the background handler, attaches the foreground/opened-app listeners and sets `isAvailable`. With no Firebase config (today) it logs "Firebase not configured — push notifications disabled." in debug only and leaves `isAvailable` false. `requestPermissionAndRegisterToken()` (permission prompt + token fetch + refresh listener) exists but **nothing calls it** — P19 wires it to a contextual moment. `dispose()` cancels all subscriptions. Logging goes through the debug-only `AppLogger`; token values are never logged. Covered by `test/core/services/push_notification_service_test.dart` (2026-10-14). **Still blocked on external setup**: real Firebase project, `google-services.json` + Google Services Gradle plugin (Android), `GoogleService-Info.plist` via Xcode (iOS), and ideally `flutterfire configure` for `firebase_options.dart`. Exact steps are in the class doc comment. Deliberately did *not* touch Android/iOS build files — applying the Gradle plugin without a real `google-services.json` breaks the build for everyone. |
 | Quality + security gates | ✅ | `tool/verify.sh` (format → analyze `--fatal-infos` → test --coverage) and `.github/workflows/ci.yml` (same gate + debug APK + gitleaks full history + OSV) added in P03, 2026-10-14. Passes locally and in CI: first run on `main` 2026-10-15 (run 38766137427), all jobs green |
@@ -32,32 +32,32 @@ Last reviewed: **2026-10-20** (P08 — release hardening, on `main`, owner smoke
 
 | Item | Status | Notes |
 |---|---|---|
-| Splash screen UI/animation | ✅ | Redesigned 2026-10-21 (owner authority): solid `splashBackground` #05471F, logo + "SmartMeal AI" wordmark + "Your AI food companion" + "by OJ Tech", one ≤ 500 ms entrance, `holdDuration` 1.6 s (was 5 s with a looping glow and dots). Native launch screens use the same green (Android `launch_background`, API 31+ `windowSplashScreenBackground`; iOS `LaunchScreen.storyboard`, unverified without a Mac) |
-| Session-aware routing | ⬜ | Currently *always* routes to `/onboarding` after 1.6 s regardless of an existing session — needs a `shared_preferences` "onboarding seen" flag + auth-state check to skip straight to `/home` for returning users |
+| Splash screen UI/animation | ✅ | Redesigned 2026-10-21 (owner authority): solid `splashBackground` #05471F, logo + "SmartMeal AI" wordmark + "Your AI food companion" + "by OJ Tech", one ≤ 500 ms entrance, `LaunchReadyNotifier.splashHold` 1.6 s (was 5 s with a looping glow and dots). Native launch screens use the same green (Android `launch_background`, API 31+ `windowSplashScreenBackground`; iOS `LaunchScreen.storyboard`, unverified without a Mac) |
+| Session-aware routing | 🟡 | P10 (2026-10-21): the splash only animates; the router (`resolveRedirect`) sends signed-in users to `/home`, returning signed-out users to `/auth/login` and new devices to `/onboarding`. The setup gate comes with P15 (needs P13) |
 
 ## Feature: Onboarding
 
 | Item | Status | Notes |
 |---|---|---|
 | 3-slide carousel UI | ✅ | Redesigned 2026-10-21 (owner authority): real Unsplash food photos (jollof, egusi, grilled fish + plantains; credits in `design-assets/source/PHOTO-CREDITS.md`) on top with 32 px rounded corners, dark text on cream below, fixed dots + `CustomButton`. Replaces the AI full-bleed art and its scrim |
-| Skip / Next / Get Started actions | ✅ | Routes to `/auth/login` |
-| "Seen onboarding" persistence | ⬜ | Not implemented — see Splash issue above, same root cause |
+| Skip / Next / Get Started actions | ✅ | Skip and Get started mark onboarding seen, then `/auth/login` |
+| "Seen onboarding" persistence | ✅ | P10: `OnboardingRepository` (SharedPreferences `smartmeal.onboarding.seen`) + `onboardingSeenProvider` |
 
 ## Feature: Authentication
 
 | Item | Status | Notes |
 |---|---|---|
 | Repository layer (`AuthRepository`) | ✅ | Email/password, Google, sign-out, password reset |
-| State + Notifier (`AuthNotifier`, `SmartMealAuthState`) | ✅ | Sealed state, live Supabase stream subscription |
-| Login screen | ✅ | Email/password + Google; Apple/Facebook are UI-only stubs |
-| Signup screen | ✅ | Handles both "email confirmation off" and "on" paths |
-| Router auth guard | ✅ | Centralized `redirect` in `app_router.dart` |
+| State + Notifier (`AuthNotifier`, `SmartMealAuthState`) | ✅ | P10: session in `authSessionProvider` (Supabase stream; all the router reads); operation state in `AuthNotifier` (idle / loading / error / awaiting confirmation / reset sent); typed Google failures; one error mapper `formatAuthError` |
+| Login screen | ✅ | Email/password + Google; shared validators (login password: non-empty only). Apple/Facebook hidden until P12 (owner, 2026-10-21) |
+| Signup screen | ✅ | Session → the router goes home; no session → "Almost there! We've sent a confirmation link to your email." (true even for an already-registered email), then login |
+| Router auth guard | ✅ | Centralized `redirect` → pure `resolveRedirect` in `launch_redirect.dart`, table-tested |
 | Encrypted session storage | 🟡 | P09 (2026-10-21): `SecureSessionStorage` + `SecurePkceStorage` (`lib/core/services/secure_session_storage.dart`) keep the Supabase session and PKCE verifier in Keychain/Keystore via `flutter_secure_storage` ^10. Migrates a legacy plaintext session (read-back verified, then deleted); clears a session surviving an iOS reinstall (`smartmeal.installed` marker); storage errors → signed out. 12 tests. Pending: owner phone checks (no token in `shared_prefs`, restart keeps the session, upgrade from the pre-P09 build keeps the session) |
 | Social button brand marks | ✅ | Official multicolor Google "G" image (`AppAssets.googleLogo`), Facebook blue `#0866FF`, Apple black (owner request, 2026-10-21). Owner still to see it on the phone |
 | Forgot password screen | ⬜ | Route exists (`/auth/forgot-password`), points at `PlaceholderScreen` |
-| Apple Sign-In | ⬜ | Button present, shows "coming soon" snackbar; needs Apple Developer account |
-| Facebook Sign-In | ⬜ | Button present, shows "coming soon" snackbar |
-| Password rule consistency | 🟡 | Login requires 6 chars min, signup requires 8 — should match |
+| Apple Sign-In | ⬜ | Button hidden (P10, owner 2026-10-21) until P12; needs the Apple Developer Program and a Mac |
+| Facebook Sign-In | ⬜ | Button hidden (P10, owner 2026-10-21) until implemented (P12 decision) |
+| Password rule consistency | ✅ | P10: `core/validation/validators.dart` — sign-up 8 chars–72 bytes with lower, upper, digit, symbol (`SECURITY.md` §5 target); login non-empty only. The Supabase project must be set to the same policy (owner, §5) |
 
 ## Feature: Setup / Preferences flow
 
@@ -73,7 +73,7 @@ Last reviewed: **2026-10-20** (P08 — release hardening, on `main`, owner smoke
 
 | Tab | Status | Notes |
 |---|---|---|
-| Home | ⬜ | Placeholder screen |
+| Home | 🟡 | Interim `HomeScreen` (P10): greets the user by name or email, Sign out. P18 replaces it with live data |
 | Discover | ⬜ | Placeholder screen |
 | Planner | ⬜ | Placeholder screen |
 | Favorites | ⬜ | Placeholder screen |
@@ -96,13 +96,12 @@ Last reviewed: **2026-10-20** (P08 — release hardening, on `main`, owner smoke
 
 | Issue | Severity | Where |
 |---|---|---|
-| Splash always shows onboarding, even for returning authenticated users | Medium | `lib/features/splash/presentation/splash_screen.dart` |
 | Desktop scaffolds (`linux/`, `macos/`, `windows/`) are still in the repo with `com.example` identifiers. The app is Android + iOS only (§0.3), so P06 left them alone; deleting them needs the owner's OK | Low | `linux/`, `macos/`, `windows/` |
 | Android 16+ ignores `screenOrientation="portrait"` on large screens (smallest width ≥ 600 dp: tablets, unfolded foldables) for apps targeting SDK 36, so the app can appear in landscape there; the portrait-only layouts have not been checked in landscape on a tablet | Low | `android/app/src/main/AndroidManifest.xml`, all screens |
 | Password min length mismatch (login 6 vs signup 8) | Low | `login_screen.dart`, `signup_screen.dart` |
 | Plain `TextStyle(fontWeight: …)` without `GoogleFonts.inter(...)` inherits the theme's per-variant family (`Inter_regular`), so the engine fakes the weight from Regular instead of using the bundled Medium/SemiBold/Bold file (found in P04 by code reading; e.g. onboarding, auth screens, `AiChefCard`, `RecipeCard`) — not fixed in P05: using the real weight files visibly changes glyphs, so it needs the owner's sign-off (fix in `AppTheme`, e.g. a pubspec `Inter` family with weights) | Low | `lib/core/theme/app_theme.dart`, screens/widgets |
 | Release build on this dev machine fails in Android lint (`lintVital*`: `ClassNotFoundException: com.android.tools.lint.Main` / `UastEnvironment`) — environment issue, not project code; P04 size builds ran Gradle directly with `-x lintVital*`. CI's Linux runner is unaffected (it builds debug). Did **not** reproduce in P08 (2026-10-20): `flutter build appbundle --release` and `flutter build apk --release` both passed. Keep the workaround in `docs/RELEASE.md` §3 in case it returns. Release downloads also time out often on this network; re-run |  Low (dev env) | local `~/.gradle` |
-| Test coverage 62.8 % lines (2026-10-15): auth notifier/repository and router redirect logic are still untested | Low | `test/` |
+| Test coverage 62.8 % lines (2026-10-15). Auth notifier and router redirect are tested since P10; `AuthRepository` (SDK wrapper) still is not | Low | `test/` |
 | `textHint` (2.54:1 on surface) used for `RecipeCard` meta icons (non-text needs 3:1). (The splash contrast failures logged in P05 are fixed by the 2026-10-21 redesign: deep `splashBackground`, orange "AI" 3.8:1 as large text, white 10.9:1; pinned by `app_colors_test.dart`.) | Low | `recipe_card.dart` |
 | `CustomTextField`: only the 24 dp text line is tappable; taps on the rest of the 56 dp box (label, padding) do not focus the input (fails the 48 dp tap-target guideline) | Low | `lib/core/widgets/custom_text_field.dart` |
 | `docs/prompt.md` P05 enforcement command: its `Colors\.` alternative has no word boundary, so it also matches every `AppColors.`; use `\bColors\.` | Low (docs) | `docs/prompt.md` |
@@ -123,6 +122,8 @@ Last reviewed: **2026-10-20** (P08 — release hardening, on `main`, owner smoke
 
 | Date | Issue | Fix |
 |---|---|---|
+| 2026-10-21 | Splash always showed onboarding (even signed in) and "seen" was never stored; screens navigated to `/home` themselves; a failed sign-out ejected the user; no way to sign out | P10: `resolveRedirect` from session + onboarding seen + splash hold; `authSessionProvider` as the router's only session input; interim Home with Sign out |
+| 2026-10-21 | Raw server/developer text in auth errors; red snackbar and string matching on Google cancel; 6-vs-8 password rules; email regex rejecting `a+b@x.company`; "Account created!" possibly untrue; "coming soon" Apple/Facebook buttons | P10: typed Google failures, one `formatAuthError` with a generic default, shared validators, neutral confirmation copy, Apple/Facebook hidden until P12 |
 | 2026-10-20 | Release build signed with the debug key; no R8 shrinking; backup on (plaintext session eligible for cloud/device transfer); no cleartext policy; no iOS privacy manifest; no release runbook | P08: `key.properties`-only release signing with a clear failure; R8 on; `allowBackup=false` + backup/data-extraction rules; `usesCleartextTraffic=false` + network security config; `PrivacyInfo.xcprivacy`; `docs/RELEASE.md` |
 | 2026-10-20 | Config hardcoded in source (`supabase_config.dart`), no environment separation, no threat model | P07: `AppConfig` from `env/<env>.json` build defines with fail-fast validation; `docs/SECURITY.md` with secrets policy, data classification and STRIDE table |
 | 2026-10-15 | Placeholder identity: Android `com.example.smart_meal`, iOS `com.example.smartMeal`, launcher name `smart_meal`, iPhone allowed landscape | P06: Android namespace/applicationId and iOS bundle IDs (Runner + `.RunnerTests`) are `com.ojtech.smartmeal`; `MainActivity` moved to that package; launcher name "Smart Meal" on both platforms (= `MaterialApp.title`); portrait-only on phones (Android activity lock, iPhone `Info.plist`; iPad unchanged) |
