@@ -85,8 +85,8 @@ Last reviewed: **2026-10-23** (P13 — schema v1 built and tested locally on `p1
 
 | Item | Status | Notes |
 |---|---|---|
-| Real Supabase project provisioned | ✅ | Project `svrelfdfonxwlfcljrag` exists and the app points at it. Schema v1 exists locally (P13) and is **not pushed yet** — remote link and push wait for the owner |
-| Schema v1 (12 tables, enums, storage, pgTAP) | 🟡 | P13 (2026-10-23): `supabase/migrations/20261023102159_schema_v1.sql`; see `context/data-model.md`. Local: `db reset` clean, `test db` 5 files / 121 assertions pass, `db lint` and `db advisors` clean, real sign-up through local GoTrue creates the profile. Pending: owner approval to link + push to the hosted project |
+| Real Supabase project provisioned | ✅ | Project `svrelfdfonxwlfcljrag` exists and the app points at it. Schema v1 is live (P13, 2026-10-23), applied by the Supabase GitHub integration when `main` was pushed |
+| Schema v1 (12 tables, enums, storage, pgTAP) | 🟡 | P13 (2026-10-23): `supabase/migrations/20261023102159_schema_v1.sql`; see `context/data-model.md`. Local: `db reset` clean, `test db` 5 files / 121 assertions pass, `db lint` and `db advisors` clean, real sign-up through local GoTrue creates the profile. Live: identical to local (read-only checks); no seed. Pending: owner checks Dashboard Advisors |
 | AI recommendation logic | ⬜ | Not started — no scoring/matching engine, no Edge Functions |
 | Google OAuth client configured (Supabase + Cloud Console) | 🟡 | Web Client ID set (2026-07-20); since P07 it comes from `GOOGLE_WEB_CLIENT_ID` in `env/<env>.json`. Still needed: (1) enable Google provider in Supabase Dashboard → Auth → Providers → Google with this Client ID; (2) Android OAuth Client ID in Google Cloud Console keyed to **`com.ojtech.smartmeal`** (P06, 2026-10-15) + the debug SHA-1, then the upload and Play App Signing SHA-1s (P12). Any client created earlier for `com.example.smart_meal` (debug SHA-1 `A3:AA:68:7E:A6:86:B6:78:3E:75:E3:59:AF:8C:8F:16:4D:F2:08:DD`) no longer matches the app — delete it and create a new one; (3) iOS OAuth Client ID keyed to bundle ID `com.ojtech.smartmeal` + reversed-client-id URL scheme added to `ios/Runner/Info.plist`. |
 
@@ -114,7 +114,8 @@ Last reviewed: **2026-10-23** (P13 — schema v1 built and tested locally on `p1
 | After a password reset, a failed `signOut(scope: others)` is only logged: other devices keep their sessions. Add a retry or a server-side revoke | Low | `auth_notifier.dart` → `updatePassword` |
 | Login and signup still carry their own copy of the header (back + logo + title) that `AuthScreenHeader` now provides for the P11 screens; switch them over in a later UI pass | Low | `login_screen.dart`, `signup_screen.dart` |
 | Seed recipe prices (`supabase/seed.sql`) are placeholders, marked `-- PLACEHOLDER`; the owner validates them before any real catalog is loaded | Low | `supabase/seed.sql` |
-| The hosted project has not been checked for dashboard-made objects: before the first push, `supabase db pull` (after an approved `supabase link`) must show nothing the migration would clash with | Medium (before push) | Supabase hosted project |
+| Pushing `main` deploys migrations to production (Supabase GitHub integration); there is no dry-run or approval gate between a merge and production. Approve schema changes before they reach `main`; protect `main` with required review (P20) | High | Supabase GitHub integration; GitHub branch protection |
+| The live project shows 0 auth users, identities and audit entries although the owner signed in on 2026-10-21 — cause unknown (owner to confirm in Dashboard → Authentication → Users) | Medium | Supabase hosted project |
 | CI does not run the pgTAP suite yet (needs Docker + the Supabase CLI in the workflow) | Medium | `.github/workflows/ci.yml` |
 | OSV-Scanner CI job is non-blocking (`continue-on-error`) — make it blocking on 2026-11-14 after triaging findings | Medium | `.github/workflows/ci.yml` |
 | `osv-scanner-action` runs its Docker image by tag, not digest — residual supply-chain risk | Low | `.github/workflows/ci.yml` |

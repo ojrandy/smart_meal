@@ -183,6 +183,11 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
   `npx supabase@2.121.0 test db` (pgTAP files in `supabase/tests/`).
   `npx supabase@2.121.0 db lint` must be clean. New user tables get
   isolation tests (A vs B, anon) and join the cascade test.
+- **Production deploys from git.** The hosted project has Supabase's GitHub
+  integration on: its production branch follows git `main`, so **pushing
+  `main` applies any new migration to production** (found 2026-10-23, P13).
+  A migration therefore reaches `main` only after the owner approves the
+  push; run `db push --dry-run --linked` against the linked project first.
 - **Remote.** `supabase link`, `db push` and every other remote command
   need the owner's explicit approval; show `db push --dry-run` first.
   `seed.sql` is local only.

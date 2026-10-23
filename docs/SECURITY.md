@@ -302,6 +302,7 @@ kept in this repo.** *(Owner: {{INCIDENT_CONTACTS_LOCATION}}.)*
 | Build defines are extractable | Public identifiers are visible to anyone with the binary | Accepted by design: only public identifiers go there (§2); access control is RLS |
 | Release-build config errors | A release build made without an env file crashes at startup and shows nothing to the user | Accepted: it is a build mistake that is caught in the first run. P20's release checklist builds from `env/prod.json` |
 | Values still pending | `{{ACK_DAYS}}`, `{{INCIDENT_LEAD}}`, `{{INCIDENT_CONTACTS_LOCATION}}` | The owner fills them in; tracked in `docs/prompt-tracker.md` |
+| Migrations deploy on push to `main` | The Supabase GitHub integration applies every migration that lands on `main` to production, with no dry run or approval step in between | Approve schema changes before they reach `main`; consider a protected `main` with required review (P20) |
 | Custom URL scheme for auth links | Another app can claim the scheme and receive a link; the code is useless without the verifier (PKCE), but the link is spent | Move to App Links / Universal Links on `{{APP_LINK_DOMAIN}}` (§10) |
 | Reset-password response reveals rate limiting | The app answers neutrally, but a script calling the API directly can tell an existing account by `over_email_send_rate_limit` | CAPTCHA on auth endpoints (§5); accept until then |
 | Other sessions after a password reset | If `signOut(scope: others)` fails, other devices keep their sessions | Logged; add a retry or server-side revoke later (Known issues) |
