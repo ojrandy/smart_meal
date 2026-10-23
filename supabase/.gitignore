@@ -1,0 +1,6 @@
+# Supabase CLI working files — never commit (may hold the linked project
+# ref, access tokens or local secrets).
+.branches
+.temp
+.env
+.env.*
