@@ -134,7 +134,7 @@ They become binding when P13/P14 implement them.
 | Class | Examples | Storage | Retention | Access | Deletion path |
 |---|---|---|---|---|---|
 | **Public** | Recipe catalog, images, nutrition facts | Postgres + Storage (public bucket or read-only RLS) | Indefinite | Everyone, read-only. Writes are admin-only (service role in Edge Functions / migrations) | Admin removal |
-| **Personal** | Email, display name, avatar, push (FCM) tokens, favorites, meal plans | Supabase Auth (`auth.users`), owner-scoped tables, private Storage bucket; push token on device + `push_tokens` table (P19) | While the account exists. Push tokens are removed on sign-out (S12) and when FCM reports them invalid (*proposed*) | Owner only (RLS `user_id = (select auth.uid())`) | Account deletion (P14) cascades; tokens are cleared on sign-out (P15/P19) |
+| **Personal** | Email, display name, avatar, push (FCM) tokens, favorites, meal plans, recipe interactions (kept 12 months, then purged daily by pg_cron — owner, 2026-10-23) | Supabase Auth (`auth.users`), owner-scoped tables, private Storage bucket; push token on device + `push_tokens` table (P19) | While the account exists. Push tokens are removed on sign-out (S12) and when FCM reports them invalid (*proposed*) | Owner only (RLS `user_id = (select auth.uid())`) | Account deletion (P14) cascades; tokens are cleared on sign-out (P15/P19) |
 | **Sensitive personal** (S6) | Allergies, dietary restrictions, health goals, household size, budget | Owner-scoped tables, RLS, explicit consent recorded (P16) | While the account exists; deleted on account deletion or consent withdrawal (*proposed*) | Owner only. Used server-side only for the owner's recommendations (P17). Never logged (S4), never in analytics, never shared with third parties | Account deletion (P14); consent withdrawal clears the data (P16/P14) |
 | **Credentials** | Supabase access + refresh tokens, OAuth ID tokens (transient) | Platform secure storage only, via `SecureSessionStorage` (`lib/core/services/secure_session_storage.dart`, P09): Android Keystore-wrapped AES-GCM; iOS Keychain `first_unlock_this_device` (no iCloud sync). The PKCE verifier too. Legacy plaintext sessions are migrated and deleted; a session surviving an iOS reinstall is cleared; storage errors mean signed out (S7). ID tokens are held in memory only, for the exchange | Access JWT ≤ 1 h; refresh tokens rotate (§5) | The device holder; Supabase Auth | Sign-out revokes the session and wipes storage (P15); account deletion revokes all sessions (P14) |
 | **Secrets** | Server keys (§2) | Edge Function secrets, CI secret store | Rotate on any suspected exposure, and at least yearly (*proposed*) | Owner and deploy pipeline only | Rotation + revocation at the provider |
@@ -171,6 +171,7 @@ D = Denial of service · E = Elevation of privilege.
 
 ## 5. Supabase Auth hardening checklist (owner)
 
+Since P13, `supabase/config.toml` mirrors these for the local stack (confirmations, password policy, token rotation, JWT expiry, redirects, anonymous sign-ins off).
 Apply each item in the Supabase Dashboard (Authentication → Sign In /
 Providers, Rate Limits, URL Configuration, Attack Protection). P13 mirrors
 the settings into `supabase/config.toml` so they are reviewable in git.

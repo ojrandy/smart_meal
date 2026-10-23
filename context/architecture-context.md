@@ -169,9 +169,23 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
 - Repository methods map 1:1 to Supabase operations. Business logic
   (scoring, matching, budget math) belongs in the domain layer or a
   Supabase Edge Function — never inline in a repository or a widget.
-- Schema changes are additive migrations, not manual dashboard edits, once
-  the schema is defined (see `progress-tracker.md` for status — schema
-  design has not started yet).
+- The schema is defined (P13): tables, vocabularies and the RLS matrix are
+  in `context/data-model.md`; the SQL is in `supabase/migrations/`.
+- **Migration workflow.** Every schema change is a new timestamped file
+  from `npx supabase@2.121.0 migration new <name>` (the CLI is used through
+  npx, pinned; Docker Desktop must be running). Never edit a migration that
+  has been applied anywhere; changes are additive. Each new table enables
+  RLS, revokes nothing it never granted (default privileges already give
+  `anon`/`authenticated` nothing), grants `authenticated` only the columns
+  it may write, and adds one policy per operation in the same migration.
+- **Local stack and tests.** `npx supabase@2.121.0 start`, then
+  `npx supabase@2.121.0 db reset` (migrations + `seed.sql`) and
+  `npx supabase@2.121.0 test db` (pgTAP files in `supabase/tests/`).
+  `npx supabase@2.121.0 db lint` must be clean. New user tables get
+  isolation tests (A vs B, anon) and join the cascade test.
+- **Remote.** `supabase link`, `db push` and every other remote command
+  need the owner's explicit approval; show `db push --dry-run` first.
+  `seed.sql` is local only.
 
 ## What NOT to do
 

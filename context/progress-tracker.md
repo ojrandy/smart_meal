@@ -3,7 +3,7 @@
 > Update this file every time a feature's status changes. Keep entries
 > honest — "in progress" means actively being worked on, not "started once."
 
-Last reviewed: **2026-10-23** (P11 — password recovery + auth deep links, on `p11-password-recovery`, owner device check pending; P10 — auth flow + launch routing, on `p10-auth-flow`, owner phone check pending; P08 — release hardening ✅, owner smoke-tested the release APK, Xcode step waits for a Mac; P07 — env config + `docs/SECURITY.md`, on `p07-env-config`; P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
+Last reviewed: **2026-10-23** (P13 — schema v1 built and tested locally on `p13-schema`, remote push pending owner approval; P11 — password recovery + auth deep links, on `p11-password-recovery`, owner device check pending; P10 — auth flow + launch routing, on `p10-auth-flow`, owner phone check pending; P08 — release hardening ✅, owner smoke-tested the release APK, Xcode step waits for a Mac; P07 — env config + `docs/SECURITY.md`, on `p07-env-config`; P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
 
 > **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
 > and `docs/prompt-tracker.md` (status per prompt). Check them before picking
@@ -85,12 +85,8 @@ Last reviewed: **2026-10-23** (P11 — password recovery + auth deep links, on `
 
 | Item | Status | Notes |
 |---|---|---|
-| Real Supabase project provisioned | ✅ | Project `svrelfdfonxwlfcljrag` exists and the app points at it. The project is provisioned; the schema is not (no tables, RLS or migrations yet — P13) |
-| `profiles` table + RLS | ⬜ | |
-| `preferences` table + RLS | ⬜ | |
-| `recipes` table + RLS | ⬜ | |
-| `favorites` table + RLS | ⬜ | |
-| `meal_plans` table + RLS | ⬜ | |
+| Real Supabase project provisioned | ✅ | Project `svrelfdfonxwlfcljrag` exists and the app points at it. Schema v1 exists locally (P13) and is **not pushed yet** — remote link and push wait for the owner |
+| Schema v1 (12 tables, enums, storage, pgTAP) | 🟡 | P13 (2026-10-23): `supabase/migrations/20261023102159_schema_v1.sql`; see `context/data-model.md`. Local: `db reset` clean, `test db` 5 files / 121 assertions pass, `db lint` and `db advisors` clean, real sign-up through local GoTrue creates the profile. Pending: owner approval to link + push to the hosted project |
 | AI recommendation logic | ⬜ | Not started — no scoring/matching engine, no Edge Functions |
 | Google OAuth client configured (Supabase + Cloud Console) | 🟡 | Web Client ID set (2026-07-20); since P07 it comes from `GOOGLE_WEB_CLIENT_ID` in `env/<env>.json`. Still needed: (1) enable Google provider in Supabase Dashboard → Auth → Providers → Google with this Client ID; (2) Android OAuth Client ID in Google Cloud Console keyed to **`com.ojtech.smartmeal`** (P06, 2026-10-15) + the debug SHA-1, then the upload and Play App Signing SHA-1s (P12). Any client created earlier for `com.example.smart_meal` (debug SHA-1 `A3:AA:68:7E:A6:86:B6:78:3E:75:E3:59:AF:8C:8F:16:4D:F2:08:DD`) no longer matches the app — delete it and create a new one; (3) iOS OAuth Client ID keyed to bundle ID `com.ojtech.smartmeal` + reversed-client-id URL scheme added to `ios/Runner/Info.plist`. |
 
@@ -117,7 +113,9 @@ Last reviewed: **2026-10-23** (P11 — password recovery + auth deep links, on `
 | Auth links use a custom URL scheme, which any app can claim (PKCE keeps an intercepted code useless, but the link is spent). Move to App Links / Universal Links once the owner has a domain (`APP_LINK_DOMAIN`, `SECURITY.md` §10) | Medium | `AndroidManifest.xml`, `Info.plist`, `AuthRepository.authRedirectUri` |
 | After a password reset, a failed `signOut(scope: others)` is only logged: other devices keep their sessions. Add a retry or a server-side revoke | Low | `auth_notifier.dart` → `updatePassword` |
 | Login and signup still carry their own copy of the header (back + logo + title) that `AuthScreenHeader` now provides for the P11 screens; switch them over in a later UI pass | Low | `login_screen.dart`, `signup_screen.dart` |
-| `supabase/config.toml` is a minimal hand-written file (auth redirects only). P13 must merge `supabase init` output into it rather than overwrite it | Low (until P13) | `supabase/config.toml` |
+| Seed recipe prices (`supabase/seed.sql`) are placeholders, marked `-- PLACEHOLDER`; the owner validates them before any real catalog is loaded | Low | `supabase/seed.sql` |
+| The hosted project has not been checked for dashboard-made objects: before the first push, `supabase db pull` (after an approved `supabase link`) must show nothing the migration would clash with | Medium (before push) | Supabase hosted project |
+| CI does not run the pgTAP suite yet (needs Docker + the Supabase CLI in the workflow) | Medium | `.github/workflows/ci.yml` |
 | OSV-Scanner CI job is non-blocking (`continue-on-error`) — make it blocking on 2026-11-14 after triaging findings | Medium | `.github/workflows/ci.yml` |
 | `osv-scanner-action` runs its Docker image by tag, not digest — residual supply-chain risk | Low | `.github/workflows/ci.yml` |
 | Notification permission is never requested — wired in P19 | Medium | `lib/core/services/push_notification_service.dart` (`requestPermissionAndRegisterToken` has no caller) |
