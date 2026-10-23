@@ -2,7 +2,7 @@
 
 > Companion to [`prompt.md`](prompt.md). The executing agent updates this file at the end of **every** prompt and whenever it is blocked (protocol: `prompt.md` §0.7). Use absolute dates (`YYYY-MM-DD`). Keep entries honest — 🟡 means actively being worked on in the current session, not "started once".
 
-**Last updated:** 2026-10-24 — P14 ✅ (deletion live: Edge Function, rate limit, web page on GitHub Pages; in-app button comes with T1-Profile). P13 ✅ (schema v1 live on the hosted project via the GitHub integration; Advisors empty). P11 ⏸️ on `p11-password-recovery` (password recovery + auth deep links; uncommitted until the owner authorizes; waiting on the Dashboard allow-list, email templates and a device check). P10 ⏸️ on `p10-auth-flow` (auth hardening + the launch-routing part of P15 that needs no database; owner phone check and copy approval pending; on `main`). P08 ✅ (owner smoke-tested the obfuscated release APK; the Xcode step waits for the owner's Mac). P06–P08 on `main` (fast-forward on the owner's instruction). P07 ⏸️: env config + `docs/SECURITY.md` done, waiting on owner review and a phone run. P01–P05 ✅, all on `main` (fast-forwarded to `67b1fa0` on the owner's instruction; CI run 38766137427 green: quality gate + debug APK, gitleaks, OSV). P06 ✅ on `p06-app-identity` (owner phone check 2026-10-20; iOS build pending, no Mac).
+**Last updated:** 2026-10-24 — Phase 4 planned with the owner (order P15 → P16 → P17 → P18; inputs recorded below; `EXPLANATION_COPY` and Home empty/error copy come with P17/P18). P14 ✅ (deletion live: Edge Function, rate limit, web page on GitHub Pages; in-app button comes with T1-Profile). P13 ✅ (schema v1 live on the hosted project via the GitHub integration; Advisors empty). P11 ⏸️ on `p11-password-recovery` (password recovery + auth deep links; uncommitted until the owner authorizes; waiting on the Dashboard allow-list, email templates and a device check). P10 ⏸️ on `p10-auth-flow` (auth hardening + the launch-routing part of P15 that needs no database; owner phone check and copy approval pending; on `main`). P08 ✅ (owner smoke-tested the obfuscated release APK; the Xcode step waits for the owner's Mac). P06–P08 on `main` (fast-forward on the owner's instruction). P07 ⏸️: env config + `docs/SECURITY.md` done, waiting on owner review and a phone run. P01–P05 ✅, all on `main` (fast-forwarded to `67b1fa0` on the owner's instruction; CI run 38766137427 green: quality gate + debug APK, gitleaks, OSV). P06 ✅ on `p06-app-identity` (owner phone check 2026-10-20; iOS build pending, no Mac).
 
 ## Status legend
 
@@ -82,15 +82,15 @@ Add one row per screen built with the T1 template.
 | `ACCOUNT_DELETION_WEB_URL` | P14 | Web page for deletion requests (Google Play) | Owner chose GitHub Pages (2026-10-23): `https://ojrandy.github.io/smart_meal/delete-account.html`, source `site/`, published from a `gh-pages` branch. Live: owner enabled Pages and checked the page (2026-10-24) | ✅ |
 | `REAUTH_POLICY` | P14 | Default: sign-in within the last 10 minutes | **10 minutes** (owner, 2026-10-23); checked server-side from the token's `amr` timestamps | ✅ |
 | `DATA_EXPORT` | P14 → later | JSON export of a user's data | **Later** (owner, 2026-10-23): needed before serving EU residents | ✅ |
-| `SPLASH_MIN_DURATION` | P15 | Currently 5 s; recommendation ≤ 2 s | | ⬜ |
-| `FIGMA_SETUP_FLOW_URL` | P16 | All setup frames and states | | ⬜ |
-| `SETUP_QUESTIONS` | P16 | Confirmed questions and answer options | | ⬜ |
-| `CONSENT_COPY` | P16 | Consent text for allergy/diet data | | ⬜ |
-| `ENGINE_DECISION` | P17 | A (Edge Function, recommended) / B (Dart) | | ⬜ |
-| `SCORING_WEIGHTS` | P17 | Default 30 / 25 / 20 / 15 / 10 | | ⬜ |
+| `SPLASH_MIN_DURATION` | P15 | Currently 5 s; recommendation ≤ 2 s | **1.6 s** — set by the owner-approved first-run redesign (2026-10-21, `LaunchReadyNotifier.splashHold`); confirmed in Phase 4 planning (2026-10-24) | ✅ |
+| `FIGMA_SETUP_FLOW_URL` | P16 | All setup frames and states | Not used: owner chose screens built in the app's existing style (2026-10-24); the code becomes the source of truth; owner reviews on the phone | ✅ |
+| `SETUP_QUESTIONS` | P16 | Confirmed questions and answer options | **Approved 2026-10-24**, in order: 1 lifestyle (student / working professional / family / athlete); 2 household size 1–20; 3 food budget in XAF + per day/week/month; 4 cooking skill + max cooking time; 5 cuisines liked / disliked; 6 diet (the 7 tags or "None"); 7 allergies (the 14 or "None", required); 8 health goals (optional). Consent shown before 6–8 | ✅ |
+| `CONSENT_COPY` | P16 | Consent text for allergy/diet data | **Approved 2026-10-24**: "I agree that Smart Meal stores my allergies, diet and health goals to personalise my meals. Only I can see them, and I can delete them anytime." | ✅ |
+| `ENGINE_DECISION` | P17 | A (Edge Function, recommended) / B (Dart) | **A — Edge Function** (owner, 2026-10-24): deterministic TypeScript scoring under the caller's JWT (RLS; never the secret key) | ✅ |
+| `SCORING_WEIGHTS` | P17 | Default 30 / 25 / 20 / 15 / 10 | **Defaults approved** (owner, 2026-10-24): budget 30, taste/cuisine 25, time + skill 20, behaviour 15, variety 10; kept in one config place | ✅ |
 | `EXPLANATION_COPY` | P17 | Approved "X% match because…" templates | | ⬜ |
 | `FIGMA_HOME_URL` | P18 | Home frames, including empty/error states | | ⬜ |
-| `CURRENCY_DISPLAY` | P18 | "FCFA" vs "XAF" | | ⬜ |
+| `CURRENCY_DISPLAY` | P18 | "FCFA" vs "XAF" | **FCFA**, e.g. "2 500 FCFA" (owner, 2026-10-24); zero decimals, shared formatter in `core/` | ✅ |
 | `FIREBASE_PROJECT` | P19 | Android + iOS apps registered for `APP_ID` | | ⬜ |
 | `APNS_KEY` | P19 | Uploaded to Firebase | | ⬜ |
 | `NOTIFICATION_USE_CASES` | P19 | Use cases, copy, and the moment to ask for permission | | ⬜ |
