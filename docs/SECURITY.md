@@ -18,6 +18,7 @@
 8. [Compliance pointers](#8-compliance-pointers)
 9. [Accepted risks and open items](#9-accepted-risks-and-open-items)
 10. [Auth deep links and password recovery](#10-auth-deep-links-and-password-recovery)
+11. [Account deletion and retention](#11-account-deletion-and-retention)
 
 ---
 
@@ -366,3 +367,46 @@ custom scheme. Tracked as `APP_LINK_DOMAIN` in `docs/prompt-tracker.md`.
 password" templates: keep `{{ .ConfirmationURL }}` as the link (it carries
 the redirect), and use the brand name "Smart Meal" in a friendly, short
 tone. Tracked in `docs/prompt-tracker.md`.
+
+## 11. Account deletion and retention
+
+Written in P14 (2026-10-23). Input for the privacy policy.
+
+**In the app** (entry point: Profile screen, T1-Profile). The app calls the
+`delete-account` Edge Function, which:
+
+1. verifies the caller's JWT inside the function (`@supabase/server`
+   `withSupabase`, `auth: 'user'`, against the project's JWKS); the gateway's
+   `verify_jwt` is only a first layer;
+2. requires a sign-in within the last **10 minutes** (owner, 2026-10-23),
+   read from the token's `amr` timestamps, which a token refresh does not
+   change; otherwise answers `reauthentication_required`;
+3. allows **5 attempts per user per rolling hour**
+   (`public.note_account_deletion_attempt`, service role only);
+4. deletes the user's files in `avatars/{uid}/` (storage does not cascade),
+   then their push tokens, then the auth user with the secret key from the
+   function environment (never in `lib/`). Deleting the auth user cascades
+   to every user row (`supabase/tests/04_account_lifecycle.test.sql`).
+
+It is idempotent (a retry after success answers `deleted`), returns stable
+error codes, and logs no user ID, email or token. The app then drops the
+local session (secure storage) and the Google sign-in.
+
+**By email** (Google Play's web requirement): the page
+`site/delete-account.html`, published with GitHub Pages, tells users to
+email the owner from their sign-in address; the owner confirms and deletes
+within **30 days** using the Dashboard (Authentication → Users → Delete
+user, after removing `avatars/{uid}/` in Storage).
+
+| Data | When deleted |
+|---|---|
+| Auth account (email, identities, sessions, refresh tokens) | Immediately |
+| Profile, preferences (incl. allergies, diet, goals), cuisine likes, favorites, meal plans and entries, recipe interactions, push tokens | Immediately (cascade) |
+| Avatar files | Immediately (before the account) |
+| Access tokens already issued | Stop working for data at once (the user's rows are gone); they expire within 1 hour (JWT expiry) |
+| Rate-limit counter (user ID + count, no other data) | Within 24 hours |
+| Provider backups | Overwritten by the provider's backup rotation |
+
+Recipe interactions of active accounts are kept 12 months (P13). **Data
+export** (a JSON copy of the user's data) is a follow-up, needed before
+serving EU residents (owner, 2026-10-23).

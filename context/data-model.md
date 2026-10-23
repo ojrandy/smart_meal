@@ -102,6 +102,13 @@ only write path for the catalog.
 | `private.handle_new_user()` | definer, `search_path = ''` | trigger only | The auth service has no rights on `public.profiles` |
 | `private.set_updated_at()` | invoker | trigger only | `updated_at` maintenance |
 | `private.purge_expired_interactions()` | invoker | pg_cron (postgres) | 12-month retention |
+| `public.note_account_deletion_attempt(uuid)` | invoker | service_role only | P14 rate limit (5 per user per rolling hour) for the `delete-account` Edge Function; counters in `private.account_deletion_attempts`, swept after a day |
+
+## Edge Functions
+
+| Function | Caller | What it does |
+|---|---|---|
+| `delete-account` | signed-in user, signed in ≤ 10 min ago | Deletes `avatars/{uid}/…`, push tokens, then the auth user (cascade). See `docs/SECURITY.md` §11 |
 
 `private` is not exposed through the Data API, and `authenticated` / `anon`
 have no usage on it.
