@@ -169,7 +169,7 @@ void main() {
         find.text('Use upper- and lowercase letters, a number and a symbol'),
         findsOneWidget,
       );
-      expect(find.text('Passwords do not match'), findsOneWidget);
+      expect(find.text("Passwords don't match"), findsOneWidget);
     });
 
     testWidgets('without a session, confirms by email and goes to sign-in', (

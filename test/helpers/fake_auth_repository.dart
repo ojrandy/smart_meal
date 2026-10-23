@@ -35,11 +35,25 @@ class FakeAuthRepository implements AuthRepository {
   Future<AuthResponse> Function()? onSignInWithGoogle;
   Future<void> Function()? onSignOut;
   Future<void> Function()? onResetPassword;
+  Future<void> Function(String password)? onUpdatePassword;
+  Future<void> Function()? onSignOutOtherSessions;
 
   void signInAs(User user) {
     currentUser = user;
     _authEvents.add(AuthState(AuthChangeEvent.signedIn, testSession(user)));
   }
+
+  /// What opening a valid recovery link does: a session plus the
+  /// passwordRecovery event, with no signedIn event.
+  void openRecoveryLinkAs(User user) {
+    currentUser = user;
+    _authEvents.add(
+      AuthState(AuthChangeEvent.passwordRecovery, testSession(user)),
+    );
+  }
+
+  /// What a failed link does: supabase_flutter reports it on the stream.
+  void failAuthLink(Object error) => _authEvents.addError(error);
 
   void signOutLocally() {
     currentUser = null;
@@ -71,6 +85,14 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Future<void> resetPassword(String email) =>
       (onResetPassword ?? (throw UnimplementedError()))();
+
+  @override
+  Future<void> updatePassword(String password) =>
+      (onUpdatePassword ?? (throw UnimplementedError()))(password);
+
+  @override
+  Future<void> signOutOtherSessions() =>
+      (onSignOutOtherSessions ?? (throw UnimplementedError()))();
 
   Future<void> dispose() => _authEvents.close();
 }

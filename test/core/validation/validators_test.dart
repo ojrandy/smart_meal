@@ -100,7 +100,7 @@ void main() {
     test('rejects a mismatch', () {
       expect(
         validatePasswordConfirmation('Abcdef1?', 'Abcdef1!'),
-        'Passwords do not match',
+        "Passwords don't match",
       );
     });
 

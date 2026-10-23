@@ -12,6 +12,8 @@ import 'core/services/push_notification_service.dart';
 import 'core/services/secure_session_storage.dart';
 import 'core/theme/app_fonts.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/app_snack_bar.dart';
+import 'features/auth/domain/password_recovery.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,12 +65,21 @@ class SmartMealApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // A failed confirmation or recovery link can arrive on any screen, even
+    // during the splash, so it is shown at the root.
+    ref.listen<String?>(authLinkErrorProvider, (_, message) {
+      if (message == null) return;
+      showRootSnackBar(message, duration: const Duration(seconds: 6));
+      ref.read(authLinkErrorProvider.notifier).clear();
+    });
+
     // Watch the router provider so it rebuilds when auth state changes.
     final router = ref.watch(routerProvider);
     return MaterialApp.router(
       title: 'Smart Meal',
       theme: AppTheme.lightTheme,
       routerConfig: router,
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
     );
   }

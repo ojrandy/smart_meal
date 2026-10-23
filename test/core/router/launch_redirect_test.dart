@@ -6,12 +6,14 @@ String? _redirect(
   bool ready = true,
   bool signedIn = false,
   bool onboardingSeen = false,
+  bool recovering = false,
 }) => resolveRedirect(
   LaunchSnapshot(
     location: location,
     isReady: ready,
     isSignedIn: signedIn,
     isOnboardingSeen: onboardingSeen,
+    isRecovering: recovering,
   ),
 );
 
@@ -77,5 +79,51 @@ void main() {
         expect(_redirect(location, signedIn: true), isNull);
       });
     }
+  });
+
+  group('recovery session', () {
+    for (final location in [
+      '/splash',
+      '/home',
+      '/profile',
+      '/auth/login',
+      '/onboarding',
+    ]) {
+      test('is forced from $location to the reset screen', () {
+        expect(
+          _redirect(location, signedIn: true, recovering: true),
+          '/auth/reset-password',
+        );
+      });
+    }
+
+    test('stays on the reset screen', () {
+      expect(
+        _redirect('/auth/reset-password', signedIn: true, recovering: true),
+        isNull,
+      );
+    });
+
+    test('still waits for the splash hold', () {
+      expect(
+        _redirect('/splash', ready: false, signedIn: true, recovering: true),
+        isNull,
+      );
+    });
+
+    test('a leftover flag without a session changes nothing', () {
+      expect(_redirect('/auth/login', recovering: true), isNull);
+      expect(_redirect('/home', recovering: true), '/auth/login');
+    });
+  });
+
+  group('the reset screen without recovery', () {
+    test('sends a signed-out user to sign-in', () {
+      expect(_redirect('/auth/reset-password'), '/auth/login');
+    });
+
+    test('sends a normal session home', () {
+      expect(_redirect('/auth/reset-password', signedIn: true), '/home');
+    });
   });
 }

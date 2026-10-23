@@ -1,0 +1,199 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:iconsax/iconsax.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/validation/validators.dart';
+import '../../../../core/widgets/app_snack_bar.dart';
+import '../../../../core/widgets/custom_button.dart';
+import '../../../../core/widgets/custom_text_field.dart';
+import '../../domain/auth_notifier.dart';
+import '../../domain/auth_state.dart';
+import '../widgets/auth_screen_header.dart';
+
+/// Requests a password reset email. Whatever the account state, a request
+/// that reaches Supabase gets the same neutral confirmation, so the screen
+/// never reveals whether an email is registered.
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
+  const ForgotPasswordScreen({super.key});
+
+  /// Matches Supabase's default minimum interval between emails to one
+  /// address, so a resend tapped as soon as it is offered goes through.
+  static const resendCooldown = Duration(seconds: 60);
+
+  @override
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+
+  bool _sent = false;
+  int _secondsLeft = 0;
+  Timer? _cooldown;
+
+  @override
+  void dispose() {
+    _cooldown?.cancel();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  // ── Actions ────────────────────────────────────────────────────────────────
+
+  Future<void> _send() async {
+    if (!_formKey.currentState!.validate()) return;
+    FocusScope.of(context).unfocus();
+    await ref
+        .read(authNotifierProvider.notifier)
+        .resetPassword(_emailController.text.trim());
+  }
+
+  void _startCooldown() {
+    _cooldown?.cancel();
+    setState(
+      () => _secondsLeft = ForgotPasswordScreen.resendCooldown.inSeconds,
+    );
+    _cooldown = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return timer.cancel();
+      setState(() => _secondsLeft--);
+      if (_secondsLeft <= 0) timer.cancel();
+    });
+  }
+
+  // After context.go there is nothing to pop, so fall back to sign-in.
+  void _goBack() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/auth/login');
+    }
+  }
+
+  // ── Auth State Listener ────────────────────────────────────────────────────
+
+  void _onAuthStateChanged(
+    SmartMealAuthState? previous,
+    SmartMealAuthState next,
+  ) {
+    if (!mounted) return;
+
+    if (next is AuthResetEmailSent) {
+      setState(() => _sent = true);
+      _startCooldown();
+    } else if (next is AuthError) {
+      showAppSnackBar(context, next.message);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen<SmartMealAuthState>(authNotifierProvider, _onAuthStateChanged);
+
+    final isLoading = ref.watch(authNotifierProvider) is AuthLoading;
+    final isCoolingDown = _secondsLeft > 0;
+
+    final String buttonText;
+    if (!_sent) {
+      buttonText = 'Send reset link';
+    } else if (isCoolingDown) {
+      buttonText = 'Resend in ${_secondsLeft}s';
+    } else {
+      buttonText = 'Resend link';
+    }
+
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _goBack();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 16.0,
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AuthScreenHeader(
+                    onBack: _goBack,
+                    title: 'Forgot your',
+                    highlight: 'password?',
+                    subtitle:
+                        "Enter your account email and we'll send you a "
+                        'link to set a new password.',
+                  ),
+                  const SizedBox(height: 32),
+
+                  CustomTextField(
+                    label: 'Email',
+                    hint: 'user@email.com',
+                    prefixIcon: Iconsax.sms,
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: validateEmail,
+                  ),
+                  const SizedBox(height: 24),
+
+                  if (_sent) ...[
+                    // Announced to screen readers when it appears.
+                    Semantics(
+                      liveRegion: true,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Iconsax.sms_tracking,
+                              color: AppColors.primary,
+                              size: 20,
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                "If an account exists for that email, we've "
+                                'sent a link to reset your password.',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.textPrimary,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+
+                  CustomButton(
+                    text: buttonText,
+                    onPressed: isLoading || isCoolingDown ? null : _send,
+                    isLoading: isLoading,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

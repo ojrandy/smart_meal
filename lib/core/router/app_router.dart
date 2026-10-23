@@ -7,6 +7,9 @@ import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
 import '../../features/auth/domain/auth_session.dart';
+import '../../features/auth/domain/password_recovery.dart';
+import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/onboarding/domain/onboarding_notifier.dart';
 import '../../features/splash/domain/launch_ready_notifier.dart';
@@ -43,6 +46,7 @@ class _RouterRefreshNotifier extends ChangeNotifier {
   _RouterRefreshNotifier(Ref ref) {
     void refresh(_, _) => notifyListeners();
     ref.listen(authSessionProvider, refresh);
+    ref.listen(passwordRecoveryProvider, refresh);
     ref.listen(onboardingSeenProvider, refresh);
     ref.listen(launchReadyProvider, refresh);
   }
@@ -51,7 +55,7 @@ class _RouterRefreshNotifier extends ChangeNotifier {
 // ── Router Provider ────────────────────────────────────────────────────────
 
 /// The main GoRouter instance exposed as a Riverpod provider.
-/// Watches the session, onboarding and launch-ready providers via
+/// Watches the session, recovery, onboarding and launch-ready providers via
 /// [_RouterRefreshNotifier] so it re-evaluates redirects when they change.
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = _RouterRefreshNotifier(ref);
@@ -70,6 +74,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         isReady: ref.read(launchReadyProvider),
         isSignedIn: ref.read(authSessionProvider) != null,
         isOnboardingSeen: ref.read(onboardingSeenProvider),
+        isRecovering: ref.read(passwordRecoveryProvider),
       ),
     ),
 
@@ -93,8 +98,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/auth/forgot-password',
-        builder: (context, state) =>
-            const PlaceholderScreen(title: 'Forgot Password'),
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: resetPasswordRoute,
+        builder: (context, state) => const ResetPasswordScreen(),
       ),
 
       // ── Setup / Preferences Flow ─────────────────────────────────────────

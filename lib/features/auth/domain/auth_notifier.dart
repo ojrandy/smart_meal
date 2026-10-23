@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 import '../../../core/services/app_logger.dart';
 import '../data/auth_repository.dart';
 import 'auth_state.dart';
+import 'password_recovery.dart';
 
 /// Auth Notifier — Domain Layer
 ///
@@ -20,6 +21,7 @@ import 'auth_state.dart';
 /// - [signInWithGoogle]  — Google OAuth via Supabase
 /// - [signOut]           — sign out from all providers
 /// - [resetPassword]     — request a password reset email
+/// - [updatePassword]    — set a new password from a recovery link
 class AuthNotifier extends Notifier<SmartMealAuthState> {
   @override
   SmartMealAuthState build() => AuthIdle();
@@ -104,8 +106,52 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
       await _repo.resetPassword(email);
       state = AuthResetEmailSent();
     } catch (error, stackTrace) {
-      state = _failure('resetPassword', error, stackTrace);
+      if (error is sb.AuthException &&
+          error.code == 'over_email_send_rate_limit') {
+        // Supabase limits emails per *existing* account, so this error
+        // alone would reveal that the account exists. Answer exactly as for
+        // a sent email; the screen's resend cooldown stops quick retries.
+        AppLogger.log(
+          'resetPassword rate limited',
+          name: 'auth',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        state = AuthResetEmailSent();
+      } else {
+        state = _failure('resetPassword', error, stackTrace);
+      }
     }
+  }
+
+  // ── New Password (recovery) ────────────────────────────────────────────────
+
+  /// Sets the new password for a recovery session, revokes the user's other
+  /// sessions, and ends recovery so the router continues as usual.
+  Future<void> updatePassword(String password) async {
+    state = AuthLoading();
+    try {
+      await _repo.updatePassword(password);
+    } catch (error, stackTrace) {
+      state = _failure('updatePassword', error, stackTrace);
+      return;
+    }
+
+    try {
+      await _repo.signOutOtherSessions();
+    } catch (error, stackTrace) {
+      // The password is changed, which is what the user asked for, so this
+      // still succeeds. Other devices keep their sessions until they sign
+      // out (known issue: no retry yet).
+      AppLogger.log(
+        'Revoking other sessions failed',
+        name: 'auth',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+    state = AuthPasswordUpdated();
+    await ref.read(passwordRecoveryProvider.notifier).end();
   }
 
   // ── Helper ─────────────────────────────────────────────────────────────────

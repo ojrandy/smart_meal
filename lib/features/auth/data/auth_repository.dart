@@ -37,8 +37,14 @@ class GoogleSignInFailed extends GoogleSignInFailure {
 /// - Email & password sign-up / sign-in
 /// - Google OAuth sign-in via Supabase
 /// - Session management (sign-out, current user)
+/// - Password recovery (reset email, new password)
 /// - Auth state change stream
 class AuthRepository {
+  /// Where confirmation and recovery emails send the user back to. Must
+  /// match the Android intent filter, the iOS `CFBundleURLTypes` entry and
+  /// the Supabase redirect allow-list (`supabase/config.toml`) exactly.
+  static const authRedirectUri = 'com.ojtech.smartmeal://auth-callback';
+
   final SupabaseClient _client;
 
   // ── Google Sign-In Configuration ──────────────────────────────────────────
@@ -69,7 +75,11 @@ class AuthRepository {
     required String email,
     required String password,
   }) {
-    return _client.auth.signUp(email: email, password: password);
+    return _client.auth.signUp(
+      email: email,
+      password: password,
+      emailRedirectTo: authRedirectUri,
+    );
   }
 
   /// Signs in an existing user with [email] and [password].
@@ -129,9 +139,25 @@ class AuthRepository {
 
   // ── Password Reset ─────────────────────────────────────────────────────────
 
-  /// Sends a password reset email to [email].
+  /// Sends a password reset email to [email]. The link opens the app, and
+  /// supabase_flutter exchanges its PKCE code for a recovery session, which
+  /// emits [AuthChangeEvent.passwordRecovery]. The verifier stays on this
+  /// device, so the link only works where it was requested.
   Future<void> resetPassword(String email) {
-    return _client.auth.resetPasswordForEmail(email);
+    return _client.auth.resetPasswordForEmail(
+      email,
+      redirectTo: authRedirectUri,
+    );
+  }
+
+  /// Sets the signed-in (recovery) user's new password.
+  Future<void> updatePassword(String password) {
+    return _client.auth.updateUser(UserAttributes(password: password));
+  }
+
+  /// Revokes every session of this user except the current one.
+  Future<void> signOutOtherSessions() {
+    return _client.auth.signOut(scope: SignOutScope.others);
   }
 }
 

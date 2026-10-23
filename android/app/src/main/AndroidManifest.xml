@@ -34,6 +34,18 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Supabase confirmation and recovery email links
+                 (AuthRepository.authRedirectUri). Any app can declare the
+                 same custom scheme; PKCE makes an intercepted code useless
+                 without this app's verifier (docs/SECURITY.md §10). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="com.ojtech.smartmeal"
+                    android:host="auth-callback"/>
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

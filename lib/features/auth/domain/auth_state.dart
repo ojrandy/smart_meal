@@ -10,6 +10,7 @@
 ///   case AuthError()                      => show SnackBar with message
 ///   case AuthAwaitingEmailConfirmation()  => tell the user to check email
 ///   case AuthResetEmailSent()             => confirm the reset email
+///   case AuthPasswordUpdated()            => confirm the new password
 /// }
 /// ```
 sealed class SmartMealAuthState {}
@@ -33,5 +34,9 @@ class AuthError extends SmartMealAuthState {
 /// this state must be true in both cases.
 class AuthAwaitingEmailConfirmation extends SmartMealAuthState {}
 
-/// A password reset email was requested.
+/// A password reset email was requested. Also the answer when Supabase
+/// rate-limits the request, so it never reveals whether the account exists.
 class AuthResetEmailSent extends SmartMealAuthState {}
+
+/// A recovery session set its new password; recovery has ended.
+class AuthPasswordUpdated extends SmartMealAuthState {}
