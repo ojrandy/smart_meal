@@ -122,6 +122,18 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
   persisted in SharedPreferences) and launch readiness (`launchReadyProvider`,
   the splash hold). The splash only animates; the router leaves it for
   `/home`, `/onboarding` or `/auth/login`.
+- Password recovery (P11) is one more input: `passwordRecoveryProvider`
+  (persisted flag). `AuthSessionNotifier` sets it from
+  `AuthChangeEvent.passwordRecovery` *before* publishing the session, so a
+  recovery session is never seen without it; while it is set,
+  `resolveRedirect` allows only `/auth/reset-password`. Sign-in, sign-out
+  and starting without a session clear it.
+- Auth deep links: supabase_flutter (`detectSessionInUri`, PKCE) handles
+  `com.ojtech.smartmeal://auth-callback` itself — the app adds no link
+  parsing. A failed link arrives as an error on the auth stream;
+  `isAuthLinkError` picks it out and `SmartMealApp` shows it through
+  `rootScaffoldMessengerKey`, which survives route changes. Messages that
+  must outlive a redirect use that root messenger.
 - `_RouterRefreshNotifier` bridges those providers into GoRouter's
   `refreshListenable` — this is what makes the redirect re-evaluate live
   when they change. Any new global state that should affect routing

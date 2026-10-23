@@ -3,7 +3,7 @@
 > Update this file every time a feature's status changes. Keep entries
 > honest — "in progress" means actively being worked on, not "started once."
 
-Last reviewed: **2026-10-21** (P10 — auth flow + launch routing, on `p10-auth-flow`, owner phone check pending; P08 — release hardening ✅, owner smoke-tested the release APK, Xcode step waits for a Mac; P07 — env config + `docs/SECURITY.md`, on `p07-env-config`; P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
+Last reviewed: **2026-10-23** (P11 — password recovery + auth deep links, on `p11-password-recovery`, owner device check pending; P10 — auth flow + launch routing, on `p10-auth-flow`, owner phone check pending; P08 — release hardening ✅, owner smoke-tested the release APK, Xcode step waits for a Mac; P07 — env config + `docs/SECURITY.md`, on `p07-env-config`; P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
 
 > **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
 > and `docs/prompt-tracker.md` (status per prompt). Check them before picking
@@ -47,14 +47,16 @@ Last reviewed: **2026-10-21** (P10 — auth flow + launch routing, on `p10-auth-
 
 | Item | Status | Notes |
 |---|---|---|
-| Repository layer (`AuthRepository`) | ✅ | Email/password, Google, sign-out, password reset |
+| Repository layer (`AuthRepository`) | ✅ | Email/password, Google, sign-out, password reset + new password (P11). Every email link uses `AuthRepository.authRedirectUri` = `com.ojtech.smartmeal://auth-callback` |
 | State + Notifier (`AuthNotifier`, `SmartMealAuthState`) | ✅ | P10: session in `authSessionProvider` (Supabase stream; all the router reads); operation state in `AuthNotifier` (idle / loading / error / awaiting confirmation / reset sent); typed Google failures; one error mapper `formatAuthError` |
 | Login screen | ✅ | Email/password + Google; shared validators (login password: non-empty only). Apple/Facebook hidden until P12 (owner, 2026-10-21) |
 | Signup screen | ✅ | Session → the router goes home; no session → "Almost there! We've sent a confirmation link to your email." (true even for an already-registered email), then login |
 | Router auth guard | ✅ | Centralized `redirect` → pure `resolveRedirect` in `launch_redirect.dart`, table-tested |
 | Encrypted session storage | 🟡 | P09 (2026-10-21): `SecureSessionStorage` + `SecurePkceStorage` (`lib/core/services/secure_session_storage.dart`) keep the Supabase session and PKCE verifier in Keychain/Keystore via `flutter_secure_storage` ^10. Migrates a legacy plaintext session (read-back verified, then deleted); clears a session surviving an iOS reinstall (`smartmeal.installed` marker); storage errors → signed out. 12 tests. Pending: owner phone checks (no token in `shared_prefs`, restart keeps the session, upgrade from the pre-P09 build keeps the session) |
 | Social button brand marks | ✅ | Official multicolor Google "G" image (`AppAssets.googleLogo`), Facebook blue `#0866FF`, Apple black (owner request, 2026-10-21). Owner still to see it on the phone |
-| Forgot password screen | ⬜ | Route exists (`/auth/forgot-password`), points at `PlaceholderScreen` |
+| Forgot password screen | 🟡 | P11 (2026-10-23): `forgot_password_screen.dart`, built in the login style (owner: no Figma). Always the neutral "If an account exists…" answer, also for `over_email_send_rate_limit`; 60 s resend cooldown. Pending: owner end-to-end check with a real mailbox |
+| Reset password screen + recovery routing | 🟡 | P11: `/auth/reset-password`; `passwordRecoveryProvider` (persisted flag `smartmeal.auth.recovery_pending`) set from `AuthChangeEvent.passwordRecovery` before the session is published; the router forces the reset screen until `updatePassword` (then `signOut(scope: others)`); back = sign out. Pending: owner device check |
+| Auth deep links | 🟡 | P11: Android `VIEW/BROWSABLE` intent filter + iOS `CFBundleURLTypes` for `com.ojtech.smartmeal://auth-callback`; PKCE (default, never implicit); bad/expired links → "This link is invalid or has expired…" on the root snackbar (`authLinkErrorProvider`). Allow-list in `supabase/config.toml`; the owner mirrors it in the Dashboard. Plan: App Links / Universal Links (`SECURITY.md` §10) |
 | Apple Sign-In | ⬜ | Button hidden (P10, owner 2026-10-21) until P12; needs the Apple Developer Program and a Mac |
 | Facebook Sign-In | ⬜ | Button hidden (P10, owner 2026-10-21) until implemented (P12 decision) |
 | Password rule consistency | ✅ | P10: `core/validation/validators.dart` — sign-up 8 chars–72 bytes with lower, upper, digit, symbol (`SECURITY.md` §5 target); login non-empty only. The Supabase project must be set to the same policy (owner, §5) |
@@ -98,7 +100,6 @@ Last reviewed: **2026-10-21** (P10 — auth flow + launch routing, on `p10-auth-
 |---|---|---|
 | Desktop scaffolds (`linux/`, `macos/`, `windows/`) are still in the repo with `com.example` identifiers. The app is Android + iOS only (§0.3), so P06 left them alone; deleting them needs the owner's OK | Low | `linux/`, `macos/`, `windows/` |
 | Android 16+ ignores `screenOrientation="portrait"` on large screens (smallest width ≥ 600 dp: tablets, unfolded foldables) for apps targeting SDK 36, so the app can appear in landscape there; the portrait-only layouts have not been checked in landscape on a tablet | Low | `android/app/src/main/AndroidManifest.xml`, all screens |
-| Password min length mismatch (login 6 vs signup 8) | Low | `login_screen.dart`, `signup_screen.dart` |
 | Plain `TextStyle(fontWeight: …)` without `GoogleFonts.inter(...)` inherits the theme's per-variant family (`Inter_regular`), so the engine fakes the weight from Regular instead of using the bundled Medium/SemiBold/Bold file (found in P04 by code reading; e.g. onboarding, auth screens, `AiChefCard`, `RecipeCard`) — not fixed in P05: using the real weight files visibly changes glyphs, so it needs the owner's sign-off (fix in `AppTheme`, e.g. a pubspec `Inter` family with weights) | Low | `lib/core/theme/app_theme.dart`, screens/widgets |
 | Release build on this dev machine fails in Android lint (`lintVital*`: `ClassNotFoundException: com.android.tools.lint.Main` / `UastEnvironment`) — environment issue, not project code; P04 size builds ran Gradle directly with `-x lintVital*`. CI's Linux runner is unaffected (it builds debug). Did **not** reproduce in P08 (2026-10-20): `flutter build appbundle --release` and `flutter build apk --release` both passed. Keep the workaround in `docs/RELEASE.md` §3 in case it returns. Release downloads also time out often on this network; re-run |  Low (dev env) | local `~/.gradle` |
 | Test coverage 62.8 % lines (2026-10-15). Auth notifier and router redirect are tested since P10; `AuthRepository` (SDK wrapper) still is not | Low | `test/` |
@@ -113,6 +114,10 @@ Last reviewed: **2026-10-21** (P10 — auth flow + launch routing, on `p10-auth-
 | Supabase Auth hardening checklist not applied yet (email confirmation, password policy, token rotation, JWT expiry, rate limits, redirect allow-list, CAPTCHA decision…) | High | Supabase Dashboard; `docs/SECURITY.md` §5 (owner) |
 | `docs/SECURITY.md` owner placeholders unfilled: `{{ACK_DAYS}}`, `{{INCIDENT_LEAD}}`, `{{INCIDENT_CONTACTS_LOCATION}}`; owner review pending | Medium | `docs/SECURITY.md` §7 |
 | iOS `GIDClientID` / reversed-client-ID URL scheme need the per-env xcconfig mechanism specified in `docs/SECURITY.md` §2 — build it in P12 on a Mac | Low (until P12) | `ios/Runner/Info.plist`, `ios/Flutter/*.xcconfig`, Runner scheme |
+| Auth links use a custom URL scheme, which any app can claim (PKCE keeps an intercepted code useless, but the link is spent). Move to App Links / Universal Links once the owner has a domain (`APP_LINK_DOMAIN`, `SECURITY.md` §10) | Medium | `AndroidManifest.xml`, `Info.plist`, `AuthRepository.authRedirectUri` |
+| After a password reset, a failed `signOut(scope: others)` is only logged: other devices keep their sessions. Add a retry or a server-side revoke | Low | `auth_notifier.dart` → `updatePassword` |
+| Login and signup still carry their own copy of the header (back + logo + title) that `AuthScreenHeader` now provides for the P11 screens; switch them over in a later UI pass | Low | `login_screen.dart`, `signup_screen.dart` |
+| `supabase/config.toml` is a minimal hand-written file (auth redirects only). P13 must merge `supabase init` output into it rather than overwrite it | Low (until P13) | `supabase/config.toml` |
 | OSV-Scanner CI job is non-blocking (`continue-on-error`) — make it blocking on 2026-11-14 after triaging findings | Medium | `.github/workflows/ci.yml` |
 | `osv-scanner-action` runs its Docker image by tag, not digest — residual supply-chain risk | Low | `.github/workflows/ci.yml` |
 | Notification permission is never requested — wired in P19 | Medium | `lib/core/services/push_notification_service.dart` (`requestPermissionAndRegisterToken` has no caller) |
