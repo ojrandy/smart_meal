@@ -22,6 +22,7 @@ import 'password_recovery.dart';
 /// - [signOut]           — sign out from all providers
 /// - [resetPassword]     — request a password reset email
 /// - [updatePassword]    — set a new password from a recovery link
+/// - [deleteAccount]     — delete the account and all its data
 class AuthNotifier extends Notifier<SmartMealAuthState> {
   @override
   SmartMealAuthState build() => AuthIdle();
@@ -154,6 +155,23 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
     await ref.read(passwordRecoveryProvider.notifier).end();
   }
 
+  // ── Account Deletion ───────────────────────────────────────────────────────
+
+  /// Deletes the account and all its data, then signs this device out. The
+  /// session change sends the router to sign-in; the UI entry point is the
+  /// Profile screen (T1-Profile).
+  Future<void> deleteAccount() async {
+    state = AuthLoading();
+    try {
+      await _repo.deleteAccount();
+      state = AuthAccountDeleted();
+    } on AccountDeletionReauthRequired {
+      state = AuthReauthenticationRequired();
+    } catch (error, stackTrace) {
+      state = _failure('deleteAccount', error, stackTrace);
+    }
+  }
+
   // ── Helper ─────────────────────────────────────────────────────────────────
 
   AuthError _failure(String operation, Object error, StackTrace stackTrace) {
@@ -186,6 +204,10 @@ String formatAuthError(Object? error) {
       return 'No connection. Check your internet and try again.';
     case GoogleSignInFailed():
       return 'Google sign-in failed. Please try again.';
+    case AccountDeletionRateLimited():
+      return 'Too many attempts. Please wait a moment and try again.';
+    case AccountDeletionFailed():
+      return "We couldn't delete your account. Please try again.";
     case sb.AuthException(:final code):
       return switch (code) {
         'invalid_credentials' =>

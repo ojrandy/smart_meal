@@ -11,6 +11,8 @@
 ///   case AuthAwaitingEmailConfirmation()  => tell the user to check email
 ///   case AuthResetEmailSent()             => confirm the reset email
 ///   case AuthPasswordUpdated()            => confirm the new password
+///   case AuthReauthenticationRequired()   => ask to sign in again, retry
+///   case AuthAccountDeleted()             => confirm; the router signs out
 /// }
 /// ```
 sealed class SmartMealAuthState {}
@@ -40,3 +42,10 @@ class AuthResetEmailSent extends SmartMealAuthState {}
 
 /// A recovery session set its new password; recovery has ended.
 class AuthPasswordUpdated extends SmartMealAuthState {}
+
+/// Account deletion needs a fresh sign-in first (server window: 10 min).
+/// Nothing was deleted.
+class AuthReauthenticationRequired extends SmartMealAuthState {}
+
+/// The account and all its data are deleted and this device is signed out.
+class AuthAccountDeleted extends SmartMealAuthState {}

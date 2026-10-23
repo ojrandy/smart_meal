@@ -426,6 +426,77 @@ void main() {
     });
   });
 
+  group('account deletion', () {
+    late FakeAuthRepository repo;
+    late ProviderContainer container;
+
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      repo = FakeAuthRepository(currentUser: testUser());
+      container = ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(repo),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
+      );
+      container.listen(authSessionProvider, (_, _) {});
+    });
+
+    tearDown(() async {
+      container.dispose();
+      await repo.dispose();
+    });
+
+    AuthNotifier notifier() => container.read(authNotifierProvider.notifier);
+    SmartMealAuthState state() => container.read(authNotifierProvider);
+
+    test('success reports the deletion and the session ends', () async {
+      repo.onDeleteAccount = () async => repo.signOutLocally();
+
+      final pending = notifier().deleteAccount();
+      expect(state(), isA<AuthLoading>());
+      await pending;
+      await Future<void>.delayed(Duration.zero);
+
+      expect(state(), isA<AuthAccountDeleted>());
+      expect(container.read(authSessionProvider), isNull);
+    });
+
+    test('an old sign-in asks for a fresh one and keeps the user in', () async {
+      repo.onDeleteAccount = () => throw const AccountDeletionReauthRequired();
+
+      await notifier().deleteAccount();
+
+      expect(state(), isA<AuthReauthenticationRequired>());
+      expect(container.read(authSessionProvider), isNotNull);
+    });
+
+    test('rate limited shows the attempts message', () async {
+      repo.onDeleteAccount = () => throw const AccountDeletionRateLimited();
+
+      await notifier().deleteAccount();
+
+      expect(
+        (state() as AuthError).message,
+        'Too many attempts. Please wait a moment and try again.',
+      );
+    });
+
+    test('a server failure shows safe copy, not the detail', () async {
+      repo.onDeleteAccount = () =>
+          throw const AccountDeletionFailed('HTTP 500 deletion_failed');
+
+      await notifier().deleteAccount();
+
+      expect(
+        (state() as AuthError).message,
+        "We couldn't delete your account. Please try again.",
+      );
+      expect(container.read(authSessionProvider), isNotNull);
+    });
+  });
+
   group('isAuthLinkError', () {
     for (final (label, error, expected) in <(String, Object, bool)>[
       (

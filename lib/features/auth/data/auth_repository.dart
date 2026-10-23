@@ -28,6 +28,30 @@ class GoogleSignInFailed extends GoogleSignInFailure {
   final String reason;
 }
 
+/// Why account deletion failed, from the `delete-account` Edge Function's
+/// stable error codes, so callers never match on text.
+sealed class AccountDeletionFailure implements Exception {
+  const AccountDeletionFailure();
+}
+
+/// The last sign-in is older than the server's window (10 minutes): the
+/// user must sign in again, then retry.
+class AccountDeletionReauthRequired extends AccountDeletionFailure {
+  const AccountDeletionReauthRequired();
+}
+
+class AccountDeletionRateLimited extends AccountDeletionFailure {
+  const AccountDeletionRateLimited();
+}
+
+/// Anything else. Nothing is assumed deleted.
+class AccountDeletionFailed extends AccountDeletionFailure {
+  const AccountDeletionFailed(this.reason);
+
+  /// Developer-facing detail for the debug log only, never the UI.
+  final String reason;
+}
+
 /// Auth Repository — Data Layer
 ///
 /// Wraps all Supabase Auth SDK calls.
@@ -38,6 +62,7 @@ class GoogleSignInFailed extends GoogleSignInFailure {
 /// - Google OAuth sign-in via Supabase
 /// - Session management (sign-out, current user)
 /// - Password recovery (reset email, new password)
+/// - Account deletion (through the `delete-account` Edge Function)
 /// - Auth state change stream
 class AuthRepository {
   /// Where confirmation and recovery emails send the user back to. Must
@@ -158,6 +183,36 @@ class AuthRepository {
   /// Revokes every session of this user except the current one.
   Future<void> signOutOtherSessions() {
     return _client.auth.signOut(scope: SignOutScope.others);
+  }
+
+  // ── Account Deletion ───────────────────────────────────────────────────────
+
+  /// Deletes the signed-in user's account and all their data on the server
+  /// (`supabase/functions/delete-account`), then drops the local session.
+  /// The secret key needed for this lives only in the function.
+  ///
+  /// Throws an [AccountDeletionFailure]; on failure nothing local changes.
+  Future<void> deleteAccount() async {
+    try {
+      await _client.functions.invoke('delete-account');
+    } on FunctionException catch (e) {
+      final details = e.details;
+      final code = details is Map ? details['error'] : null;
+      throw switch (code) {
+        'reauthentication_required' => const AccountDeletionReauthRequired(),
+        'rate_limited' => const AccountDeletionRateLimited(),
+        _ => AccountDeletionFailed('HTTP ${e.status} ${code ?? ''}'.trim()),
+      };
+    }
+
+    // The server user is gone, so a server-side revoke would fail: drop
+    // the local session (secure storage, S7) and the Google sign-in only.
+    try {
+      await _googleSignIn.signOut();
+    } on PlatformException {
+      // Not signed in with Google; nothing to clear.
+    }
+    await _client.auth.signOut(scope: SignOutScope.local);
   }
 }
 

@@ -37,6 +37,7 @@ class FakeAuthRepository implements AuthRepository {
   Future<void> Function()? onResetPassword;
   Future<void> Function(String password)? onUpdatePassword;
   Future<void> Function()? onSignOutOtherSessions;
+  Future<void> Function()? onDeleteAccount;
 
   void signInAs(User user) {
     currentUser = user;
@@ -93,6 +94,10 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Future<void> signOutOtherSessions() =>
       (onSignOutOtherSessions ?? (throw UnimplementedError()))();
+
+  @override
+  Future<void> deleteAccount() =>
+      (onDeleteAccount ?? (throw UnimplementedError()))();
 
   Future<void> dispose() => _authEvents.close();
 }
