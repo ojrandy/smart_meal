@@ -1,0 +1,22 @@
+<!-- Supabase "Reset password" email. Paste into Dashboard → Authentication →
+     Emails → Reset password, or ship with supabase/config.toml. Keep
+     {{ .ConfirmationURL }} as the only link: it carries the app redirect. -->
+<div style="margin:0;padding:24px;background:#FCFAF5;font-family:Arial,Helvetica,sans-serif;color:#111827;">
+  <div style="max-width:480px;margin:0 auto;background:#FFFFFF;border-radius:16px;padding:32px;">
+    <h1 style="margin:0 0 16px;font-size:22px;color:#0A7C36;">Reset your Smart Meal password</h1>
+    <p style="margin:0 0 16px;font-size:15px;line-height:1.5;">
+      We got a request to reset the password for your Smart Meal account.
+      Open this email on the phone where you asked for it, then tap the button.
+    </p>
+    <p style="margin:24px 0;">
+      <a href="{{ .ConfirmationURL }}"
+         style="display:inline-block;background:#0A7C36;color:#FFFFFF;text-decoration:none;font-weight:bold;font-size:15px;padding:14px 24px;border-radius:12px;">
+        Set a new password
+      </a>
+    </p>
+    <p style="margin:0;font-size:13px;line-height:1.5;color:#6B7280;">
+      If you didn't ask for this, you can ignore this email. Your password
+      stays the same.
+    </p>
+  </div>
+</div>

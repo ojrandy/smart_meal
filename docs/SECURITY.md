@@ -17,6 +17,7 @@
 7. [Vulnerability disclosure and incident response](#7-vulnerability-disclosure-and-incident-response)
 8. [Compliance pointers](#8-compliance-pointers)
 9. [Accepted risks and open items](#9-accepted-risks-and-open-items)
+10. [Auth deep links and password recovery](#10-auth-deep-links-and-password-recovery)
 
 ---
 
@@ -300,3 +301,66 @@ kept in this repo.** *(Owner: {{INCIDENT_CONTACTS_LOCATION}}.)*
 | Build defines are extractable | Public identifiers are visible to anyone with the binary | Accepted by design: only public identifiers go there (§2); access control is RLS |
 | Release-build config errors | A release build made without an env file crashes at startup and shows nothing to the user | Accepted: it is a build mistake that is caught in the first run. P20's release checklist builds from `env/prod.json` |
 | Values still pending | `{{ACK_DAYS}}`, `{{INCIDENT_LEAD}}`, `{{INCIDENT_CONTACTS_LOCATION}}` | The owner fills them in; tracked in `docs/prompt-tracker.md` |
+| Custom URL scheme for auth links | Another app can claim the scheme and receive a link; the code is useless without the verifier (PKCE), but the link is spent | Move to App Links / Universal Links on `{{APP_LINK_DOMAIN}}` (§10) |
+| Reset-password response reveals rate limiting | The app answers neutrally, but a script calling the API directly can tell an existing account by `over_email_send_rate_limit` | CAPTCHA on auth endpoints (§5); accept until then |
+| Other sessions after a password reset | If `signOut(scope: others)` fails, other devices keep their sessions | Logged; add a retry or server-side revoke later (Known issues) |
+
+## 10. Auth deep links and password recovery
+
+Written in P11 (2026-10-23).
+
+**Redirect URI.** Confirmation and recovery emails link to
+`com.ojtech.smartmeal://auth-callback` (`AuthRepository.authRedirectUri`).
+The same value is registered in the Android intent filter on `MainActivity`,
+in iOS `CFBundleURLTypes`, and in `supabase/config.toml` as both `site_url`
+and the only `additional_redirect_urls` entry. The hosted project must match:
+Dashboard → Authentication → URL Configuration, Site URL and Redirect URLs =
+exactly this URI, **no wildcards** (§5).
+
+**Flow: PKCE only.** supabase_flutter v2 defaults to PKCE, and `main.dart`
+does not override `authFlowType`. Never switch to the implicit flow: it would
+put tokens in the link itself. With PKCE the link carries only a one-time
+`code`, and the code needs this install's verifier, which is kept in secure
+storage (`SecurePkceStorage`, P09). Consequences:
+
+- **Custom schemes can be claimed by other apps.** Any app may declare
+  `com.ojtech.smartmeal://`, and the OS may hand it our link. An app that
+  intercepts the code cannot turn it into a session without the verifier.
+  The residual risk is a denial of service (the user's link is used up), not
+  account takeover.
+- **A link works only on the device that requested it.** A recovery or
+  confirmation link opened on another device, or after reinstalling, fails
+  and shows "This link is invalid or has expired. Please request a new one."
+- An expired, used or forged link (`error=` / bad `code`) arrives as an
+  error on the auth stream; the app shows the same message and logs details
+  in debug builds only (S4, S5).
+
+**Recovery session.** Opening a recovery link emits
+`AuthChangeEvent.passwordRecovery`. The app then sets a persisted
+"recovery pending" flag (a boolean in SharedPreferences; no credential), and
+the router allows only `/auth/reset-password` until a new password is set.
+A restart cannot reach Home with a recovery session. Going back signs out.
+After `updateUser(password)` the app revokes the user's other sessions
+(`signOut(scope: others)`); if that call fails the password change still
+stands and the failure is logged (open item, §9).
+
+**Anti-enumeration.** "Forgot password" always answers "If an account exists
+for that email, we've sent a link to reset your password." Supabase's
+per-address email limit (`over_email_send_rate_limit`) applies only to
+existing accounts, so the app shows that same neutral answer for it, and a
+60 s resend cooldown keeps normal use under the limit. The API response
+itself still differs; only a server-side change (CAPTCHA, uniform limits)
+closes that, see §9.
+
+**Planned: verified links.** Move from the custom scheme to Android App Links
+and iOS Universal Links on `{{APP_LINK_DOMAIN}}` once the owner has a domain:
+host `/.well-known/assetlinks.json` (package `com.ojtech.smartmeal` plus the
+upload and Play App Signing SHA-256s) and `apple-app-site-association`
+(Team ID + bundle ID), add `android:autoVerify="true"` and the Associated
+Domains entitlement, put the `https://` URI on the allow-list, and remove the
+custom scheme. Tracked as `APP_LINK_DOMAIN` in `docs/prompt-tracker.md`.
+
+**Email templates (owner).** Drafts: `supabase/templates/confirmation.html` and `recovery.html`. Update the Supabase "Confirm signup" and "Reset
+password" templates: keep `{{ .ConfirmationURL }}` as the link (it carries
+the redirect), and use the brand name "Smart Meal" in a friendly, short
+tone. Tracked in `docs/prompt-tracker.md`.

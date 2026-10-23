@@ -1,0 +1,23 @@
+# SmartMeal — Supabase local configuration (minimal, P11).
+#
+# Holds only the auth redirect settings for now. P13 runs `supabase init`
+# and merges the generated defaults into this file; keep these values.
+# The hosted project's Dashboard (Authentication → URL Configuration) must
+# match: docs/SECURITY.md §10.
+
+[auth]
+# Mobile-only app: the fallback redirect is the app's own callback.
+site_url = "com.ojtech.smartmeal://auth-callback"
+# Exactly the one URI the app sends as redirectTo / emailRedirectTo
+# (AuthRepository.authRedirectUri). Never add a wildcard.
+additional_redirect_urls = ["com.ojtech.smartmeal://auth-callback"]
+
+# Branded emails (P11). The hosted project uses the same text, pasted in
+# Dashboard → Authentication → Emails.
+[auth.email.template.confirmation]
+subject = "Confirm your Smart Meal account"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Reset your Smart Meal password"
+content_path = "./supabase/templates/recovery.html"
