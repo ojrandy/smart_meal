@@ -185,8 +185,8 @@ Fill in the date when an item is applied.
 | [ ] | Refresh-token rotation | On, with a short reuse interval (default 10 s) | |
 | [ ] | JWT expiry | ≤ 3600 s (1 h) | |
 | [ ] | Rate limits | Reviewed: email sends, sign-ups/sign-ins per IP, token refreshes, OTP/verify. Record the chosen numbers here | |
-| [ ] | Redirect URL allow-list | Exact app URIs only, built from `com.ojtech.smartmeal` (P11). **No wildcards** | |
-| [ ] | Site URL | Not a localhost or placeholder value | |
+| [x] | Redirect URL allow-list | Exact app URIs only, built from `com.ojtech.smartmeal` (P11). **No wildcards** | 2026-10-23 — exactly `com.ojtech.smartmeal://auth-callback` |
+| [x] | Site URL | Not a localhost or placeholder value | 2026-10-23 — `com.ojtech.smartmeal://auth-callback` |
 | [ ] | Unused providers | Disabled — keep only Email, Google, and Apple / Facebook once P12 ships them | |
 | [ ] | CAPTCHA on sign-up | Owner decision: hCaptcha or Turnstile. Recommended before public launch | |
 | [ ] | MFA (TOTP) | On the roadmap; required before any payment feature | |
