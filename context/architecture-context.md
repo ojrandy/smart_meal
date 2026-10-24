@@ -128,6 +128,16 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
   recovery session is never seen without it; while it is set,
   `resolveRedirect` allows only `/auth/reset-password`. Sign-in, sign-out
   and starting without a session clear it.
+- Setup gate (P15): `setupStatusProvider` (`features/setup/domain/`) holds
+  `signedOut / checking / incomplete / complete / unavailable` for the
+  signed-in user. It starts from a per-user cached boolean
+  (`smartmeal.setup_complete.<uid>`, cleared on sign-out — S12), then
+  confirms `profiles.setup_completed_at` with the server on sign-in, on app
+  resume and on retry. Only `complete` opens the main tabs; anything else
+  sends the user to `/setup/loading`, which waits, offers a retry (and sign
+  out) when offline with nothing cached, and enters the flow when setup is
+  unfinished. Setup screens never navigate to `/home`: when P16 marks setup
+  complete, the router moves on.
 - Auth deep links: supabase_flutter (`detectSessionInUri`, PKCE) handles
   `com.ojtech.smartmeal://auth-callback` itself — the app adds no link
   parsing. A failed link arrives as an error on the auth stream;
@@ -137,7 +147,7 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
 - `_RouterRefreshNotifier` bridges those providers into GoRouter's
   `refreshListenable` — this is what makes the redirect re-evaluate live
   when they change. Any new global state that should affect routing
-  (e.g. "has completed setup flow", P15) extends this same notifier and
+  (as the setup gate did in P15) extends this same notifier and
   `LaunchSnapshot` rather than creating a second refresh mechanism.
 - The 5-tab shell (`Home`, `Discover`, `Planner`, `Favorites`, `Profile`)
   uses `StatefulShellRoute.indexedStack` so each tab keeps its own

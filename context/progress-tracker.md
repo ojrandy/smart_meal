@@ -3,7 +3,7 @@
 > Update this file every time a feature's status changes. Keep entries
 > honest — "in progress" means actively being worked on, not "started once."
 
-Last reviewed: **2026-10-23** (P13 ✅ — schema v1 live, Advisors empty; P11 — password recovery + auth deep links, on `p11-password-recovery`, owner device check pending; P10 — auth flow + launch routing, on `p10-auth-flow`, owner phone check pending; P08 — release hardening ✅, owner smoke-tested the release APK, Xcode step waits for a Mac; P07 — env config + `docs/SECURITY.md`, on `p07-env-config`; P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
+Last reviewed: **2026-10-24** (P15 — setup gate on `p15-setup-gate`; P14 ✅ — account deletion live; P13 ✅ — schema v1 live, Advisors empty; P11 — password recovery + auth deep links, on `p11-password-recovery`, owner device check pending; P10 — auth flow + launch routing, on `p10-auth-flow`, owner phone check pending; P08 — release hardening ✅, owner smoke-tested the release APK, Xcode step waits for a Mac; P07 — env config + `docs/SECURITY.md`, on `p07-env-config`; P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
 
 > **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
 > and `docs/prompt-tracker.md` (status per prompt). Check them before picking
@@ -33,7 +33,7 @@ Last reviewed: **2026-10-23** (P13 ✅ — schema v1 live, Advisors empty; P11 �
 | Item | Status | Notes |
 |---|---|---|
 | Splash screen UI/animation | ✅ | Redesigned 2026-10-21 (owner authority): solid `splashBackground` #05471F, logo + "SmartMeal AI" wordmark + "Your AI food companion" + "by OJ Tech", one ≤ 500 ms entrance, `LaunchReadyNotifier.splashHold` 1.6 s (was 5 s with a looping glow and dots). Native launch screens use the same green (Android `launch_background`, API 31+ `windowSplashScreenBackground`; iOS `LaunchScreen.storyboard`, unverified without a Mac) |
-| Session-aware routing | 🟡 | P10 (2026-10-21): the splash only animates; the router (`resolveRedirect`) sends signed-in users to `/home`, returning signed-out users to `/auth/login` and new devices to `/onboarding`. The setup gate comes with P15 (needs P13) |
+| Session-aware routing | 🟡 | P15 (2026-10-24): setup gate added — signed-in users go to `/home` only when setup is complete (server `profiles.setup_completed_at`, cached per user), otherwise to `/setup/loading`; table-tested; pending owner phone check. P10 (2026-10-21): the splash only animates; the router (`resolveRedirect`) sends signed-in users to `/home`, returning signed-out users to `/auth/login` and new devices to `/onboarding`. The setup gate comes with P15 (needs P13) |
 
 ## Feature: Onboarding
 
@@ -66,11 +66,12 @@ Last reviewed: **2026-10-23** (P13 ✅ — schema v1 live, Advisors empty; P11 �
 
 | Item | Status | Notes |
 |---|---|---|
-| `/setup/loading` | ⬜ | Placeholder |
+| `/setup/loading` | 🟡 | P15: `SetupLoadingScreen` — waits for the setup check, offline with nothing cached → "No connection…" + Try again + Sign out, unfinished → `/setup/lifestyle`. Built in app style (owner); final look may change in P16 |
 | `/setup/lifestyle` | ⬜ | Placeholder |
 | `/setup/preferences` | ⬜ | Placeholder |
 | `/setup/processing` (AI processing experience) | ⬜ | Placeholder |
-| Supabase `preferences` table | ⬜ | Schema not designed yet |
+| Supabase `user_preferences` table | ✅ | P13 schema (live); written by P16's `complete_setup` RPC |
+| Setup status gate | 🟡 | P15: `SetupStatusRepository` + `setupStatusProvider`; refresh on sign-in, resume, retry; per-user cache cleared on sign-out |
 
 ## Main tab shell
 
@@ -120,6 +121,7 @@ Last reviewed: **2026-10-23** (P13 ✅ — schema v1 live, Advisors empty; P11 �
 | The local stack runs CLI-default image versions (Postgres 17.11) instead of the live project's (Postgres 17.6.1.147, PostgREST v14.5, storage v1.80.2): their images would not download on this network, so the version pins written by `supabase link` were set aside (scratchpad, not deleted; `link` rewrites them). Re-link and pull those images when the network allows | Low | `supabase/.temp/*-version` |
 | Account deletion has no UI yet; Google Play and the App Store need the in-app entry point before release (T1-Profile). The web page already describes Profile → Delete account | High (before release) | Profile screen (T1) |
 | Account-deletion errors through `functions.invoke` when offline arrive as an HTTP client exception, which maps to the generic "couldn't delete" message rather than the connection message | Low | `auth_notifier.dart` → `formatAuthError` |
+| Until P16 ships, every signed-in user without a finished setup stops at the `/setup/lifestyle` placeholder (no way back except reinstall or the offline sign-out). Merge P15 to `main` together with P16, or test P15 only on a device | Medium (until P16) | `/setup/*` placeholders |
 | OSV-Scanner CI job is non-blocking (`continue-on-error`) — make it blocking on 2026-11-14 after triaging findings | Medium | `.github/workflows/ci.yml` |
 | `osv-scanner-action` runs its Docker image by tag, not digest — residual supply-chain risk | Low | `.github/workflows/ci.yml` |
 | Notification permission is never requested — wired in P19 | Medium | `lib/core/services/push_notification_service.dart` (`requestPermissionAndRegisterToken` has no caller) |
