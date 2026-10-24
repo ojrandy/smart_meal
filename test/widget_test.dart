@@ -22,17 +22,21 @@ import 'package:smart_meal/features/onboarding/data/onboarding_repository.dart';
 import 'package:smart_meal/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:smart_meal/features/splash/domain/launch_ready_notifier.dart';
 import 'package:smart_meal/features/splash/presentation/splash_screen.dart';
+import 'package:smart_meal/features/setup/data/setup_status_repository.dart';
+import 'package:smart_meal/features/setup/presentation/setup_loading_screen.dart';
 import 'package:smart_meal/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'
     show AuthException, User;
 
 import 'helpers/fake_auth_repository.dart';
+import 'helpers/fake_setup_status_repository.dart';
 
 Future<FakeAuthRepository> _pumpApp(
   WidgetTester tester, {
   User? signedInAs,
   bool onboardingSeen = false,
   bool recoveryPending = false,
+  FakeSetupStatusRepository? setup,
 }) async {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 2.75;
@@ -51,6 +55,9 @@ Future<FakeAuthRepository> _pumpApp(
       overrides: [
         authRepositoryProvider.overrideWithValue(authRepository),
         sharedPreferencesProvider.overrideWithValue(prefs),
+        setupStatusRepositoryProvider.overrideWithValue(
+          setup ?? FakeSetupStatusRepository(serverComplete: true),
+        ),
       ],
       child: const SmartMealApp(),
     ),
@@ -206,5 +213,66 @@ void main() {
     expect(find.byType(LoginScreen), findsOneWidget);
     expect(find.text(authLinkErrorMessage), findsOneWidget);
     expect(find.textContaining('raw server text'), findsNothing);
+  });
+
+  testWidgets('a signed-in user without setup goes splash → setup, never '
+      'home', (tester) async {
+    await _pumpApp(
+      tester,
+      signedInAs: testUser(),
+      setup: FakeSetupStatusRepository(serverComplete: false),
+    );
+    await _finishSplash(tester);
+
+    expect(find.byType(HomeScreen), findsNothing);
+    // The loading screen hands over to the first setup step.
+    expect(find.widgetWithText(AppBar, 'Lifestyle Setup'), findsOneWidget);
+  });
+
+  testWidgets('signing in a new user leads into setup', (tester) async {
+    final repo = await _pumpApp(
+      tester,
+      onboardingSeen: true,
+      setup: FakeSetupStatusRepository(serverComplete: false),
+    );
+    await _finishSplash(tester);
+
+    repo.signInAs(testUser());
+    await tester.pumpAndSettle();
+
+    expect(find.byType(HomeScreen), findsNothing);
+    expect(find.widgetWithText(AppBar, 'Lifestyle Setup'), findsOneWidget);
+  });
+
+  testWidgets('offline with no cached answer offers a retry, which '
+      'recovers', (tester) async {
+    final setup = FakeSetupStatusRepository(serverComplete: true)
+      ..onFetch = (_) => throw const SocketException('down');
+    await _pumpApp(tester, signedInAs: testUser(), setup: setup);
+    await _finishSplash(tester);
+
+    expect(find.byType(SetupLoadingScreen), findsOneWidget);
+    expect(
+      find.text('No connection. Check your internet and try again.'),
+      findsOneWidget,
+    );
+
+    setup.onFetch = null;
+    await tester.tap(find.text('Try again'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(HomeScreen), findsOneWidget);
+  });
+
+  testWidgets('a returning user with setup cached goes straight home, even '
+      'offline', (tester) async {
+    final user = testUser();
+    final setup = FakeSetupStatusRepository(cached: {user.id: true})
+      ..onFetch = (_) => throw const SocketException('down');
+    await _pumpApp(tester, signedInAs: user, setup: setup);
+    await _finishSplash(tester);
+
+    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(SetupLoadingScreen), findsNothing);
   });
 }

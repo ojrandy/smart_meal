@@ -7,6 +7,7 @@ String? _redirect(
   bool signedIn = false,
   bool onboardingSeen = false,
   bool recovering = false,
+  bool setupComplete = false,
 }) => resolveRedirect(
   LaunchSnapshot(
     location: location,
@@ -14,6 +15,7 @@ String? _redirect(
     isSignedIn: signedIn,
     isOnboardingSeen: onboardingSeen,
     isRecovering: recovering,
+    isSetupComplete: setupComplete,
   ),
 );
 
@@ -32,10 +34,18 @@ void main() {
       expect(_redirect('/splash', onboardingSeen: true), '/auth/login');
     });
 
-    test('a signed-in user goes home, seen or not', () {
-      expect(_redirect('/splash', signedIn: true), '/home');
+    test('a signed-in user with setup done goes home, seen or not', () {
       expect(
-        _redirect('/splash', signedIn: true, onboardingSeen: true),
+        _redirect('/splash', signedIn: true, setupComplete: true),
+        '/home',
+      );
+      expect(
+        _redirect(
+          '/splash',
+          signedIn: true,
+          onboardingSeen: true,
+          setupComplete: true,
+        ),
         '/home',
       );
     });
@@ -67,16 +77,22 @@ void main() {
     }
   });
 
-  group('signed in', () {
+  group('signed in, setup complete', () {
     for (final location in ['/onboarding', '/auth/login', '/auth/signup']) {
       test('is sent from $location home', () {
-        expect(_redirect(location, signedIn: true), '/home');
+        expect(
+          _redirect(location, signedIn: true, setupComplete: true),
+          '/home',
+        );
       });
     }
 
     for (final location in ['/home', '/discover', '/profile']) {
       test('may open $location', () {
-        expect(_redirect(location, signedIn: true), isNull);
+        expect(
+          _redirect(location, signedIn: true, setupComplete: true),
+          isNull,
+        );
       });
     }
   });
@@ -123,7 +139,73 @@ void main() {
     });
 
     test('sends a normal session home', () {
-      expect(_redirect('/auth/reset-password', signedIn: true), '/home');
+      expect(
+        _redirect('/auth/reset-password', signedIn: true, setupComplete: true),
+        '/home',
+      );
     });
+  });
+
+  group('signed in, setup not complete (or not known yet)', () {
+    test('the splash leads into setup, seen or not', () {
+      expect(_redirect('/splash', signedIn: true), '/setup/loading');
+      expect(
+        _redirect('/splash', signedIn: true, onboardingSeen: true),
+        '/setup/loading',
+      );
+    });
+
+    for (final location in [
+      '/home',
+      '/home/recipe/1',
+      '/discover',
+      '/planner',
+      '/favorites',
+      '/profile',
+      '/onboarding',
+      '/auth/login',
+      '/auth/signup',
+      '/auth/reset-password',
+    ]) {
+      test('is sent from $location to setup', () {
+        expect(_redirect(location, signedIn: true), '/setup/loading');
+      });
+    }
+
+    for (final location in [
+      '/setup/loading',
+      '/setup/lifestyle',
+      '/setup/preferences',
+      '/setup/processing',
+    ]) {
+      test('may move through $location', () {
+        expect(_redirect(location, signedIn: true), isNull);
+      });
+    }
+  });
+
+  group('signed in, setup complete, setup routes', () {
+    for (final location in ['/setup/loading', '/setup/lifestyle']) {
+      test('$location sends a finished user home', () {
+        expect(
+          _redirect(location, signedIn: true, setupComplete: true),
+          '/home',
+        );
+      });
+    }
+  });
+
+  group('signed out, setup routes', () {
+    test('/setup/* is protected', () {
+      expect(_redirect('/setup/loading'), '/auth/login');
+      expect(_redirect('/setup/lifestyle', setupComplete: true), '/auth/login');
+    });
+  });
+
+  test('recovery outranks an unfinished setup', () {
+    expect(
+      _redirect('/setup/loading', signedIn: true, recovering: true),
+      '/auth/reset-password',
+    );
   });
 }

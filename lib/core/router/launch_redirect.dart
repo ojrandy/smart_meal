@@ -6,6 +6,7 @@ class LaunchSnapshot {
     required this.isSignedIn,
     required this.isOnboardingSeen,
     this.isRecovering = false,
+    this.isSetupComplete = false,
   });
 
   /// The matched location being navigated to, e.g. `/auth/login`.
@@ -19,26 +20,31 @@ class LaunchSnapshot {
   /// The session comes from a password-recovery link and no new password
   /// has been set yet.
   final bool isRecovering;
+
+  /// The signed-in user has finished setup, as far as this device knows.
+  /// "Not finished" and "not known yet" are both false: the setup loading
+  /// screen resolves which.
+  final bool isSetupComplete;
 }
 
 const resetPasswordRoute = '/auth/reset-password';
+const setupEntryRoute = '/setup/loading';
+const homeRoute = '/home';
 
 /// The router guard as a pure function: where to send the user instead of
 /// [LaunchSnapshot.location], or null to let them through.
 ///
-/// | From      | Signed in       | Onboarding seen | Goes to              |
-/// |-----------|-----------------|-----------------|----------------------|
-/// | splash    | (not ready yet)                   | stays                |
-/// | anywhere  | yes, recovering | –               | /auth/reset-password |
-/// | splash    | yes             | –               | /home                |
-/// | splash    | no              | no              | /onboarding          |
-/// | splash    | no              | yes             | /auth/login          |
-/// | public    | yes             | –               | /home                |
-/// | protected | no              | –               | /auth/login          |
+/// | Ready | Session | Recovery | Onboarding seen | Setup complete | From splash          | Guard elsewhere                          |
+/// |-------|---------|----------|-----------------|----------------|----------------------|------------------------------------------|
+/// | no    | –       | –        | –               | –              | stay                 | stay                                     |
+/// | yes   | none    | –        | no              | –              | /onboarding          | protected → /auth/login                  |
+/// | yes   | none    | –        | yes             | –              | /auth/login          | protected → /auth/login                  |
+/// | yes   | yes     | yes      | –               | –              | /auth/reset-password | everything → /auth/reset-password        |
+/// | yes   | yes     | no       | –               | no / unknown   | /setup/loading       | public and main routes → /setup/loading  |
+/// | yes   | yes     | no       | –               | yes            | /home                | /setup/* and public routes → /home       |
 ///
 /// Public routes are `/onboarding` and `/auth/*`; the reset screen is only
-/// reachable with a recovery session. P15 adds the setup gate once profiles
-/// exist (P13).
+/// reachable with a recovery session.
 String? resolveRedirect(LaunchSnapshot snapshot) {
   final location = snapshot.location;
 
@@ -49,20 +55,24 @@ String? resolveRedirect(LaunchSnapshot snapshot) {
     return location == resetPasswordRoute ? null : resetPasswordRoute;
   }
 
-  if (location == '/splash') {
-    if (snapshot.isSignedIn) return '/home';
-    return snapshot.isOnboardingSeen ? '/auth/login' : '/onboarding';
-  }
-
-  if (location == resetPasswordRoute) {
-    return snapshot.isSignedIn ? '/home' : '/auth/login';
-  }
-
   final isPublic =
       location == '/onboarding' ||
       location == '/auth' ||
       location.startsWith('/auth/');
+  final isSetup = location == '/setup' || location.startsWith('/setup/');
 
-  if (snapshot.isSignedIn) return isPublic ? '/home' : null;
-  return isPublic ? null : '/auth/login';
+  if (!snapshot.isSignedIn) {
+    if (location == '/splash') {
+      return snapshot.isOnboardingSeen ? '/auth/login' : '/onboarding';
+    }
+    if (location == resetPasswordRoute) return '/auth/login';
+    return isPublic ? null : '/auth/login';
+  }
+
+  // Signed in, not recovering: setup decides between the flow and the app.
+  if (!snapshot.isSetupComplete) {
+    return isSetup ? null : setupEntryRoute;
+  }
+  if (location == '/splash' || isPublic || isSetup) return homeRoute;
+  return null;
 }

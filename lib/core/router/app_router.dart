@@ -12,6 +12,8 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/onboarding/domain/onboarding_notifier.dart';
+import '../../features/setup/domain/setup_status.dart';
+import '../../features/setup/presentation/setup_loading_screen.dart';
 import '../../features/splash/domain/launch_ready_notifier.dart';
 import 'launch_redirect.dart';
 
@@ -47,6 +49,7 @@ class _RouterRefreshNotifier extends ChangeNotifier {
     void refresh(_, _) => notifyListeners();
     ref.listen(authSessionProvider, refresh);
     ref.listen(passwordRecoveryProvider, refresh);
+    ref.listen(setupStatusProvider, refresh);
     ref.listen(onboardingSeenProvider, refresh);
     ref.listen(launchReadyProvider, refresh);
   }
@@ -55,7 +58,7 @@ class _RouterRefreshNotifier extends ChangeNotifier {
 // ── Router Provider ────────────────────────────────────────────────────────
 
 /// The main GoRouter instance exposed as a Riverpod provider.
-/// Watches the session, recovery, onboarding and launch-ready providers via
+/// Watches the session, recovery, setup, onboarding and launch-ready providers via
 /// [_RouterRefreshNotifier] so it re-evaluates redirects when they change.
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = _RouterRefreshNotifier(ref);
@@ -75,6 +78,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         isSignedIn: ref.read(authSessionProvider) != null,
         isOnboardingSeen: ref.read(onboardingSeenProvider),
         isRecovering: ref.read(passwordRecoveryProvider),
+        isSetupComplete: ref.read(setupStatusProvider) == SetupStatus.complete,
       ),
     ),
 
@@ -107,9 +111,8 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // ── Setup / Preferences Flow ─────────────────────────────────────────
       GoRoute(
-        path: '/setup/loading',
-        builder: (context, state) =>
-            const PlaceholderScreen(title: 'Getting Things Ready'),
+        path: setupEntryRoute,
+        builder: (context, state) => const SetupLoadingScreen(),
       ),
       GoRoute(
         path: '/setup/lifestyle',
