@@ -3,7 +3,7 @@
 > Update this file every time a feature's status changes. Keep entries
 > honest — "in progress" means actively being worked on, not "started once."
 
-Last reviewed: **2026-10-24** (P15 — setup gate on `p15-setup-gate`; P14 ✅ — account deletion live; P13 ✅ — schema v1 live, Advisors empty; P11 — password recovery + auth deep links, on `p11-password-recovery`, owner device check pending; P10 — auth flow + launch routing, on `p10-auth-flow`, owner phone check pending; P08 — release hardening ✅, owner smoke-tested the release APK, Xcode step waits for a Mac; P07 — env config + `docs/SECURITY.md`, on `p07-env-config`; P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
+Last reviewed: **2026-10-26** (P15 + P16 — setup gate and setup flow on `main` and live, owner phone check pending; CI gitleaks red since 2026-10-20; P14 ✅ — account deletion live; P13 ✅ — schema v1 live, Advisors empty; P11 — password recovery + auth deep links, on `p11-password-recovery`, owner device check pending; P10 — auth flow + launch routing, on `p10-auth-flow`, owner phone check pending; P08 — release hardening ✅, owner smoke-tested the release APK, Xcode step waits for a Mac; P07 — env config + `docs/SECURITY.md`, on `p07-env-config`; P06 — permanent app identity `com.ojtech.smartmeal`, ✅ on `p06-app-identity`, owner phone check passed; P01–P05 on `main`, CI green; P05 — UI standards and accessibility cleanup, ✅ on `p05-ui-a11y`; P04 — dependency, asset and font diet; earlier: P01–P03 on 2026-10-14)
 
 > **Remediation plan:** `docs/prompt.md` (instructions, P01–P20 + template T1)
 > and `docs/prompt-tracker.md` (status per prompt). Check them before picking
@@ -67,9 +67,9 @@ Last reviewed: **2026-10-24** (P15 — setup gate on `p15-setup-gate`; P14 ✅ �
 | Item | Status | Notes |
 |---|---|---|
 | `/setup/loading` | 🟡 | P15: `SetupLoadingScreen` — waits for the setup check, offline with nothing cached → "No connection…" + Try again + Sign out, unfinished → `/setup/lifestyle`. Built in app style (owner); final look may change in P16 |
-| `/setup/lifestyle` | ⬜ | Placeholder |
-| `/setup/preferences` | ⬜ | Placeholder |
-| `/setup/processing` (AI processing experience) | ⬜ | Placeholder |
+| `/setup/lifestyle` (steps 1–4) | 🟡 | P16: one question per step — lifestyle, household (1–20), budget in FCFA with non-blocking advice, cooking skill + time. Plain Cameroonian wording. Pending: owner phone check |
+| `/setup/preferences` (steps 5–9) | 🟡 | P16: kinds of food (like / don't like), consent (required), diet, allergies ("No, none" is an answer), health goals (optional). Pending: owner phone check |
+| `/setup/processing` (AI processing experience) | 🟡 | P16: saves through the atomic `complete_setup` RPC with a 2.1 s minimum display, retry on failure; the router then goes home. First recommendations come with P17 |
 | Supabase `user_preferences` table | ✅ | P13 schema (live); written by P16's `complete_setup` RPC |
 | Setup status gate | 🟡 | P15: `SetupStatusRepository` + `setupStatusProvider`; refresh on sign-in, resume, retry; per-user cache cleared on sign-out |
 
@@ -105,7 +105,7 @@ Last reviewed: **2026-10-24** (P15 — setup gate on `p15-setup-gate`; P14 ✅ �
 | `CustomTextField`: only the 24 dp text line is tappable; taps on the rest of the 56 dp box (label, padding) do not focus the input (fails the 48 dp tap-target guideline) | Low | `lib/core/widgets/custom_text_field.dart` |
 | `docs/prompt.md` P05 enforcement command: its `Colors\.` alternative has no word boundary, so it also matches every `AppColors.`; use `\bColors\.` | Low (docs) | `docs/prompt.md` |
 | Figma / `Mockup/` still show the old AI artwork for splash, onboarding and the auth heroes; the code is the source of truth for those since 2026-10-21 (`ui-context.md`). Update Figma when convenient | Low | Figma |
-| `ios/Runner/PrivacyInfo.xcprivacy` exists but is not yet in the Runner target, so it does not ship until added in Xcode (*Target Membership*). P16 and P19 must add their data types | Medium (before App Store) | `ios/Runner/PrivacyInfo.xcprivacy` |
+| `ios/Runner/PrivacyInfo.xcprivacy` exists but is not yet in the Runner target, so it does not ship until added in Xcode (*Target Membership*). P16 declared Health (allergies, diet, goals) and Other Data Types (household, budget, cooking, food likes) on 2026-10-26; P19 adds its own | Medium (before App Store) | `ios/Runner/PrivacyInfo.xcprivacy` |
 | No real upload keystore yet: P08 was verified with a throwaway key. The owner creates it per `docs/RELEASE.md` §2 (outside the repo, two backups) before the first Play upload, then registers its SHA-1 and the Play App Signing SHA-1 for Google Sign-In (P12) | Medium (before first upload) | owner; `android/key.properties` |
 | The Supabase project is on the free tier and **paused itself** after inactivity (found 2026-10-21: the host stopped resolving, so every sign-in failed with `SocketException: Failed host lookup`; the owner restored it). It will pause again after ~7 idle days. Before launch: paid plan or a production project that never idles | High (before launch) | Supabase Dashboard; `docs/SECURITY.md` §9 |
 | One Supabase project serves every `APP_ENV` (owner, 2026-10-20): dev/test accounts, test data and any mistaken destructive command share a database with real users. Create a separate prod (or staging) project before public launch; until then P13 works against a local Supabase | High (before launch) | Supabase; `env/*.json`; `docs/SECURITY.md` §9 |
@@ -121,7 +121,9 @@ Last reviewed: **2026-10-24** (P15 — setup gate on `p15-setup-gate`; P14 ✅ �
 | The local stack runs CLI-default image versions (Postgres 17.11) instead of the live project's (Postgres 17.6.1.147, PostgREST v14.5, storage v1.80.2): their images would not download on this network, so the version pins written by `supabase link` were set aside (scratchpad, not deleted; `link` rewrites them). Re-link and pull those images when the network allows | Low | `supabase/.temp/*-version` |
 | Account deletion has no UI yet; Google Play and the App Store need the in-app entry point before release (T1-Profile). The web page already describes Profile → Delete account | High (before release) | Profile screen (T1) |
 | Account-deletion errors through `functions.invoke` when offline arrive as an HTTP client exception, which maps to the generic "couldn't delete" message rather than the connection message | Low | `auth_notifier.dart` → `formatAuthError` |
-| Until P16 ships, every signed-in user without a finished setup stops at the `/setup/lifestyle` placeholder (no way back except reinstall or the offline sign-out). Merge P15 to `main` together with P16, or test P15 only on a device | Medium (until P16) | `/setup/*` placeholders |
+| CI "Secret scan (gitleaks, full history)" has failed on every `main` push since 2026-10-20 (run 39508795850, `8e53480`); last green 38788496280 (`caa1b55`). Unnoticed until 2026-10-26. No secret-like value found by searching the history; the job log (GitHub login) or a local gitleaks run will name the finding. If it is a real secret: rotate first, then allowlist or rewrite per SECURITY.md §7 | High | `.github/workflows/ci.yml`, `.gitleaks.toml` |
+| The app is English-only; Cameroon is bilingual. Add French (all user-facing copy, starting with setup) — owner, 2026-10-26: make the app bilingual now (next task after the P16 merge) | Medium | `lib/` copy, `intl` |
+| `setup_completed_at` gates the app, but nothing yet lets a user change setup answers later; Profile (T1) must reuse `complete_setup` | Low | T1-Profile |
 | OSV-Scanner CI job is non-blocking (`continue-on-error`) — make it blocking on 2026-11-14 after triaging findings | Medium | `.github/workflows/ci.yml` |
 | `osv-scanner-action` runs its Docker image by tag, not digest — residual supply-chain risk | Low | `.github/workflows/ci.yml` |
 | Notification permission is never requested — wired in P19 | Medium | `lib/core/services/push_notification_service.dart` (`requestPermissionAndRegisterToken` has no caller) |
@@ -131,6 +133,7 @@ Last reviewed: **2026-10-24** (P15 — setup gate on `p15-setup-gate`; P14 ✅ �
 
 | Date | Issue | Fix |
 |---|---|---|
+| 2026-10-26 | Budget advice figures inconsistent (monthly 25 000 FCFA ≈ 830 per day, below the daily 1 000) | P16: owner set the monthly suggestion to 30 000 FCFA per person (`budget_advice.dart`, tests updated) |
 | 2026-10-21 | Splash always showed onboarding (even signed in) and "seen" was never stored; screens navigated to `/home` themselves; a failed sign-out ejected the user; no way to sign out | P10: `resolveRedirect` from session + onboarding seen + splash hold; `authSessionProvider` as the router's only session input; interim Home with Sign out |
 | 2026-10-21 | Raw server/developer text in auth errors; red snackbar and string matching on Google cancel; 6-vs-8 password rules; email regex rejecting `a+b@x.company`; "Account created!" possibly untrue; "coming soon" Apple/Facebook buttons | P10: typed Google failures, one `formatAuthError` with a generic default, shared validators, neutral confirmation copy, Apple/Facebook hidden until P12 |
 | 2026-10-20 | Release build signed with the debug key; no R8 shrinking; backup on (plaintext session eligible for cloud/device transfer); no cleartext policy; no iOS privacy manifest; no release runbook | P08: `key.properties`-only release signing with a clear failure; R8 on; `allowBackup=false` + backup/data-extraction rules; `usesCleartextTraffic=false` + network security config; `PrivacyInfo.xcprivacy`; `docs/RELEASE.md` |
