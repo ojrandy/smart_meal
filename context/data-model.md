@@ -42,7 +42,7 @@ cascade: P14's Edge Function deletes `avatars/{uid}/…`.
 |---|---|---|
 | `profiles` | One row per auth user | Created by `private.handle_new_user()` on `auth.users` insert (display name from Google `full_name`, trimmed, ≤ 80). `avatar_path` must sit in `{id}/…`. Defaults: `CM` / `XAF`. `setup_completed_at` is P15's gate |
 | `user_preferences` | Setup answers (P16) | Sensitive. Allergy, diet and health values require `sensitive_data_consent_at` (CHECK). `allergens_declared` separates "none" from "not answered". Budget in whole XAF, amount and period set together |
-| `cuisines` | Lookup | `slug` key; grows over time, so a table, not an enum |
+| `cuisines` | Lookup | `slug` key; grows over time, so a table, not an enum. Reference data shipped by migration `20261024073206` (P16): cameroonian, west_african, italian, french, indian, chinese — names in plain words ("Cameroonian food"); the app adds familiar dish examples per slug |
 | `user_cuisine_preferences` | Like / dislike per cuisine | |
 | `recipes` | Catalog | Clients see `is_published` rows only. `allergens` never null (empty = none of the listed allergens). GIN indexes on `allergens` and `dietary_tags` for filters |
 | `recipe_ingredients`, `recipe_steps` | Recipe detail | Visible when the parent recipe is published. `quantity` null = "to taste" |
@@ -102,6 +102,7 @@ only write path for the catalog.
 | `private.handle_new_user()` | definer, `search_path = ''` | trigger only | The auth service has no rights on `public.profiles` |
 | `private.set_updated_at()` | invoker | trigger only | `updated_at` maintenance |
 | `private.purge_expired_interactions()` | invoker | pg_cron (postgres) | 12-month retention |
+| `public.complete_setup(...)` | invoker | authenticated | P16. Validates every setup answer, then in one transaction upserts `user_preferences` (`allergens_declared = true`: an empty list means "None"), replaces `user_cuisine_preferences` and sets `profiles.setup_completed_at`. Requires `p_sensitive_data_consent = true` (owner: consent required). Budget 1–10 000 000 FCFA; low budgets are only *advised* against in the app. Profile (T1) reuses it to edit answers |
 | `public.note_account_deletion_attempt(uuid)` | invoker | service_role only | P14 rate limit (5 per user per rolling hour) for the `delete-account` Edge Function; counters in `private.account_deletion_attempts`, swept after a day |
 
 ## Edge Functions
@@ -122,7 +123,7 @@ have no usage on it.
 
 ## Seed
 
-`supabase/seed.sql`: 6 cuisines and 12 published recipes (Ndolé, Eru, Achu,
+`supabase/seed.sql`: 12 published recipes (cuisines come from the migration) (Ndolé, Eru, Achu,
 Koki, Poulet DG, Mbongo tchobi, jollof, puff-puff and four international).
 Local only. Prices are placeholders for the owner to validate; images are
 null so the app shows its fallback.

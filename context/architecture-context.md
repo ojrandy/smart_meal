@@ -138,6 +138,17 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
   out) when offline with nothing cached, and enters the flow when setup is
   unfinished. Setup screens never navigate to `/home`: when P16 marks setup
   complete, the router moves on.
+- Setup flow (P16): `SetupNotifier` (sealed `SetupEditing / Submitting /
+  Completed / Failed`) holds the answers in an immutable `SetupDraft`,
+  **in memory only** (sensitive, S6; reset on sign-out, S12). One question
+  per step; `SetupQuestionsScreen` serves `/setup/lifestyle` (steps 1–4)
+  and `/setup/preferences` (5–9) and only moves between those two routes
+  and `/setup/processing`, which calls the atomic `complete_setup` RPC and
+  then `setupStatusProvider.markComplete()`. What users read (plain,
+  Cameroonian wording) lives in `setup_labels.dart`; the enums in
+  `setup_vocabulary.dart` carry only database values. Budget advice
+  (`budget_advice.dart`) advises, never blocks. Money is formatted only
+  through `core/formatting/fcfa.dart`.
 - Auth deep links: supabase_flutter (`detectSessionInUri`, PKCE) handles
   `com.ojtech.smartmeal://auth-callback` itself — the app adds no link
   parsing. A failed link arrives as an error on the auth stream;

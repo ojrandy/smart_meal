@@ -31,6 +31,11 @@ enum SetupStatus {
 class SetupStatusNotifier extends Notifier<SetupStatus> {
   String? _userId;
 
+  // Bumped by every newer fact (a user change, a completed setup). A server
+  // answer is applied only if nothing newer arrived while it was in flight,
+  // so a check started before `complete_setup` committed cannot undo it.
+  int _generation = 0;
+
   SetupStatusRepository get _repo => ref.read(setupStatusRepositoryProvider);
 
   @override
@@ -57,6 +62,7 @@ class SetupStatusNotifier extends Notifier<SetupStatus> {
 
   SetupStatus _startFor(String? userId) {
     _userId = userId;
+    _generation++;
     if (userId == null) return SetupStatus.signedOut;
 
     scheduleMicrotask(() => unawaited(refresh()));
@@ -67,16 +73,28 @@ class SetupStatusNotifier extends Notifier<SetupStatus> {
     };
   }
 
+  /// Records a setup just saved on the server (P16), so the router leaves
+  /// setup at once without another round trip.
+  Future<void> markComplete() async {
+    final userId = _userId;
+    if (userId == null) return;
+    _generation++;
+    state = SetupStatus.complete;
+    await _repo.cache(userId, isComplete: true);
+  }
+
   /// Asks the server again. Without a connection the cached answer stands;
   /// with no cached answer the status becomes [SetupStatus.unavailable].
   Future<void> refresh() async {
     final userId = _userId;
     if (userId == null) return;
+    final generation = _generation;
     if (state == SetupStatus.unavailable) state = SetupStatus.checking;
 
     try {
       final isComplete = await _repo.fetchIsComplete(userId);
-      if (_userId != userId) return; // Signed out or switched meanwhile.
+      // Signed out, switched user, or setup completed meanwhile: stale.
+      if (generation != _generation) return;
       state = isComplete ? SetupStatus.complete : SetupStatus.incomplete;
       await _repo.cache(userId, isComplete: isComplete);
     } catch (error, stackTrace) {
@@ -86,7 +104,7 @@ class SetupStatusNotifier extends Notifier<SetupStatus> {
         error: error,
         stackTrace: stackTrace,
       );
-      if (_userId == userId && state == SetupStatus.checking) {
+      if (generation == _generation && state == SetupStatus.checking) {
         state = SetupStatus.unavailable;
       }
     }

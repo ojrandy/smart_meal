@@ -22,6 +22,7 @@ import 'package:smart_meal/features/onboarding/data/onboarding_repository.dart';
 import 'package:smart_meal/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:smart_meal/features/splash/domain/launch_ready_notifier.dart';
 import 'package:smart_meal/features/splash/presentation/splash_screen.dart';
+import 'package:smart_meal/features/setup/data/setup_repository.dart';
 import 'package:smart_meal/features/setup/data/setup_status_repository.dart';
 import 'package:smart_meal/features/setup/presentation/setup_loading_screen.dart';
 import 'package:smart_meal/main.dart';
@@ -29,6 +30,7 @@ import 'package:supabase_flutter/supabase_flutter.dart'
     show AuthException, User;
 
 import 'helpers/fake_auth_repository.dart';
+import 'helpers/fake_setup_repository.dart';
 import 'helpers/fake_setup_status_repository.dart';
 
 Future<FakeAuthRepository> _pumpApp(
@@ -55,6 +57,7 @@ Future<FakeAuthRepository> _pumpApp(
       overrides: [
         authRepositoryProvider.overrideWithValue(authRepository),
         sharedPreferencesProvider.overrideWithValue(prefs),
+        setupRepositoryProvider.overrideWithValue(FakeSetupRepository()),
         setupStatusRepositoryProvider.overrideWithValue(
           setup ?? FakeSetupStatusRepository(serverComplete: true),
         ),
@@ -226,7 +229,7 @@ void main() {
 
     expect(find.byType(HomeScreen), findsNothing);
     // The loading screen hands over to the first setup step.
-    expect(find.widgetWithText(AppBar, 'Lifestyle Setup'), findsOneWidget);
+    expect(find.text('What best describes you?'), findsOneWidget);
   });
 
   testWidgets('signing in a new user leads into setup', (tester) async {
@@ -241,7 +244,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(HomeScreen), findsNothing);
-    expect(find.widgetWithText(AppBar, 'Lifestyle Setup'), findsOneWidget);
+    expect(find.text('What best describes you?'), findsOneWidget);
   });
 
   testWidgets('offline with no cached answer offers a retry, which '

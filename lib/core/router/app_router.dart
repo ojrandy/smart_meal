@@ -14,6 +14,8 @@ import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/onboarding/domain/onboarding_notifier.dart';
 import '../../features/setup/domain/setup_status.dart';
 import '../../features/setup/presentation/setup_loading_screen.dart';
+import '../../features/setup/presentation/setup_processing_screen.dart';
+import '../../features/setup/presentation/setup_questions_screen.dart';
 import '../../features/splash/domain/launch_ready_notifier.dart';
 import 'launch_redirect.dart';
 
@@ -117,17 +119,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/setup/lifestyle',
         builder: (context, state) =>
-            const PlaceholderScreen(title: 'Lifestyle Setup'),
+            const SetupQuestionsScreen(lifestyleSection: true),
       ),
       GoRoute(
         path: '/setup/preferences',
         builder: (context, state) =>
-            const PlaceholderScreen(title: 'Preferences & Budget'),
+            const SetupQuestionsScreen(lifestyleSection: false),
       ),
       GoRoute(
         path: '/setup/processing',
-        builder: (context, state) =>
-            const PlaceholderScreen(title: 'AI Processing Experience'),
+        builder: (context, state) => const SetupProcessingScreen(),
       ),
 
       // ── Main Shell (Bottom Navigation) ───────────────────────────────────

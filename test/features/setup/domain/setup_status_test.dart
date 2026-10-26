@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
@@ -152,4 +153,24 @@ void main() {
 
     expect(status(), SetupStatus.complete);
   });
+
+  test(
+    'a check started before setup completed cannot undo it (race)',
+    () async {
+      setup = FakeSetupStatusRepository(serverComplete: false);
+      final slowAnswer = Completer<bool>();
+      setup.onFetch = (_) => slowAnswer.future;
+      await start();
+      await settle(); // The first check is now in flight.
+
+      await container.read(setupStatusProvider.notifier).markComplete();
+      slowAnswer.complete(
+        false,
+      ); // Stale: read before complete_setup committed.
+      await settle();
+
+      expect(status(), SetupStatus.complete);
+      expect(setup.cached[_userId], isTrue);
+    },
+  );
 }

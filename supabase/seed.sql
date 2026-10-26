@@ -5,14 +5,8 @@
 -- cubes are used because they often hide gluten, celery and soy. If you
 -- add an ingredient, re-check the allergen list (S11).
 -- Every price is a placeholder until the owner validates it.
+-- Cuisines are reference data in migration 20261024073206_setup_flow.sql.
 
-insert into public.cuisines (slug, name, region) values
-  ('cameroonian', 'Cameroonian', 'Central Africa'),
-  ('west_african', 'West African', 'West Africa'),
-  ('italian', 'Italian', 'Europe'),
-  ('french', 'French', 'Europe'),
-  ('indian', 'Indian', 'South Asia'),
-  ('chinese', 'Chinese', 'East Asia');
 
 insert into public.recipes (
   id, slug, title, summary, cuisine_slug, image_path, prep_minutes,
