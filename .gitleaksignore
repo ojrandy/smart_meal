@@ -1,0 +1,7 @@
+# Gitleaks findings reviewed and accepted. One fingerprint per line
+# (commit:file:rule:line); anything not listed still fails CI.
+#
+# 2026-10-27: deliberately fake keys ('sb_secret_abc' and the header-only
+# JWT 'eyJhbGciOiJIUzI1NiJ9.x.y') in the test that proves AppConfig refuses
+# to start with a secret key. Not credentials; nothing to rotate.
+887db90bcedc2f2f8e3cf5a0a41fd9e349cd1730:test/core/config/app_config_test.dart:generic-api-key:91
