@@ -4,15 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../domain/setup_notifier.dart';
 
-const _stages = [
-  'Saving your preferences',
-  'Matching recipes to your taste',
-  'Checking allergies and budget',
+List<String> _stagesFor(AppLocalizations l10n) => [
+  l10n.setupStageSaving,
+  l10n.setupStageMatching,
+  l10n.setupStageChecking,
 ];
+
+const _stageCount = 3;
 
 /// The "AI processing" moment (`/setup/processing`): saves every answer in
 /// one call and shows progress. On success the router leaves setup on its
@@ -37,7 +40,7 @@ class _SetupProcessingScreenState extends ConsumerState<SetupProcessingScreen> {
   void initState() {
     super.initState();
     _timer = Timer.periodic(SetupProcessingScreen.stageInterval, (timer) {
-      if (_visibleStages >= _stages.length) return timer.cancel();
+      if (_visibleStages >= _stageCount) return timer.cancel();
       setState(() => _visibleStages++);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => _start());
@@ -68,7 +71,9 @@ class _SetupProcessingScreenState extends ConsumerState<SetupProcessingScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(setupNotifierProvider);
-    final failure = state is SetupFailed ? state.message : null;
+    final failed = state is SetupFailed;
+    final l10n = context.l10n;
+    final stages = _stagesFor(l10n);
 
     return PopScope(
       // Leaving mid-save would only confuse; the router moves on after.
@@ -93,13 +98,13 @@ class _SetupProcessingScreenState extends ConsumerState<SetupProcessingScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  if (failure == null) ...[
+                  if (!failed) ...[
                     Semantics(
                       header: true,
-                      child: const Text(
-                        'Personalising your meals…',
+                      child: Text(
+                        l10n.setupProcessingTitle,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -131,7 +136,7 @@ class _SetupProcessingScreenState extends ConsumerState<SetupProcessingScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              _stages[i],
+                              stages[i],
                               style: const TextStyle(
                                 fontSize: 15,
                                 color: AppColors.textSecondary,
@@ -142,7 +147,7 @@ class _SetupProcessingScreenState extends ConsumerState<SetupProcessingScreen> {
                       ),
                   ] else ...[
                     Text(
-                      failure,
+                      l10n.setupSaveFailed,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 16,
@@ -152,7 +157,7 @@ class _SetupProcessingScreenState extends ConsumerState<SetupProcessingScreen> {
                     ),
                     const SizedBox(height: 24),
                     CustomButton(
-                      text: 'Try again',
+                      text: l10n.tryAgain,
                       onPressed: () => unawaited(
                         ref.read(setupNotifierProvider.notifier).submit(),
                       ),

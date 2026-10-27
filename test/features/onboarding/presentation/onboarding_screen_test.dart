@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_meal/core/l10n/l10n.dart';
 import 'package:smart_meal/core/providers/shared_preferences_provider.dart';
 import 'package:smart_meal/core/theme/app_fonts.dart';
 import 'package:smart_meal/core/theme/app_theme.dart';
@@ -50,6 +51,8 @@ Future<SharedPreferences> _pump(
     ProviderScope(
       overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: AppTheme.lightTheme,
         routerConfig: router,
       ),

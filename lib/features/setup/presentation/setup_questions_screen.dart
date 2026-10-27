@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/formatting/fcfa.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/domain/auth_notifier.dart';
 import '../data/setup_repository.dart';
@@ -16,11 +17,6 @@ import 'widgets/setup_step_layout.dart';
 const _lifestyleRoute = '/setup/lifestyle';
 const _preferencesRoute = '/setup/preferences';
 const _processingRoute = '/setup/processing';
-const _chooseOption = 'Please choose an option';
-const _consentText =
-    'I agree that Smart Meal stores my allergies, diet and health goals to '
-    'personalise my meals. Only I can see them, and I can delete them '
-    'anytime.';
 
 /// Cuisines for the "kinds of food" step, loaded once per session.
 final cuisinesProvider = FutureProvider<List<Cuisine>>(
@@ -117,55 +113,61 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
     final step = state is SetupEditing ? state.step : SetupStep.goals;
     final draft = state.draft;
     final showError = _showMissing && !draft.isAnswered(step);
+    final l10n = context.l10n;
 
     final (title, subtitle, body) = switch (step) {
       SetupStep.lifestyle => (
-        'What best describes you?',
+        l10n.setupLifestyleTitle,
         null,
         _singleChoice<Lifestyle>(
           Lifestyle.values,
           draft.lifestyle,
-          lifestyleLabel,
+          (v) => lifestyleLabel(l10n, v),
           (v) => _notifier.edit((d) => d.withLifestyle(v)),
         ),
       ),
       SetupStep.household => (
-        'How many people do you cook for?',
-        'Count yourself too.',
-        _householdCounter(draft.householdSize),
+        l10n.setupHouseholdTitle,
+        l10n.setupHouseholdSubtitle,
+        _householdCounter(l10n, draft.householdSize),
       ),
       SetupStep.budget => (
-        'How much do you spend on food?',
-        "We'll suggest meals that fit it.",
-        _budget(draft),
+        l10n.setupBudgetTitle,
+        l10n.setupBudgetSubtitle,
+        _budget(l10n, draft),
       ),
-      SetupStep.cooking => ('How do you like to cook?', null, _cooking(draft)),
+      SetupStep.cooking => (
+        l10n.setupCookingTitle,
+        null,
+        _cooking(l10n, draft),
+      ),
       SetupStep.cuisines => (
-        'What kinds of food do you like?',
-        "Tap once if you like it, twice if you don't. You can skip this.",
-        _cuisines(draft),
+        l10n.setupCuisinesTitle,
+        l10n.setupCuisinesSubtitle,
+        _cuisines(l10n, draft),
       ),
       SetupStep.consent => (
-        'Your health information, your choice',
+        l10n.setupConsentTitle,
         null,
-        _consent(draft),
+        _consent(l10n, draft),
       ),
-      SetupStep.diet => ("Is there food you don't eat?", null, _diet(draft)),
+      SetupStep.diet => (l10n.setupDietTitle, null, _diet(l10n, draft)),
       SetupStep.allergies => (
-        'Does any food make you sick?',
-        "Food allergies. We'll never suggest a meal that contains these.",
-        _allergies(draft),
+        l10n.setupAllergiesTitle,
+        l10n.setupAllergiesSubtitle,
+        _allergies(l10n, draft),
       ),
       SetupStep.goals => (
-        'What should your food help you with?',
-        'Optional — choose any.',
-        _goals(draft),
+        l10n.setupGoalsTitle,
+        l10n.setupGoalsSubtitle,
+        _goals(l10n, draft),
       ),
     };
 
     final continueLabel = switch (step) {
-      SetupStep.goals => draft.goals.isEmpty ? 'Skip' : 'Finish',
-      _ => 'Continue',
+      SetupStep.goals =>
+        draft.goals.isEmpty ? l10n.skipButton : l10n.finishButton,
+      _ => l10n.continueButton,
     };
     final isFirst = step == SetupStep.lifestyle;
 
@@ -182,11 +184,11 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
         continueLabel: continueLabel,
         onContinue: () => _continue(step),
         onBack: isFirst ? null : () => _back(step),
-        topAction: isFirst || step == SetupStep.consent ? _signOut() : null,
+        topAction: isFirst || step == SetupStep.consent ? _signOut(l10n) : null,
         error: showError
             ? (step == SetupStep.budget
-                  ? 'Enter an amount between 1 and 10 000 000 FCFA'
-                  : _chooseOption)
+                  ? l10n.setupBudgetInvalid
+                  : l10n.setupChooseOption)
             : null,
       ),
     );
@@ -215,7 +217,7 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
     );
   }
 
-  Widget _householdCounter(int size) {
+  Widget _householdCounter(AppLocalizations l10n, int size) {
     Widget roundButton(IconData icon, String tooltip, VoidCallback? onTap) {
       return IconButton.filledTonal(
         onPressed: onTap,
@@ -235,7 +237,7 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
       children: [
         roundButton(
           Icons.remove_rounded,
-          'Fewer people',
+          l10n.setupHouseholdFewer,
           size > minHouseholdSize
               ? () => _notifier.edit((d) => d.withHouseholdSize(size - 1))
               : null,
@@ -244,7 +246,7 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
           width: 120,
           child: Semantics(
             liveRegion: true,
-            label: size == 1 ? '1 person' : '$size people',
+            label: l10n.peopleCount(size),
             excludeSemantics: true,
             child: Column(
               children: [
@@ -257,7 +259,7 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
                   ),
                 ),
                 Text(
-                  size == 1 ? 'person' : 'people',
+                  l10n.peopleUnit(size),
                   style: const TextStyle(color: AppColors.textSecondary),
                 ),
               ],
@@ -266,7 +268,7 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
         ),
         roundButton(
           Icons.add_rounded,
-          'More people',
+          l10n.setupHouseholdMore,
           size < maxHouseholdSize
               ? () => _notifier.edit((d) => d.withHouseholdSize(size + 1))
               : null,
@@ -275,7 +277,7 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
     );
   }
 
-  Widget _budget(SetupDraft draft) {
+  Widget _budget(AppLocalizations l10n, SetupDraft draft) {
     final suggestion = budgetSuggestion(
       amount: draft.budgetAmount,
       period: draft.budgetPeriod,
@@ -291,7 +293,7 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
           inputFormatters: const [FcfaInputFormatter()],
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
-            labelText: 'Amount in FCFA',
+            labelText: l10n.setupBudgetAmountLabel,
             suffixText: 'FCFA',
             filled: true,
             fillColor: AppColors.surface,
@@ -309,7 +311,7 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
           children: [
             for (final period in BudgetPeriod.values)
               ChoiceChip(
-                label: Text(budgetPeriodLabel(period)),
+                label: Text(budgetPeriodLabel(l10n, period)),
                 selected: draft.budgetPeriod == period,
                 selectedColor: AppColors.primaryLight,
                 onSelected: (_) => _notifier.edit(
@@ -330,20 +332,20 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
     );
   }
 
-  Widget _cooking(SetupDraft draft) {
+  Widget _cooking(AppLocalizations l10n, SetupDraft draft) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _singleChoice<CookingSkill>(
           CookingSkill.values,
           draft.cookingSkill,
-          cookingSkillLabel,
+          (v) => cookingSkillLabel(l10n, v),
           (v) => _notifier.edit((d) => d.withCookingSkill(v)),
         ),
         const SizedBox(height: 12),
-        const Text(
-          'How much time can you spend cooking?',
-          style: TextStyle(
+        Text(
+          l10n.setupCookTimeQuestion,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -356,7 +358,7 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
           children: [
             for (final minutes in cookTimeChoices)
               ChoiceChip(
-                label: Text(cookTimeLabel(minutes)),
+                label: Text(cookTimeLabel(l10n, minutes)),
                 selected: draft.maxCookMinutes == minutes,
                 selectedColor: AppColors.primaryLight,
                 onSelected: (_) =>
@@ -368,7 +370,7 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
     );
   }
 
-  Widget _cuisines(SetupDraft draft) {
+  Widget _cuisines(AppLocalizations l10n, SetupDraft draft) {
     final cuisines = ref.watch(cuisinesProvider);
     return cuisines.when(
       loading: () => const Padding(
@@ -379,14 +381,14 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
       ),
       error: (_, _) => Column(
         children: [
-          const Text(
-            'No connection. Check your internet and try again.',
+          Text(
+            l10n.errorNoConnection,
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.textPrimary, height: 1.5),
+            style: const TextStyle(color: AppColors.textPrimary, height: 1.5),
           ),
           TextButton(
             onPressed: () => ref.invalidate(cuisinesProvider),
-            child: const Text('Try again'),
+            child: Text(l10n.tryAgain),
           ),
         ],
       ),
@@ -394,16 +396,16 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
         children: [
           for (final cuisine in list) ...[
             ChoiceTile(
-              label: cuisine.name,
-              hint: cuisineExamples[cuisine.slug],
+              label: cuisineLabel(l10n, cuisine.slug, cuisine.name).label,
+              hint: cuisineLabel(l10n, cuisine.slug, cuisine.name).hint,
               mark: switch (draft.cuisines[cuisine.slug]) {
                 CuisinePreference.like => ChoiceMark.selected,
                 CuisinePreference.dislike => ChoiceMark.rejected,
                 null => ChoiceMark.none,
               },
               markLabel: switch (draft.cuisines[cuisine.slug]) {
-                CuisinePreference.like => 'Like',
-                CuisinePreference.dislike => "Don't like",
+                CuisinePreference.like => l10n.cuisineLike,
+                CuisinePreference.dislike => l10n.cuisineDislike,
                 null => null,
               },
               onTap: () =>
@@ -416,14 +418,13 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
     );
   }
 
-  Widget _consent(SetupDraft draft) {
+  Widget _consent(AppLocalizations l10n, SetupDraft draft) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Why we ask: knowing your allergies is how we keep every meal we '
-          'suggest safe for you.',
-          style: TextStyle(
+        Text(
+          l10n.setupConsentWhy,
+          style: const TextStyle(
             fontSize: 15,
             color: AppColors.textSecondary,
             height: 1.5,
@@ -446,19 +447,19 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            title: const Text(
-              _consentText,
-              style: TextStyle(
+            title: Text(
+              l10n.setupConsentText,
+              style: const TextStyle(
                 fontSize: 15,
                 color: AppColors.textPrimary,
                 height: 1.5,
               ),
             ),
-            subtitle: const Padding(
-              padding: EdgeInsets.only(top: 8),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 8),
               child: Text(
-                'I agree',
-                style: TextStyle(
+                l10n.setupConsentAgree,
+                style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   color: AppColors.primary,
                 ),
@@ -470,19 +471,19 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
     );
   }
 
-  Widget _diet(SetupDraft draft) {
+  Widget _diet(AppLocalizations l10n, SetupDraft draft) {
     return Column(
       children: [
         ChoiceTile(
-          label: 'I eat everything',
+          label: l10n.dietNone,
           mark: draft.dietNone ? ChoiceMark.selected : ChoiceMark.none,
           onTap: () => _notifier.edit((d) => d.withDietNone()),
         ),
         const SizedBox(height: 12),
         for (final tag in DietaryTag.values) ...[
           ChoiceTile(
-            label: dietLabel(tag).label,
-            hint: dietLabel(tag).hint,
+            label: dietLabel(l10n, tag).label,
+            hint: dietLabel(l10n, tag).hint,
             mark: draft.diet.contains(tag)
                 ? ChoiceMark.selected
                 : ChoiceMark.none,
@@ -494,19 +495,19 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
     );
   }
 
-  Widget _allergies(SetupDraft draft) {
+  Widget _allergies(AppLocalizations l10n, SetupDraft draft) {
     return Column(
       children: [
         ChoiceTile(
-          label: 'No, none',
+          label: l10n.allergiesNone,
           mark: draft.allergiesNone ? ChoiceMark.selected : ChoiceMark.none,
           onTap: () => _notifier.edit((d) => d.withAllergiesNone()),
         ),
         const SizedBox(height: 12),
         for (final allergen in Allergen.values) ...[
           ChoiceTile(
-            label: allergenLabel(allergen).label,
-            hint: allergenLabel(allergen).hint,
+            label: allergenLabel(l10n, allergen).label,
+            hint: allergenLabel(l10n, allergen).hint,
             mark: draft.allergies.contains(allergen)
                 ? ChoiceMark.selected
                 : ChoiceMark.none,
@@ -518,13 +519,13 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
     );
   }
 
-  Widget _goals(SetupDraft draft) {
+  Widget _goals(AppLocalizations l10n, SetupDraft draft) {
     return Column(
       children: [
         for (final goal in HealthGoal.values) ...[
           ChoiceTile(
-            label: healthGoalLabel(goal).label,
-            hint: healthGoalLabel(goal).hint,
+            label: healthGoalLabel(l10n, goal).label,
+            hint: healthGoalLabel(l10n, goal).hint,
             mark: draft.goals.contains(goal)
                 ? ChoiceMark.selected
                 : ChoiceMark.none,
@@ -536,12 +537,15 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
     );
   }
 
-  Widget _signOut() {
+  Widget _signOut(AppLocalizations l10n) {
     return TextButton(
       onPressed: () => ref.read(authNotifierProvider.notifier).signOut(),
-      child: const Text(
-        'Sign out',
-        style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
+      child: Text(
+        l10n.signOut,
+        style: const TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -562,7 +566,19 @@ class _BudgetAdviceNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final people = householdSize == 1 ? '1 person' : '$householdSize people';
+    final l10n = context.l10n;
+    final amount = formatFcfa(suggested);
+    final advice = switch (period) {
+      BudgetPeriod.daily => l10n.setupBudgetAdviceDaily(householdSize, amount),
+      BudgetPeriod.weekly => l10n.setupBudgetAdviceWeekly(
+        householdSize,
+        amount,
+      ),
+      BudgetPeriod.monthly => l10n.setupBudgetAdviceMonthly(
+        householdSize,
+        amount,
+      ),
+    };
     return Semantics(
       liveRegion: true,
       child: Container(
@@ -582,9 +598,7 @@ class _BudgetAdviceNote extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'For $people, we suggest at least ${formatFcfa(suggested)} '
-                'per ${budgetPeriodNoun(period)} so we can find enough good '
-                "meals. You can keep your amount — we'll do our best with it.",
+                advice,
                 style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textPrimary,

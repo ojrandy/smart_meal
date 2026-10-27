@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
+import '../l10n/l10n.dart';
 import '../theme/app_colors.dart';
 
 class ScaffoldWithNavBar extends StatelessWidget {
@@ -42,31 +43,31 @@ class ScaffoldWithNavBar extends StatelessWidget {
             fontWeight: FontWeight.w500,
             fontSize: 12,
           ),
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Iconsax.home_2),
-              activeIcon: Icon(Iconsax.home_1),
-              label: 'Home',
+              icon: const Icon(Iconsax.home_2),
+              activeIcon: const Icon(Iconsax.home_1),
+              label: context.l10n.navHome,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Iconsax.discover),
-              activeIcon: Icon(Iconsax.discover_1),
-              label: 'Discover',
+              icon: const Icon(Iconsax.discover),
+              activeIcon: const Icon(Iconsax.discover_1),
+              label: context.l10n.navDiscover,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Iconsax.calendar_1),
-              activeIcon: Icon(Iconsax.calendar),
-              label: 'Planner',
+              icon: const Icon(Iconsax.calendar_1),
+              activeIcon: const Icon(Iconsax.calendar),
+              label: context.l10n.navPlanner,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Iconsax.heart),
-              activeIcon: Icon(Iconsax.heart_tick),
-              label: 'Favorites',
+              icon: const Icon(Iconsax.heart),
+              activeIcon: const Icon(Iconsax.heart_tick),
+              label: context.l10n.navFavorites,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Iconsax.profile_circle),
-              activeIcon: Icon(Iconsax.profile_tick),
-              label: 'Profile',
+              icon: const Icon(Iconsax.profile_circle),
+              activeIcon: const Icon(Iconsax.profile_tick),
+              label: context.l10n.navProfile,
             ),
           ],
         ),

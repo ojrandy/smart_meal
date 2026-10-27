@@ -3,13 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../../core/constants/app_assets.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/validation/field_error_text.dart';
 import '../../../../core/validation/validators.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/social_auth_button.dart';
 import '../../domain/auth_notifier.dart';
+import '../auth_error_text.dart';
 import '../../domain/auth_state.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -76,13 +79,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       // too, so this copy must be true in both cases.
       showAppSnackBar(
         context,
-        "Almost there! We've sent a confirmation link to your email.",
+        context.l10n.signupConfirmationSent,
         isError: false,
         duration: const Duration(seconds: 6),
       );
       context.go('/auth/login');
     } else if (next is AuthError) {
-      showAppSnackBar(context, next.message);
+      showAppSnackBar(context, authErrorText(context.l10n, next.reason));
     }
   }
 
@@ -92,6 +95,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
     final authState = ref.watch(authNotifierProvider);
     final isLoading = authState is AuthLoading;
+    final l10n = context.l10n;
 
     // The system back (Android button/gesture) behaves like the on-screen
     // one instead of closing the app when there is nothing to pop.
@@ -144,27 +148,27 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   const SizedBox(height: 32),
 
                   // Title Section
-                  const Text.rich(
+                  Text.rich(
                     TextSpan(
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
                         height: 1.2,
                       ),
                       children: [
-                        TextSpan(text: 'Create your\n'),
+                        TextSpan(text: '${l10n.signupTitleLead}\n'),
                         TextSpan(
-                          text: 'Smart Meal account',
-                          style: TextStyle(color: AppColors.primary),
+                          text: l10n.signupTitleAccent,
+                          style: const TextStyle(color: AppColors.primary),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Discover personalized meals made for your taste ✨',
-                    style: TextStyle(
+                  Text(
+                    l10n.signupSubtitle,
+                    style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.textSecondary,
                       height: 1.5,
@@ -190,69 +194,74 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
                   // Email Field
                   CustomTextField(
-                    label: 'Email',
-                    hint: 'user@email.com',
+                    label: l10n.emailLabel,
+                    hint: l10n.emailHint,
                     prefixIcon: Iconsax.sms,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    validator: validateEmail,
+                    validator: (value) =>
+                        fieldErrorText(l10n, validateEmail(value)),
                   ),
                   const SizedBox(height: 16),
 
                   // Password Field
                   CustomTextField(
-                    label: 'Password',
+                    label: l10n.passwordLabel,
                     hint: '••••••••',
                     prefixIcon: Iconsax.lock,
                     isPassword: true,
                     controller: _passwordController,
-                    validator: validateNewPassword,
+                    validator: (value) =>
+                        fieldErrorText(l10n, validateNewPassword(value)),
                   ),
                   const SizedBox(height: 16),
 
                   // Confirm Password Field
                   CustomTextField(
-                    label: 'Confirm Password',
+                    label: l10n.confirmPasswordLabel,
                     hint: '••••••••',
                     prefixIcon: Iconsax.lock_1,
                     isPassword: true,
                     controller: _confirmPasswordController,
-                    validator: (value) => validatePasswordConfirmation(
-                      value,
-                      _passwordController.text,
+                    validator: (value) => fieldErrorText(
+                      l10n,
+                      validatePasswordConfirmation(
+                        value,
+                        _passwordController.text,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // Create Account Button
                   CustomButton(
-                    text: 'Create Account ✨',
+                    text: l10n.createAccountButton,
                     onPressed: isLoading ? null : _signUp,
                     isLoading: isLoading,
                   ),
                   const SizedBox(height: 32),
 
                   // Divider
-                  const Row(
+                  Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         child: Divider(
                           color: AppColors.surfaceVariant,
                           thickness: 1.5,
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'or continue with',
-                          style: TextStyle(
+                          l10n.orContinueWith,
+                          style: const TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
-                      Expanded(
+                      const Expanded(
                         child: Divider(
                           color: AppColors.surfaceVariant,
                           thickness: 1.5,
@@ -264,7 +273,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
                   // Google Sign-In
                   SocialAuthButton(
-                    text: 'Continue with Google',
+                    text: l10n.continueWithGoogle,
                     icon: Image.asset(
                       AppAssets.googleLogo,
                       width: 20,
@@ -279,18 +288,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   Center(
                     child: GestureDetector(
                       onTap: isLoading ? null : () => context.go('/auth/login'),
-                      child: const Text.rich(
+                      child: Text.rich(
                         TextSpan(
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
                           children: [
-                            TextSpan(text: 'Already have an account? '),
+                            TextSpan(text: '${l10n.haveAccountPrompt} '),
                             TextSpan(
-                              text: 'Log in',
-                              style: TextStyle(
+                              text: l10n.logInLink,
+                              style: const TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
                               ),

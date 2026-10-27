@@ -14,7 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_meal/core/providers/shared_preferences_provider.dart';
 import 'package:smart_meal/features/auth/data/auth_repository.dart';
 import 'package:smart_meal/features/auth/data/password_recovery_repository.dart';
-import 'package:smart_meal/features/auth/domain/password_recovery.dart';
 import 'package:smart_meal/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:smart_meal/features/auth/presentation/screens/login_screen.dart';
 import 'package:smart_meal/features/home/presentation/screens/home_screen.dart';
@@ -214,7 +213,12 @@ void main() {
     await _finishSplash(tester);
 
     expect(find.byType(LoginScreen), findsOneWidget);
-    expect(find.text(authLinkErrorMessage), findsOneWidget);
+    expect(
+      find.text(
+        'This link is invalid or has expired. Please request a new one.',
+      ),
+      findsOneWidget,
+    );
     expect(find.textContaining('raw server text'), findsNothing);
   });
 

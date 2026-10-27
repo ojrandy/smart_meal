@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// Minimal brand splash (owner-approved redesign, 2026-10-21): the logo
@@ -64,7 +65,7 @@ class SplashScreen extends StatelessWidget {
                   .slideY(begin: 0.2, end: 0, curve: Curves.easeOutCubic),
               const SizedBox(height: 10),
               Text(
-                'Your AI food companion',
+                context.l10n.splashTagline,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   color: AppColors.onDarkMuted,
@@ -74,7 +75,7 @@ class SplashScreen extends StatelessWidget {
               ).animate().fade(delay: 400.ms, duration: 500.ms),
               const Spacer(),
               Text(
-                'by OJ Tech',
+                context.l10n.splashByline,
                 style: GoogleFonts.inter(
                   color: AppColors.onDarkMuted,
                   fontSize: 13,

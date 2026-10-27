@@ -41,23 +41,20 @@ final passwordRecoveryProvider =
       PasswordRecoveryNotifier.new,
     );
 
-/// Shown when an emailed auth link (confirmation or recovery) is invalid,
-/// expired, already used, or was opened on another device.
-const authLinkErrorMessage =
-    'This link is invalid or has expired. Please request a new one.';
-
-/// The latest auth-link failure, as a user-safe message, until the app has
-/// shown it and called [clear]. Set by `AuthSessionNotifier`.
-class AuthLinkErrorNotifier extends Notifier<String?> {
+/// True from an auth-link failure until the app has shown it and called
+/// [clear]: an emailed link (confirmation or recovery) was invalid,
+/// expired, already used, or opened on another device. Set by
+/// `AuthSessionNotifier`; the app words it (`authLinkErrorNotice`).
+class AuthLinkErrorNotifier extends Notifier<bool> {
   @override
-  String? build() => null;
+  bool build() => false;
 
-  void report() => state = authLinkErrorMessage;
+  void report() => state = true;
 
-  void clear() => state = null;
+  void clear() => state = false;
 }
 
-final authLinkErrorProvider = NotifierProvider<AuthLinkErrorNotifier, String?>(
+final authLinkErrorProvider = NotifierProvider<AuthLinkErrorNotifier, bool>(
   AuthLinkErrorNotifier.new,
 );
 

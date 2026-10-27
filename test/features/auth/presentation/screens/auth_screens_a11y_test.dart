@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_meal/core/l10n/l10n.dart';
 import 'package:smart_meal/core/theme/app_fonts.dart';
 import 'package:smart_meal/core/theme/app_theme.dart';
 import 'package:smart_meal/features/auth/data/auth_repository.dart';
@@ -37,6 +38,8 @@ Future<GoRouter> _pump(WidgetTester tester, String initialLocation) async {
     ProviderScope(
       overrides: [authRepositoryProvider.overrideWithValue(repository)],
       child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: AppTheme.lightTheme,
         routerConfig: router,
       ),

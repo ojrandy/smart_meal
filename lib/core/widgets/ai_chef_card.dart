@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import '../l10n/l10n.dart';
 import '../theme/app_colors.dart';
 
 class AiChefCard extends StatelessWidget {
@@ -41,7 +42,7 @@ class AiChefCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Text(
-                'YOUR AI CHEF RECOMMENDS',
+                context.l10n.aiChefHeading,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: AppColors.onDark.withValues(alpha: 0.9),
                   letterSpacing: 1.2,
@@ -73,7 +74,7 @@ class AiChefCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'See why',
+                    context.l10n.seeWhyButton,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: AppColors.primaryDark,
                       fontWeight: FontWeight.bold,

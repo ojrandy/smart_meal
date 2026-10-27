@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 import '../theme/app_colors.dart';
 
 /// A styled text field that integrates with Flutter's [Form] widget
@@ -137,7 +138,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     : Icons.visibility_off_outlined,
                 color: AppColors.textSecondary,
                 size: 24,
-                semanticLabel: _obscureText ? 'Show password' : 'Hide password',
+                semanticLabel: _obscureText
+                    ? context.l10n.showPasswordLabel
+                    : context.l10n.hidePasswordLabel,
               ),
             ),
           ),

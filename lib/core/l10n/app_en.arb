@@ -1,0 +1,874 @@
+{
+  "@@locale": "en",
+  "appName": "Smart Meal",
+  "@appName": {
+    "description": "The app's name; a brand, never translated"
+  },
+  "languageSwitchLabel": "Language",
+  "@languageSwitchLabel": {
+    "description": "Screen-reader label of the EN | FR switch"
+  },
+  "errorNoConnection": "No connection. Check your internet and try again.",
+  "@errorNoConnection": {
+    "description": "Shown when the server cannot be reached"
+  },
+  "errorGeneric": "Something went wrong. Please try again.",
+  "@errorGeneric": {
+    "description": "Fallback error for anything unexpected"
+  },
+  "tryAgain": "Try again",
+  "@tryAgain": {
+    "description": "Retry button"
+  },
+  "signOut": "Sign out",
+  "@signOut": {
+    "description": "Sign-out link or button"
+  },
+  "authErrorInvalidCredentials": "Incorrect email or password. Please try again.",
+  "@authErrorInvalidCredentials": {
+    "description": "Sign-in failed: wrong email or password"
+  },
+  "authErrorEmailExists": "An account with this email already exists. Try signing in.",
+  "@authErrorEmailExists": {
+    "description": "Sign-up with an email that is taken"
+  },
+  "authErrorWeakPassword": "Choose a stronger password: at least 8 characters with upper- and lowercase letters, a number and a symbol.",
+  "@authErrorWeakPassword": {
+    "description": "Server rejected the password as weak"
+  },
+  "authErrorEmailNotConfirmed": "Please confirm your email before signing in.",
+  "@authErrorEmailNotConfirmed": {
+    "description": "Sign-in before the confirmation link was opened"
+  },
+  "authErrorTooManyAttempts": "Too many attempts. Please wait a moment and try again.",
+  "@authErrorTooManyAttempts": {
+    "description": "Rate limited"
+  },
+  "authErrorSignupDisabled": "New sign-ups are paused right now. Please try again later.",
+  "@authErrorSignupDisabled": {
+    "description": "Sign-ups turned off on the server"
+  },
+  "authErrorEmailAddressInvalid": "That email address can't be used. Please check it and try again.",
+  "@authErrorEmailAddressInvalid": {
+    "description": "Server refused the email address"
+  },
+  "authErrorValidationFailed": "Please check your details and try again.",
+  "@authErrorValidationFailed": {
+    "description": "Server-side validation failed"
+  },
+  "authErrorSamePassword": "Your new password must be different from your current one.",
+  "@authErrorSamePassword": {
+    "description": "New password equals the old one"
+  },
+  "authErrorSessionExpired": "Your session has expired. Please sign in again.",
+  "@authErrorSessionExpired": {
+    "description": "Session no longer valid"
+  },
+  "authErrorUserBanned": "This account can't sign in right now.",
+  "@authErrorUserBanned": {
+    "description": "Account blocked"
+  },
+  "authErrorGoogleSignInFailed": "Google sign-in failed. Please try again.",
+  "@authErrorGoogleSignInFailed": {
+    "description": "Google sign-in error"
+  },
+  "authErrorSignOutFailed": "Sign out failed. Please try again.",
+  "@authErrorSignOutFailed": {
+    "description": "Sign-out failed while still signed in"
+  },
+  "authErrorAccountDeletionFailed": "We couldn't delete your account. Please try again.",
+  "@authErrorAccountDeletionFailed": {
+    "description": "Account deletion failed"
+  },
+  "fieldEmailMissing": "Please enter your email",
+  "@fieldEmailMissing": {
+    "description": "Form error: email empty"
+  },
+  "fieldEmailInvalid": "Please enter a valid email",
+  "@fieldEmailInvalid": {
+    "description": "Form error: email malformed"
+  },
+  "fieldPasswordMissing": "Please enter your password",
+  "@fieldPasswordMissing": {
+    "description": "Form error: password empty"
+  },
+  "fieldPasswordTooShort": "Password must be at least {count} characters",
+  "@fieldPasswordTooShort": {
+    "description": "Form error: password shorter than the minimum",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldPasswordTooLong": "Password is too long",
+  "@fieldPasswordTooLong": {
+    "description": "Form error: password over 72 bytes"
+  },
+  "fieldPasswordTooSimple": "Use upper- and lowercase letters, a number and a symbol",
+  "@fieldPasswordTooSimple": {
+    "description": "Form error: password misses a character class"
+  },
+  "fieldConfirmationMissing": "Please confirm your password",
+  "@fieldConfirmationMissing": {
+    "description": "Form error: confirmation empty"
+  },
+  "fieldConfirmationMismatch": "Passwords don't match",
+  "@fieldConfirmationMismatch": {
+    "description": "Form error: confirmation differs"
+  },
+  "loginTitleLead": "Welcome back to",
+  "@loginTitleLead": {
+    "description": "Sign-in title, followed by the app name on the next line"
+  },
+  "loginSubtitle": "Sign in to get your personalized meal\nrecommendations ✨",
+  "@loginSubtitle": {
+    "description": "Sign-in subtitle"
+  },
+  "emailLabel": "Email",
+  "@emailLabel": {
+    "description": "Email field label"
+  },
+  "emailHint": "user@email.com",
+  "@emailHint": {
+    "description": "Email field example"
+  },
+  "passwordLabel": "Password",
+  "@passwordLabel": {
+    "description": "Password field label"
+  },
+  "forgotPasswordLink": "Forgot password?",
+  "@forgotPasswordLink": {
+    "description": "Link to password recovery"
+  },
+  "signInButton": "Sign In ✨",
+  "@signInButton": {
+    "description": "Sign-in button"
+  },
+  "orContinueWith": "or continue with",
+  "@orContinueWith": {
+    "description": "Divider above social sign-in"
+  },
+  "continueWithGoogle": "Continue with Google",
+  "@continueWithGoogle": {
+    "description": "Google sign-in button"
+  },
+  "noAccountPrompt": "Don't have an account?",
+  "@noAccountPrompt": {
+    "description": "Before the sign-up link"
+  },
+  "signUpLink": "Sign up",
+  "@signUpLink": {
+    "description": "Link to sign-up"
+  },
+  "signupConfirmationSent": "Almost there! We've sent a confirmation link to your email.",
+  "@signupConfirmationSent": {
+    "description": "After sign-up when email confirmation is on (also shown for an email already registered)"
+  },
+  "signupTitleLead": "Create your",
+  "@signupTitleLead": {
+    "description": "Sign-up title, first line"
+  },
+  "signupTitleAccent": "Smart Meal account",
+  "@signupTitleAccent": {
+    "description": "Sign-up title, second line in brand colour"
+  },
+  "signupSubtitle": "Discover personalized meals made for your taste ✨",
+  "@signupSubtitle": {
+    "description": "Sign-up subtitle"
+  },
+  "confirmPasswordLabel": "Confirm Password",
+  "@confirmPasswordLabel": {
+    "description": "Sign-up: confirmation field label"
+  },
+  "createAccountButton": "Create Account ✨",
+  "@createAccountButton": {
+    "description": "Sign-up button"
+  },
+  "haveAccountPrompt": "Already have an account?",
+  "@haveAccountPrompt": {
+    "description": "Before the sign-in link"
+  },
+  "logInLink": "Log in",
+  "@logInLink": {
+    "description": "Link to sign-in"
+  },
+  "forgotPasswordTitleLead": "Forgot your",
+  "@forgotPasswordTitleLead": {
+    "description": "Forgot-password title, first line"
+  },
+  "forgotPasswordTitleAccent": "password?",
+  "@forgotPasswordTitleAccent": {
+    "description": "Forgot-password title, second line in brand colour"
+  },
+  "forgotPasswordSubtitle": "Enter your account email and we'll send you a link to set a new password.",
+  "@forgotPasswordSubtitle": {
+    "description": "Forgot-password explanation"
+  },
+  "sendResetLinkButton": "Send reset link",
+  "@sendResetLinkButton": {
+    "description": "Forgot-password button before sending"
+  },
+  "resendInSeconds": "Resend in {seconds}s",
+  "@resendInSeconds": {
+    "description": "Button while the resend cooldown runs",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "resendLinkButton": "Resend link",
+  "@resendLinkButton": {
+    "description": "Button after the cooldown"
+  },
+  "resetEmailSentNotice": "If an account exists for that email, we've sent a link to reset your password.",
+  "@resetEmailSentNotice": {
+    "description": "Neutral confirmation; must not reveal whether the account exists"
+  },
+  "passwordUpdatedNotice": "Your password has been updated.",
+  "@passwordUpdatedNotice": {
+    "description": "After setting a new password"
+  },
+  "resetPasswordTitleLead": "Set a new",
+  "@resetPasswordTitleLead": {
+    "description": "Reset-password title, first line"
+  },
+  "resetPasswordTitleAccent": "password",
+  "@resetPasswordTitleAccent": {
+    "description": "Reset-password title, second line in brand colour"
+  },
+  "newPasswordLabel": "New password",
+  "@newPasswordLabel": {
+    "description": "Reset-password: new password field"
+  },
+  "confirmNewPasswordLabel": "Confirm password",
+  "@confirmNewPasswordLabel": {
+    "description": "Reset-password: confirmation field"
+  },
+  "savePasswordButton": "Save password",
+  "@savePasswordButton": {
+    "description": "Reset-password button"
+  },
+  "aiChefHeading": "YOUR AI CHEF RECOMMENDS",
+  "@aiChefHeading": {
+    "description": "Recommendation card heading (all caps)"
+  },
+  "seeWhyButton": "See why",
+  "@seeWhyButton": {
+    "description": "Opens the reasons for a recommendation"
+  },
+  "showPasswordLabel": "Show password",
+  "@showPasswordLabel": {
+    "description": "Screen-reader label of the eye icon"
+  },
+  "hidePasswordLabel": "Hide password",
+  "@hidePasswordLabel": {
+    "description": "Screen-reader label of the eye icon"
+  },
+  "addToFavoritesLabel": "Add to favorites",
+  "@addToFavoritesLabel": {
+    "description": "Screen-reader label of the heart icon"
+  },
+  "removeFromFavoritesLabel": "Remove from favorites",
+  "@removeFromFavoritesLabel": {
+    "description": "Screen-reader label of the heart icon"
+  },
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Bottom tab"
+  },
+  "navDiscover": "Discover",
+  "@navDiscover": {
+    "description": "Bottom tab"
+  },
+  "navPlanner": "Planner",
+  "@navPlanner": {
+    "description": "Bottom tab: meal planner"
+  },
+  "navFavorites": "Favorites",
+  "@navFavorites": {
+    "description": "Bottom tab"
+  },
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Bottom tab"
+  },
+  "homeWelcome": "Welcome to Smart Meal",
+  "@homeWelcome": {
+    "description": "Interim Home title when the name is unknown"
+  },
+  "homeWelcomeName": "Welcome, {name}",
+  "@homeWelcomeName": {
+    "description": "Interim Home title with the user's first name",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeSignedInAs": "Signed in as {email}",
+  "@homeSignedInAs": {
+    "description": "Interim Home: which account is signed in",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "homeComingSoon": "Your personalized meals will appear here soon ✨",
+  "@homeComingSoon": {
+    "description": "Interim Home body until recommendations ship"
+  },
+  "splashTagline": "Your AI food companion",
+  "@splashTagline": {
+    "description": "Splash line under the wordmark"
+  },
+  "splashByline": "by OJ Tech",
+  "@splashByline": {
+    "description": "Splash credit; OJ Tech is a brand"
+  },
+  "onboardingDiscoverTitle": "Welcome to SmartMeal",
+  "@onboardingDiscoverTitle": {
+    "description": "Onboarding slide 1 title"
+  },
+  "onboardingDiscoverBody": "Discover meals you will enjoy with AI-powered recommendations tailored to your taste.",
+  "@onboardingDiscoverBody": {
+    "description": "Onboarding slide 1 text"
+  },
+  "onboardingPlanTitle": "Plan Your Meals",
+  "@onboardingPlanTitle": {
+    "description": "Onboarding slide 2 title"
+  },
+  "onboardingPlanBody": "Manage your budget and plan your weekly recipes efficiently with intelligent tracking.",
+  "@onboardingPlanBody": {
+    "description": "Onboarding slide 2 text"
+  },
+  "onboardingDecideTitle": "Smarter Food Decisions",
+  "@onboardingDecideTitle": {
+    "description": "Onboarding slide 3 title"
+  },
+  "onboardingDecideBody": "Get personalized recommendations and insights to make healthier food choices.",
+  "@onboardingDecideBody": {
+    "description": "Onboarding slide 3 text"
+  },
+  "getStartedButton": "Get started",
+  "@getStartedButton": {
+    "description": "Last onboarding slide button"
+  },
+  "nextButton": "Next",
+  "@nextButton": {
+    "description": "Onboarding button to the next slide"
+  },
+  "skipButton": "Skip",
+  "@skipButton": {
+    "description": "Skips onboarding, or an optional setup question"
+  },
+  "authLinkErrorNotice": "This link is invalid or has expired. Please request a new one.",
+  "@authLinkErrorNotice": {
+    "description": "A confirmation or recovery link failed"
+  },
+  "setupLoadingMessage": "Getting things ready…",
+  "@setupLoadingMessage": {
+    "description": "Setup loading screen while the status is checked"
+  },
+  "setupStepCounter": "Step {number} of {total}",
+  "@setupStepCounter": {
+    "description": "Setup progress text",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "setupProgressLabel": "Setup progress",
+  "@setupProgressLabel": {
+    "description": "Screen-reader label of the setup progress bar"
+  },
+  "setupChooseOption": "Please choose an option",
+  "@setupChooseOption": {
+    "description": "Setup: Continue tapped without an answer"
+  },
+  "continueButton": "Continue",
+  "@continueButton": {
+    "description": "Setup: next step button"
+  },
+  "finishButton": "Finish",
+  "@finishButton": {
+    "description": "Setup: last step button when goals are chosen"
+  },
+  "setupLifestyleTitle": "What best describes you?",
+  "@setupLifestyleTitle": {
+    "description": "Setup step 1 question"
+  },
+  "lifestyleStudent": "Student",
+  "@lifestyleStudent": {
+    "description": "Lifestyle answer"
+  },
+  "lifestyleStudentHint": "School or university",
+  "@lifestyleStudentHint": {
+    "description": "Lifestyle answer hint"
+  },
+  "lifestyleWorking": "Working",
+  "@lifestyleWorking": {
+    "description": "Lifestyle answer"
+  },
+  "lifestyleWorkingHint": "Job, business or trade",
+  "@lifestyleWorkingHint": {
+    "description": "Lifestyle answer hint"
+  },
+  "lifestyleFamily": "Cooking for my family",
+  "@lifestyleFamily": {
+    "description": "Lifestyle answer"
+  },
+  "lifestyleAthlete": "Sports / very active",
+  "@lifestyleAthlete": {
+    "description": "Lifestyle answer"
+  },
+  "setupHouseholdTitle": "How many people do you cook for?",
+  "@setupHouseholdTitle": {
+    "description": "Setup step 2 question"
+  },
+  "setupHouseholdSubtitle": "Count yourself too.",
+  "@setupHouseholdSubtitle": {
+    "description": "Setup step 2 hint"
+  },
+  "setupHouseholdFewer": "Fewer people",
+  "@setupHouseholdFewer": {
+    "description": "Tooltip of the minus button"
+  },
+  "setupHouseholdMore": "More people",
+  "@setupHouseholdMore": {
+    "description": "Tooltip of the plus button"
+  },
+  "peopleCount": "{count, plural, =1{1 person} other{{count} people}}",
+  "@peopleCount": {
+    "description": "A number of people",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "peopleUnit": "{count, plural, =1{person} other{people}}",
+  "@peopleUnit": {
+    "description": "Word under the household number",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "setupBudgetTitle": "How much do you spend on food?",
+  "@setupBudgetTitle": {
+    "description": "Setup step 3 question"
+  },
+  "setupBudgetSubtitle": "We'll suggest meals that fit it.",
+  "@setupBudgetSubtitle": {
+    "description": "Setup step 3 hint"
+  },
+  "setupBudgetAmountLabel": "Amount in FCFA",
+  "@setupBudgetAmountLabel": {
+    "description": "Budget field label"
+  },
+  "setupBudgetInvalid": "Enter an amount between 1 and 10 000 000 FCFA",
+  "@setupBudgetInvalid": {
+    "description": "Budget missing or out of range"
+  },
+  "budgetPerDay": "Per day",
+  "@budgetPerDay": {
+    "description": "Budget period chip"
+  },
+  "budgetPerWeek": "Per week",
+  "@budgetPerWeek": {
+    "description": "Budget period chip"
+  },
+  "budgetPerMonth": "Per month",
+  "@budgetPerMonth": {
+    "description": "Budget period chip"
+  },
+  "setupBudgetAdviceDaily": "For {count, plural, =1{1 person} other{{count} people}}, we suggest at least {amount} per day so we can find enough good meals. You can keep your amount — we'll do our best with it.",
+  "@setupBudgetAdviceDaily": {
+    "description": "Advice, never a block, when a daily budget is below the suggestion",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String",
+        "example": "3 100 FCFA"
+      }
+    }
+  },
+  "setupBudgetAdviceWeekly": "For {count, plural, =1{1 person} other{{count} people}}, we suggest at least {amount} per week so we can find enough good meals. You can keep your amount — we'll do our best with it.",
+  "@setupBudgetAdviceWeekly": {
+    "description": "Advice, never a block, when a weekly budget is below the suggestion",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String",
+        "example": "17 000 FCFA"
+      }
+    }
+  },
+  "setupBudgetAdviceMonthly": "For {count, plural, =1{1 person} other{{count} people}}, we suggest at least {amount} per month so we can find enough good meals. You can keep your amount — we'll do our best with it.",
+  "@setupBudgetAdviceMonthly": {
+    "description": "Advice, never a block, when a monthly budget is below the suggestion",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String",
+        "example": "51 000 FCFA"
+      }
+    }
+  },
+  "setupCookingTitle": "How do you like to cook?",
+  "@setupCookingTitle": {
+    "description": "Setup step 4 question"
+  },
+  "cookingSkillBeginner": "I'm still learning",
+  "@cookingSkillBeginner": {
+    "description": "Cooking skill answer"
+  },
+  "cookingSkillIntermediate": "I cook often",
+  "@cookingSkillIntermediate": {
+    "description": "Cooking skill answer"
+  },
+  "cookingSkillAdvanced": "I'm a very good cook",
+  "@cookingSkillAdvanced": {
+    "description": "Cooking skill answer"
+  },
+  "setupCookTimeQuestion": "How much time can you spend cooking?",
+  "@setupCookTimeQuestion": {
+    "description": "Setup step 4 second question"
+  },
+  "cookTimeMinutes": "{minutes} min",
+  "@cookTimeMinutes": {
+    "description": "Cooking time chip",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "cookTimeOneHour": "1 h",
+  "@cookTimeOneHour": {
+    "description": "Cooking time chip"
+  },
+  "cookTimeOneHourThirty": "1 h 30",
+  "@cookTimeOneHourThirty": {
+    "description": "Cooking time chip"
+  },
+  "cookTimeTwoHours": "2 h",
+  "@cookTimeTwoHours": {
+    "description": "Cooking time chip"
+  },
+  "setupCuisinesTitle": "What kinds of food do you like?",
+  "@setupCuisinesTitle": {
+    "description": "Setup step 5 question"
+  },
+  "setupCuisinesSubtitle": "Tap once if you like it, twice if you don't. You can skip this.",
+  "@setupCuisinesSubtitle": {
+    "description": "Setup step 5 hint"
+  },
+  "cuisineLike": "Like",
+  "@cuisineLike": {
+    "description": "Mark on a liked kind of food"
+  },
+  "cuisineDislike": "Don't like",
+  "@cuisineDislike": {
+    "description": "Mark on a disliked kind of food"
+  },
+  "cuisineCameroonian": "Cameroonian food",
+  "@cuisineCameroonian": {
+    "description": "Kind of food"
+  },
+  "cuisineCameroonianHint": "Ndolé, eru, achu, koki",
+  "@cuisineCameroonianHint": {
+    "description": "Familiar dishes; names stay as people say them"
+  },
+  "cuisineWestAfrican": "West African food",
+  "@cuisineWestAfrican": {
+    "description": "Kind of food"
+  },
+  "cuisineWestAfricanHint": "Jollof rice, puff-puff",
+  "@cuisineWestAfricanHint": {
+    "description": "Familiar dishes"
+  },
+  "cuisineItalian": "Italian food",
+  "@cuisineItalian": {
+    "description": "Kind of food"
+  },
+  "cuisineItalianHint": "Spaghetti, pasta, pizza",
+  "@cuisineItalianHint": {
+    "description": "Familiar dishes"
+  },
+  "cuisineFrench": "French food",
+  "@cuisineFrench": {
+    "description": "Kind of food"
+  },
+  "cuisineFrenchHint": "Omelette, salads, gratin",
+  "@cuisineFrenchHint": {
+    "description": "Familiar dishes"
+  },
+  "cuisineIndian": "Indian food",
+  "@cuisineIndian": {
+    "description": "Kind of food"
+  },
+  "cuisineIndianHint": "Curry, chapati",
+  "@cuisineIndianHint": {
+    "description": "Familiar dishes"
+  },
+  "cuisineChinese": "Chinese food",
+  "@cuisineChinese": {
+    "description": "Kind of food"
+  },
+  "cuisineChineseHint": "Fried rice, noodles",
+  "@cuisineChineseHint": {
+    "description": "Familiar dishes"
+  },
+  "setupConsentTitle": "Your health information, your choice",
+  "@setupConsentTitle": {
+    "description": "Setup step 6 title"
+  },
+  "setupConsentWhy": "Why we ask: knowing your allergies is how we keep every meal we suggest safe for you.",
+  "@setupConsentWhy": {
+    "description": "Why consent is needed"
+  },
+  "setupConsentText": "I agree that Smart Meal stores my allergies, diet and health goals to personalise my meals. Only I can see them, and I can delete them anytime.",
+  "@setupConsentText": {
+    "description": "Consent text (owner-approved English, CONSENT_COPY)"
+  },
+  "setupConsentAgree": "I agree",
+  "@setupConsentAgree": {
+    "description": "Under the consent text"
+  },
+  "setupDietTitle": "Is there food you don't eat?",
+  "@setupDietTitle": {
+    "description": "Setup step 7 question"
+  },
+  "dietNone": "I eat everything",
+  "@dietNone": {
+    "description": "Diet answer: no restriction"
+  },
+  "dietVegetarian": "No meat",
+  "@dietVegetarian": {
+    "description": "Diet answer"
+  },
+  "dietVegetarianHint": "Vegetarian",
+  "@dietVegetarianHint": {
+    "description": "Diet answer hint"
+  },
+  "dietVegan": "No food from animals",
+  "@dietVegan": {
+    "description": "Diet answer"
+  },
+  "dietVeganHint": "No meat, fish, eggs or milk (vegan)",
+  "@dietVeganHint": {
+    "description": "Diet answer hint"
+  },
+  "dietPescatarian": "Fish, but no meat",
+  "@dietPescatarian": {
+    "description": "Diet answer"
+  },
+  "dietHalal": "Halal only",
+  "@dietHalal": {
+    "description": "Diet answer"
+  },
+  "dietGlutenFree": "No wheat flour",
+  "@dietGlutenFree": {
+    "description": "Diet answer"
+  },
+  "dietGlutenFreeHint": "No bread, puff-puff or pasta (gluten-free)",
+  "@dietGlutenFreeHint": {
+    "description": "Diet answer hint"
+  },
+  "dietDairyFree": "No milk products",
+  "@dietDairyFree": {
+    "description": "Diet answer"
+  },
+  "dietDairyFreeHint": "No milk, cheese or yoghurt",
+  "@dietDairyFreeHint": {
+    "description": "Diet answer hint"
+  },
+  "dietLowCarb": "Less starch",
+  "@dietLowCarb": {
+    "description": "Diet answer"
+  },
+  "dietLowCarbHint": "Less rice, garri, bread and pasta (low-carb)",
+  "@dietLowCarbHint": {
+    "description": "Diet answer hint"
+  },
+  "setupAllergiesTitle": "Does any food make you sick?",
+  "@setupAllergiesTitle": {
+    "description": "Setup step 8 question"
+  },
+  "setupAllergiesSubtitle": "Food allergies. We'll never suggest a meal that contains these.",
+  "@setupAllergiesSubtitle": {
+    "description": "Setup step 8 hint"
+  },
+  "allergiesNone": "No, none",
+  "@allergiesNone": {
+    "description": "Allergy answer: none"
+  },
+  "allergenGluten": "Wheat flour",
+  "@allergenGluten": {
+    "description": "Allergen"
+  },
+  "allergenGlutenHint": "Bread, puff-puff, pasta, beignets",
+  "@allergenGlutenHint": {
+    "description": "Allergen hint"
+  },
+  "allergenCrustaceans": "Crayfish, prawns, crabs",
+  "@allergenCrustaceans": {
+    "description": "Allergen"
+  },
+  "allergenMolluscs": "Snails, mussels, oysters",
+  "@allergenMolluscs": {
+    "description": "Allergen"
+  },
+  "allergenFish": "Fish",
+  "@allergenFish": {
+    "description": "Allergen"
+  },
+  "allergenFishHint": "Fresh, smoked or dried",
+  "@allergenFishHint": {
+    "description": "Allergen hint"
+  },
+  "allergenEggs": "Eggs",
+  "@allergenEggs": {
+    "description": "Allergen"
+  },
+  "allergenMilk": "Milk",
+  "@allergenMilk": {
+    "description": "Allergen"
+  },
+  "allergenMilkHint": "And cheese, yoghurt, butter",
+  "@allergenMilkHint": {
+    "description": "Allergen hint"
+  },
+  "allergenPeanuts": "Groundnuts",
+  "@allergenPeanuts": {
+    "description": "Allergen"
+  },
+  "allergenPeanutsHint": "Peanuts, groundnut paste",
+  "@allergenPeanutsHint": {
+    "description": "Allergen hint"
+  },
+  "allergenTreeNuts": "Cashew, almonds and other nuts",
+  "@allergenTreeNuts": {
+    "description": "Allergen"
+  },
+  "allergenSoy": "Soya",
+  "@allergenSoy": {
+    "description": "Allergen"
+  },
+  "allergenSoyHint": "Soya beans, soy sauce",
+  "@allergenSoyHint": {
+    "description": "Allergen hint"
+  },
+  "allergenSesame": "Sesame (benne) seeds",
+  "@allergenSesame": {
+    "description": "Allergen"
+  },
+  "allergenCelery": "Celery",
+  "@allergenCelery": {
+    "description": "Allergen"
+  },
+  "allergenMustard": "Mustard",
+  "@allergenMustard": {
+    "description": "Allergen"
+  },
+  "allergenSulphites": "Sulphites",
+  "@allergenSulphites": {
+    "description": "Allergen"
+  },
+  "allergenSulphitesHint": "In some wine, dried fruit, vinegar",
+  "@allergenSulphitesHint": {
+    "description": "Allergen hint"
+  },
+  "allergenLupin": "Lupin flour",
+  "@allergenLupin": {
+    "description": "Allergen"
+  },
+  "allergenLupinHint": "Rare; in some imported breads",
+  "@allergenLupinHint": {
+    "description": "Allergen hint"
+  },
+  "setupGoalsTitle": "What should your food help you with?",
+  "@setupGoalsTitle": {
+    "description": "Setup step 9 question"
+  },
+  "setupGoalsSubtitle": "Optional — choose any.",
+  "@setupGoalsSubtitle": {
+    "description": "Setup step 9 hint"
+  },
+  "goalLoseWeight": "Lose weight",
+  "@goalLoseWeight": {
+    "description": "Health goal"
+  },
+  "goalMaintainWeight": "Keep my weight",
+  "@goalMaintainWeight": {
+    "description": "Health goal"
+  },
+  "goalGainMuscle": "Get stronger",
+  "@goalGainMuscle": {
+    "description": "Health goal"
+  },
+  "goalGainMuscleHint": "Build muscle",
+  "@goalGainMuscleHint": {
+    "description": "Health goal hint"
+  },
+  "goalEatHealthier": "Eat healthier",
+  "@goalEatHealthier": {
+    "description": "Health goal"
+  },
+  "goalManageBloodSugar": "Control my blood sugar",
+  "@goalManageBloodSugar": {
+    "description": "Health goal"
+  },
+  "goalManageBloodSugarHint": "For example, with diabetes",
+  "@goalManageBloodSugarHint": {
+    "description": "Health goal hint"
+  },
+  "setupProcessingTitle": "Personalising your meals…",
+  "@setupProcessingTitle": {
+    "description": "Processing screen title"
+  },
+  "setupStageSaving": "Saving your preferences",
+  "@setupStageSaving": {
+    "description": "Processing stage 1"
+  },
+  "setupStageMatching": "Matching recipes to your taste",
+  "@setupStageMatching": {
+    "description": "Processing stage 2"
+  },
+  "setupStageChecking": "Checking allergies and budget",
+  "@setupStageChecking": {
+    "description": "Processing stage 3"
+  },
+  "setupSaveFailed": "We couldn't save your answers. Please try again.",
+  "@setupSaveFailed": {
+    "description": "Setup save failed; nothing stored"
+  },
+  "recipeDetailsTitle": "Recipe {id}",
+  "@recipeDetailsTitle": {
+    "description": "Placeholder title of the recipe detail screen until it is built",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldNewPasswordMissing": "Please enter a password",
+  "@fieldNewPasswordMissing": {
+    "description": "Form error: new password empty (sign-up, reset)"
+  }
+}

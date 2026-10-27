@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_meal/core/l10n/l10n.dart';
 import 'package:smart_meal/core/theme/app_theme.dart';
 import 'package:smart_meal/core/widgets/recipe_card.dart';
 
@@ -10,6 +11,8 @@ void main() {
     var taps = 0;
     Future<void> pump({required bool isFavorite}) => tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: AppTheme.lightTheme,
         home: Scaffold(
           body: Center(

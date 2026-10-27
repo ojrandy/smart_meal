@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/validation/field_error_text.dart';
 import '../../../../core/validation/validators.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../domain/auth_notifier.dart';
 import '../../domain/auth_state.dart';
+import '../auth_error_text.dart';
 import '../widgets/auth_screen_header.dart';
 
 /// Requests a password reset email. Whatever the account state, a request
@@ -86,7 +89,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       setState(() => _sent = true);
       _startCooldown();
     } else if (next is AuthError) {
-      showAppSnackBar(context, next.message);
+      showAppSnackBar(context, authErrorText(context.l10n, next.reason));
     }
   }
 
@@ -96,14 +99,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     final isLoading = ref.watch(authNotifierProvider) is AuthLoading;
     final isCoolingDown = _secondsLeft > 0;
+    final l10n = context.l10n;
 
     final String buttonText;
     if (!_sent) {
-      buttonText = 'Send reset link';
+      buttonText = l10n.sendResetLinkButton;
     } else if (isCoolingDown) {
-      buttonText = 'Resend in ${_secondsLeft}s';
+      buttonText = l10n.resendInSeconds(_secondsLeft);
     } else {
-      buttonText = 'Resend link';
+      buttonText = l10n.resendLinkButton;
     }
 
     return PopScope(
@@ -126,21 +130,20 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 children: [
                   AuthScreenHeader(
                     onBack: _goBack,
-                    title: 'Forgot your',
-                    highlight: 'password?',
-                    subtitle:
-                        "Enter your account email and we'll send you a "
-                        'link to set a new password.',
+                    title: l10n.forgotPasswordTitleLead,
+                    highlight: l10n.forgotPasswordTitleAccent,
+                    subtitle: l10n.forgotPasswordSubtitle,
                   ),
                   const SizedBox(height: 32),
 
                   CustomTextField(
-                    label: 'Email',
-                    hint: 'user@email.com',
+                    label: l10n.emailLabel,
+                    hint: l10n.emailHint,
                     prefixIcon: Iconsax.sms,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    validator: validateEmail,
+                    validator: (value) =>
+                        fieldErrorText(l10n, validateEmail(value)),
                   ),
                   const SizedBox(height: 24),
 
@@ -155,20 +158,19 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           color: AppColors.primary.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Row(
+                        child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
+                            const Icon(
                               Iconsax.sms_tracking,
                               color: AppColors.primary,
                               size: 20,
                             ),
-                            SizedBox(width: 12),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                "If an account exists for that email, we've "
-                                'sent a link to reset your password.',
-                                style: TextStyle(
+                                l10n.resetEmailSentNotice,
+                                style: const TextStyle(
                                   fontSize: 14,
                                   color: AppColors.textPrimary,
                                   height: 1.5,

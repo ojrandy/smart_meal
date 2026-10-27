@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import '../l10n/l10n.dart';
 import '../theme/app_colors.dart';
 import 'app_network_image.dart';
 
@@ -113,8 +114,8 @@ class RecipeCard extends StatelessWidget {
                           ? AppColors.favorite
                           : AppColors.textPrimary,
                       semanticLabel: isFavorite
-                          ? 'Remove from favorites'
-                          : 'Add to favorites',
+                          ? context.l10n.removeFromFavoritesLabel
+                          : context.l10n.addToFavoritesLabel,
                     ),
                   ),
                 ),

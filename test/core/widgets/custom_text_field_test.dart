@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_meal/core/l10n/l10n.dart';
 import 'package:smart_meal/core/theme/app_theme.dart';
 import 'package:smart_meal/core/widgets/custom_text_field.dart';
 
 void main() {
   Future<void> pumpFields(WidgetTester tester) => tester.pumpWidget(
     MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: AppTheme.lightTheme,
       home: Scaffold(
         body: Column(

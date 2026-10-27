@@ -37,7 +37,7 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
       final response = await _repo.signIn(email: email, password: password);
       state = response.session != null
           ? AuthIdle()
-          : AuthError(formatAuthError(null));
+          : AuthError(AuthErrorReason.generic);
     } catch (error, stackTrace) {
       state = _failure('signIn', error, stackTrace);
     }
@@ -89,7 +89,7 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
       // means the user is still signed in and should hear about it.
       state = _repo.currentUser == null
           ? AuthIdle()
-          : AuthError('Sign out failed. Please try again.');
+          : AuthError(AuthErrorReason.signOutFailed);
       AppLogger.log(
         'signOut failed',
         name: 'auth',
@@ -175,65 +175,57 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
   // ── Helper ─────────────────────────────────────────────────────────────────
 
   AuthError _failure(String operation, Object error, StackTrace stackTrace) {
-    // The raw error goes to the debug log only; the UI gets a safe message.
+    // The raw error goes to the debug log only; the UI gets a reason.
     AppLogger.log(
       '$operation failed',
       name: 'auth',
       error: error,
       stackTrace: stackTrace,
     );
-    return AuthError(formatAuthError(error));
+    return AuthError(authErrorReason(error));
   }
 }
 
-const _genericAuthError = 'Something went wrong. Please try again.';
-
-/// Maps any auth failure to a user-safe message. The one error mapper for
-/// auth: extend its switch when a new Supabase error code shows up, and
-/// never return the error's own text.
+/// Maps any auth failure to the reason the user is told. The one error
+/// mapper for auth: extend its switch when a new Supabase error code shows
+/// up. The screen turns the reason into words (`authErrorText`), so the
+/// error's own text never reaches the user.
 ///
 /// Codes: https://supabase.com/docs/guides/auth/debugging/error-codes
 @visibleForTesting
-String formatAuthError(Object? error) {
+AuthErrorReason authErrorReason(Object? error) {
   switch (error) {
     // Checked before the code switch: it carries no code.
     case sb.AuthRetryableFetchException():
     case SocketException():
     case TimeoutException():
     case GoogleSignInNetworkFailure():
-      return 'No connection. Check your internet and try again.';
+      return AuthErrorReason.noConnection;
     case GoogleSignInFailed():
-      return 'Google sign-in failed. Please try again.';
+      return AuthErrorReason.googleSignInFailed;
     case AccountDeletionRateLimited():
-      return 'Too many attempts. Please wait a moment and try again.';
+      return AuthErrorReason.tooManyAttempts;
     case AccountDeletionFailed():
-      return "We couldn't delete your account. Please try again.";
+      return AuthErrorReason.accountDeletionFailed;
     case sb.AuthException(:final code):
       return switch (code) {
-        'invalid_credentials' =>
-          'Incorrect email or password. Please try again.',
-        'email_exists' || 'user_already_exists' =>
-          'An account with this email already exists. Try signing in.',
-        'weak_password' =>
-          'Choose a stronger password: at least 8 characters with upper- '
-              'and lowercase letters, a number and a symbol.',
-        'email_not_confirmed' => 'Please confirm your email before signing in.',
-        'over_email_send_rate_limit' || 'over_request_rate_limit' =>
-          'Too many attempts. Please wait a moment and try again.',
-        'signup_disabled' =>
-          'New sign-ups are paused right now. Please try again later.',
-        'email_address_invalid' =>
-          "That email address can't be used. Please check it and try again.",
-        'validation_failed' => 'Please check your details and try again.',
-        'same_password' =>
-          'Your new password must be different from your current one.',
-        'session_expired' || 'refresh_token_not_found' =>
-          'Your session has expired. Please sign in again.',
-        'user_banned' => "This account can't sign in right now.",
-        _ => _genericAuthError,
+        'invalid_credentials' => AuthErrorReason.invalidCredentials,
+        'email_exists' || 'user_already_exists' => AuthErrorReason.emailExists,
+        'weak_password' => AuthErrorReason.weakPassword,
+        'email_not_confirmed' => AuthErrorReason.emailNotConfirmed,
+        'over_email_send_rate_limit' ||
+        'over_request_rate_limit' => AuthErrorReason.tooManyAttempts,
+        'signup_disabled' => AuthErrorReason.signupDisabled,
+        'email_address_invalid' => AuthErrorReason.emailAddressInvalid,
+        'validation_failed' => AuthErrorReason.validationFailed,
+        'same_password' => AuthErrorReason.samePassword,
+        'session_expired' ||
+        'refresh_token_not_found' => AuthErrorReason.sessionExpired,
+        'user_banned' => AuthErrorReason.userBanned,
+        _ => AuthErrorReason.generic,
       };
     default:
-      return _genericAuthError;
+      return AuthErrorReason.generic;
   }
 }
 

@@ -38,6 +38,11 @@ lib/
                                   # They migrate a legacy plaintext session, clear a session
                                   # surviving an iOS reinstall, and treat any storage error
                                   # as signed out. Never persist credentials anywhere else.
+    l10n/                        # UI text in English and French (owner, 2026-10-26):
+                                  # app_en.arb (template, every key described) and
+                                  # app_fr.arb; gen-l10n writes app_localizations*.dart
+                                  # here (config: l10n.yaml). Widgets read text through
+                                  # context.l10n (l10n.dart) — never a string literal.
     theme/                       # AppColors, AppTheme
     validation/                  # Pure form validators (validateEmail, validateNewPassword,
                                   # ...) returning null or a user-facing message. Every form
@@ -168,6 +173,28 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
 - Replace `PlaceholderScreen` entries one at a time as each screen is built.
   Never leave a route pointing at a placeholder and a real screen
   simultaneously reachable.
+
+## Language (English + French)
+
+- Every user-facing string lives in `lib/core/l10n/app_en.arb` with a
+  description, and in `app_fr.arb` with the same key. A new string is
+  added to both in the same change; `test/core/l10n/arb_test.dart` fails
+  on a missing key, a missing description or French left in English.
+  Plurals and counts use ICU (`{count, plural, =1{…} other{…}}`), never
+  string concatenation. French uses a no-break space before `? ! : ;`.
+- Domain and data layers never produce user-facing text. They report
+  typed outcomes (`AuthErrorReason`, `FieldError`, `SetupFailed`, the
+  `authLinkErrorProvider` flag) and presentation words them
+  (`authErrorText`, `fieldErrorText`, `setup_labels.dart`). Database
+  values and server names stay English; the app maps them by key (e.g.
+  cuisine slug) with the server name as fallback.
+- Language choice: `appLanguageProvider` (`features/language/`) holds
+  the user's pick (SharedPreferences `smartmeal.language`) or null to
+  follow the phone; `resolveAppLocale` gives French to French phones
+  and English to everyone else. `LanguageSwitch` (EN | FR) is on
+  onboarding and sign-in; T1-Profile adds it to Profile.
+- Money goes through `core/formatting/fcfa.dart` in both languages
+  (`3 100 FCFA`).
 
 ## State management rules
 

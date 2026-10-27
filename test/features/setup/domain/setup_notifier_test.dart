@@ -100,7 +100,7 @@ void main() {
     expect(container.read(setupStatusProvider), SetupStatus.complete);
   });
 
-  test('a failed save keeps the answers, says so safely, and can be '
+  test('a failed save keeps the answers and can be '
       'retried', () async {
     fill(completeDraft());
     setup.onComplete = (_) => throw const SocketException('down');
@@ -108,7 +108,6 @@ void main() {
     await notifier().submit(minimumDuration: Duration.zero);
 
     final failed = state() as SetupFailed;
-    expect(failed.message, "We couldn't save your answers. Please try again.");
     expect(failed.draft.householdSize, 4);
     expect(container.read(setupStatusProvider), isNot(SetupStatus.complete));
 

@@ -7,7 +7,7 @@
 /// switch (authState) {
 ///   case AuthIdle()                       => ...
 ///   case AuthLoading()                    => disable buttons, show spinner
-///   case AuthError()                      => show SnackBar with message
+///   case AuthError()                      => show SnackBar for the reason
 ///   case AuthAwaitingEmailConfirmation()  => tell the user to check email
 ///   case AuthResetEmailSent()             => confirm the reset email
 ///   case AuthPasswordUpdated()            => confirm the new password
@@ -24,11 +24,32 @@ class AuthIdle extends SmartMealAuthState {}
 /// An auth operation is in progress. Disable every auth action.
 class AuthLoading extends SmartMealAuthState {}
 
-/// An operation failed. [message] is user-safe; never raw server text.
+/// An operation failed. The screen words [reason] in the user's language
+/// (`authErrorText`); raw server text never reaches the user.
 class AuthError extends SmartMealAuthState {
-  final String message;
+  final AuthErrorReason reason;
 
-  AuthError(this.message);
+  AuthError(this.reason);
+}
+
+/// Why an auth operation failed, as far as the user needs to know.
+enum AuthErrorReason {
+  noConnection,
+  invalidCredentials,
+  emailExists,
+  weakPassword,
+  emailNotConfirmed,
+  tooManyAttempts,
+  signupDisabled,
+  emailAddressInvalid,
+  validationFailed,
+  samePassword,
+  sessionExpired,
+  userBanned,
+  googleSignInFailed,
+  signOutFailed,
+  accountDeletionFailed,
+  generic,
 }
 
 /// Sign-up succeeded without a session: email confirmation is on. Supabase

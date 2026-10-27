@@ -1,9 +1,22 @@
 import 'dart:convert';
 
 /// Form validators shared by every screen. Each returns null when the value
-/// is valid, or a user-facing message, so they plug straight into
-/// `TextFormField.validator`. The server stays the authority: these only
-/// catch mistakes early.
+/// is valid, or the [FieldError] found; `fieldErrorText` words it in the
+/// user's language for `TextFormField.validator`. The server stays the
+/// authority: these only catch mistakes early.
+
+/// What is wrong with a form field.
+enum FieldError {
+  emailMissing,
+  emailInvalid,
+  passwordMissing,
+  newPasswordMissing,
+  passwordTooShort,
+  passwordTooLong,
+  passwordTooSimple,
+  confirmationMissing,
+  confirmationMismatch,
+}
 
 /// RFC 5321 caps a whole address at 254 characters.
 const maxEmailLength = 254;
@@ -21,25 +34,25 @@ final _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$');
 // and symbols" requirement, so the client never accepts what it rejects.
 final _symbolPattern = RegExp(r'''[!@#$%^&*()_+\-=\[\]{};'\\:"|<>?,./`~]''');
 
-String? validateEmail(String? value) {
+FieldError? validateEmail(String? value) {
   final email = value?.trim() ?? '';
-  if (email.isEmpty) return 'Please enter your email';
+  if (email.isEmpty) return FieldError.emailMissing;
   if (email.length > maxEmailLength || !_emailPattern.hasMatch(email)) {
-    return 'Please enter a valid email';
+    return FieldError.emailInvalid;
   }
   return null;
 }
 
 /// Sign-up and password-change policy, matching the Supabase project
 /// setting recorded in docs/SECURITY.md §5.
-String? validateNewPassword(String? value) {
+FieldError? validateNewPassword(String? value) {
   final password = value ?? '';
-  if (password.isEmpty) return 'Please enter a password';
+  if (password.isEmpty) return FieldError.newPasswordMissing;
   if (password.length < minPasswordLength) {
-    return 'Password must be at least $minPasswordLength characters';
+    return FieldError.passwordTooShort;
   }
   if (utf8.encode(password).length > maxPasswordBytes) {
-    return 'Password is too long';
+    return FieldError.passwordTooLong;
   }
   final hasEveryClass =
       password.contains(RegExp('[a-z]')) &&
@@ -47,20 +60,20 @@ String? validateNewPassword(String? value) {
       password.contains(RegExp('[0-9]')) &&
       password.contains(_symbolPattern);
   if (!hasEveryClass) {
-    return 'Use upper- and lowercase letters, a number and a symbol';
+    return FieldError.passwordTooSimple;
   }
   return null;
 }
 
 /// Sign-in only checks that something was typed: the creation policy may
 /// change, and existing accounts must still get in.
-String? validateLoginPassword(String? value) {
-  if (value == null || value.isEmpty) return 'Please enter your password';
+FieldError? validateLoginPassword(String? value) {
+  if (value == null || value.isEmpty) return FieldError.passwordMissing;
   return null;
 }
 
-String? validatePasswordConfirmation(String? value, String password) {
-  if (value == null || value.isEmpty) return 'Please confirm your password';
-  if (value != password) return "Passwords don't match";
+FieldError? validatePasswordConfirmation(String? value, String password) {
+  if (value == null || value.isEmpty) return FieldError.confirmationMissing;
+  if (value != password) return FieldError.confirmationMismatch;
   return null;
 }

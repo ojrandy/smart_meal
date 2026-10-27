@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../auth/domain/auth_notifier.dart';
@@ -76,10 +77,10 @@ class _SetupLoadingScreenState extends ConsumerState<SetupLoadingScreen> {
                     size: 32,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'No connection. Check your internet and try again.',
+                  Text(
+                    context.l10n.errorNoConnection,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 15,
                       color: AppColors.textPrimary,
                       height: 1.5,
@@ -87,7 +88,7 @@ class _SetupLoadingScreenState extends ConsumerState<SetupLoadingScreen> {
                   ),
                   const SizedBox(height: 24),
                   CustomButton(
-                    text: 'Try again',
+                    text: context.l10n.tryAgain,
                     onPressed: () =>
                         ref.read(setupStatusProvider.notifier).refresh(),
                   ),
@@ -98,9 +99,9 @@ class _SetupLoadingScreenState extends ConsumerState<SetupLoadingScreen> {
                         ? null
                         : () =>
                               ref.read(authNotifierProvider.notifier).signOut(),
-                    child: const Text(
-                      'Sign out',
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.signOut,
+                      style: const TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
                       ),
@@ -116,9 +117,9 @@ class _SetupLoadingScreenState extends ConsumerState<SetupLoadingScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    'Getting things ready…',
-                    style: TextStyle(
+                  Text(
+                    context.l10n.setupLoadingMessage,
+                    style: const TextStyle(
                       fontSize: 15,
                       color: AppColors.textSecondary,
                     ),

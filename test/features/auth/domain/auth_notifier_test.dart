@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_meal/core/l10n/l10n.dart';
 import 'package:smart_meal/core/providers/shared_preferences_provider.dart';
 import 'package:smart_meal/features/auth/data/auth_repository.dart';
 import 'package:smart_meal/features/auth/data/password_recovery_repository.dart';
@@ -11,6 +13,7 @@ import 'package:smart_meal/features/auth/domain/auth_notifier.dart';
 import 'package:smart_meal/features/auth/domain/auth_session.dart';
 import 'package:smart_meal/features/auth/domain/auth_state.dart';
 import 'package:smart_meal/features/auth/domain/password_recovery.dart';
+import 'package:smart_meal/features/auth/presentation/auth_error_text.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../helpers/fake_auth_repository.dart';
@@ -18,8 +21,15 @@ import '../../../helpers/fake_auth_repository.dart';
 const _generic = 'Something went wrong. Please try again.';
 const _offline = 'No connection. Check your internet and try again.';
 
+// The English the user reads for a reason: checks the mapping and the
+// approved copy together.
+String _text(AuthErrorReason reason) =>
+    authErrorText(lookupAppLocalizations(const Locale('en')), reason);
+
+String _messageFor(Object? error) => _text(authErrorReason(error));
+
 void main() {
-  group('formatAuthError', () {
+  group('authErrorReason', () {
     for (final (code, message) in [
       ('invalid_credentials', 'Incorrect email or password. Please try again.'),
       (
@@ -66,7 +76,7 @@ void main() {
     ]) {
       test(code, () {
         expect(
-          formatAuthError(AuthApiException('server text', code: code)),
+          _messageFor(AuthApiException('server text', code: code)),
           message,
         );
       });
@@ -74,10 +84,10 @@ void main() {
 
     test('an unknown code gets the generic message, not server text', () {
       expect(
-        formatAuthError(const AuthException('raw server text', code: 'nope')),
+        _messageFor(const AuthException('raw server text', code: 'nope')),
         _generic,
       );
-      expect(formatAuthError(const AuthException('raw server text')), _generic);
+      expect(_messageFor(const AuthException('raw server text')), _generic);
     });
 
     for (final (label, error) in [
@@ -87,20 +97,20 @@ void main() {
       ('Google network failure', const GoogleSignInNetworkFailure()),
     ]) {
       test('$label is a connection problem', () {
-        expect(formatAuthError(error), _offline);
+        expect(_messageFor(error), _offline);
       });
     }
 
     test('a failed Google step hides the developer detail', () {
       expect(
-        formatAuthError(const GoogleSignInFailed('check the OAuth client')),
+        _messageFor(const GoogleSignInFailed('check the OAuth client')),
         'Google sign-in failed. Please try again.',
       );
     });
 
     test('anything else is generic', () {
-      expect(formatAuthError(StateError('bug')), _generic);
-      expect(formatAuthError(null), _generic);
+      expect(_messageFor(StateError('bug')), _generic);
+      expect(_messageFor(null), _generic);
     });
   });
 
@@ -160,7 +170,7 @@ void main() {
       await notifier().signIn(email: 'a@b.co', password: 'x');
 
       expect(
-        (state() as AuthError).message,
+        _text((state() as AuthError).reason),
         'Incorrect email or password. Please try again.',
       );
     });
@@ -170,7 +180,7 @@ void main() {
 
       await notifier().signIn(email: 'a@b.co', password: 'x');
 
-      expect((state() as AuthError).message, _offline);
+      expect(_text((state() as AuthError).reason), _offline);
     });
 
     test('sign-up with a session returns to idle', () async {
@@ -203,7 +213,7 @@ void main() {
 
       await notifier().signInWithGoogle();
 
-      expect((state() as AuthError).message, _offline);
+      expect(_text((state() as AuthError).reason), _offline);
     });
 
     test('a Supabase rejection after Google is mapped too', () async {
@@ -213,7 +223,7 @@ void main() {
       await notifier().signInWithGoogle();
 
       expect(
-        (state() as AuthError).message,
+        _text((state() as AuthError).reason),
         "This account can't sign in right now.",
       );
     });
@@ -228,7 +238,7 @@ void main() {
       await notifier().signOut();
 
       expect(
-        (state() as AuthError).message,
+        _text((state() as AuthError).reason),
         'Sign out failed. Please try again.',
       );
       expect(container.read(authSessionProvider), user);
@@ -274,7 +284,7 @@ void main() {
 
       await notifier().resetPassword('a@b.co');
 
-      expect((state() as AuthError).message, _offline);
+      expect(_text((state() as AuthError).reason), _offline);
     });
   });
 
@@ -364,7 +374,7 @@ void main() {
 
           await notifier().updatePassword('N3w-password');
 
-          expect((state() as AuthError).message, message);
+          expect(_text((state() as AuthError).reason), message);
           expect(recovering(), isTrue);
         },
       );
@@ -414,7 +424,7 @@ void main() {
       );
       await Future<void>.delayed(Duration.zero);
 
-      expect(container.read(authLinkErrorProvider), authLinkErrorMessage);
+      expect(container.read(authLinkErrorProvider), isTrue);
       expect(container.read(authSessionProvider), isNull);
     });
 
@@ -422,7 +432,7 @@ void main() {
       repo.failAuthLink(AuthRetryableFetchException());
       await Future<void>.delayed(Duration.zero);
 
-      expect(container.read(authLinkErrorProvider), isNull);
+      expect(container.read(authLinkErrorProvider), isFalse);
     });
   });
 
@@ -478,7 +488,7 @@ void main() {
       await notifier().deleteAccount();
 
       expect(
-        (state() as AuthError).message,
+        _text((state() as AuthError).reason),
         'Too many attempts. Please wait a moment and try again.',
       );
     });
@@ -490,7 +500,7 @@ void main() {
       await notifier().deleteAccount();
 
       expect(
-        (state() as AuthError).message,
+        _text((state() as AuthError).reason),
         "We couldn't delete your account. Please try again.",
       );
       expect(container.read(authSessionProvider), isNotNull);

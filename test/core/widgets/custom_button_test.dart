@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_meal/core/l10n/l10n.dart';
 import 'package:smart_meal/core/theme/app_colors.dart';
 import 'package:smart_meal/core/theme/app_theme.dart';
 import 'package:smart_meal/core/widgets/custom_button.dart';
 
 Future<void> _pump(WidgetTester tester, Widget button) => tester.pumpWidget(
   MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     theme: AppTheme.lightTheme,
     home: Scaffold(body: button),
   ),

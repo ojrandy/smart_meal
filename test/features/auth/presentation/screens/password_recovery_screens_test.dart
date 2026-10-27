@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_meal/core/l10n/l10n.dart';
 import 'package:smart_meal/core/providers/shared_preferences_provider.dart';
 import 'package:smart_meal/core/theme/app_fonts.dart';
 import 'package:smart_meal/core/theme/app_theme.dart';
@@ -52,6 +53,8 @@ Future<FakeAuthRepository> _pump(WidgetTester tester, String location) async {
         sharedPreferencesProvider.overrideWithValue(prefs),
       ],
       child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: AppTheme.lightTheme,
         routerConfig: router,
       ),

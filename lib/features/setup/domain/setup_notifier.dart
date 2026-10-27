@@ -29,15 +29,10 @@ class SetupCompleted extends SetupFlowState {
   const SetupCompleted(super.draft);
 }
 
-/// Saving failed; nothing was stored. [message] is user-safe.
+/// Saving failed; nothing was stored. The screen offers a retry.
 class SetupFailed extends SetupFlowState {
-  const SetupFailed(super.draft, this.message);
-
-  final String message;
+  const SetupFailed(super.draft);
 }
-
-const setupSaveFailedMessage =
-    "We couldn't save your answers. Please try again.";
 
 /// Runs the setup flow (P16). The draft holds sensitive answers, so it
 /// lives only here, in memory (S6): closing the app or signing out starts
@@ -112,7 +107,7 @@ class SetupNotifier extends Notifier<SetupFlowState> {
         error: error.runtimeType,
         stackTrace: stackTrace,
       );
-      state = SetupFailed(draft, setupSaveFailedMessage);
+      state = SetupFailed(draft);
       return;
     }
     state = SetupCompleted(draft);

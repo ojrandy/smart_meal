@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_button.dart';
+import '../../language/presentation/widgets/language_switch.dart';
 import '../domain/onboarding_notifier.dart';
 
 class _OnboardingSlide {
@@ -33,26 +35,25 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  static const _slides = [
+  static List<_OnboardingSlide> _slidesFor(AppLocalizations l10n) => [
     _OnboardingSlide(
-      title: 'Welcome to SmartMeal',
-      subtitle:
-          'Discover meals you will enjoy with AI-powered recommendations tailored to your taste.',
+      title: l10n.onboardingDiscoverTitle,
+      subtitle: l10n.onboardingDiscoverBody,
       image: AppAssets.onboardingDiscover,
     ),
     _OnboardingSlide(
-      title: 'Plan Your Meals',
-      subtitle:
-          'Manage your budget and plan your weekly recipes efficiently with intelligent tracking.',
+      title: l10n.onboardingPlanTitle,
+      subtitle: l10n.onboardingPlanBody,
       image: AppAssets.onboardingPlan,
     ),
     _OnboardingSlide(
-      title: 'Smarter Food Decisions',
-      subtitle:
-          'Get personalized recommendations and insights to make healthier food choices.',
+      title: l10n.onboardingDecideTitle,
+      subtitle: l10n.onboardingDecideBody,
       image: AppAssets.onboardingDecide,
     ),
   ];
+
+  static const _slideCount = 3;
 
   // Translucent pill behind Skip: keeps the white label readable on any
   // photo without darkening the photo itself.
@@ -81,7 +82,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   void _onSkip() => _finish();
 
   void _onNext() {
-    if (_currentIndex == _slides.length - 1) {
+    if (_currentIndex == _slideCount - 1) {
       _finish();
     } else {
       _pageController.nextPage(
@@ -99,7 +100,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final skipTop = math.max(60.0, insets.top + 8);
     // Room for the Skip button, which grows with the system text size.
     final skipHeight = MediaQuery.textScalerOf(context).scale(48);
-    final isLastSlide = _currentIndex == _slides.length - 1;
+    final isLastSlide = _currentIndex == _slideCount - 1;
+    final l10n = context.l10n;
+    final slides = _slidesFor(l10n);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -112,9 +115,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   controller: _pageController,
                   onPageChanged: (index) =>
                       setState(() => _currentIndex = index),
-                  itemCount: _slides.length,
+                  itemCount: slides.length,
                   itemBuilder: (context, index) => _SlidePage(
-                    slide: _slides[index],
+                    slide: slides[index],
                     // The title never starts under Skip, even when the
                     // photo is short (small screens, large text).
                     minPhotoHeight: skipTop + skipHeight,
@@ -125,16 +128,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 padding: EdgeInsets.fromLTRB(24, 8, 24, 24 + insets.bottom),
                 child: Column(
                   children: [
-                    _PageDots(count: _slides.length, current: _currentIndex),
+                    _PageDots(count: slides.length, current: _currentIndex),
                     const SizedBox(height: 24),
                     CustomButton(
-                      text: isLastSlide ? 'Get started' : 'Next',
+                      text: isLastSlide
+                          ? l10n.getStartedButton
+                          : l10n.nextButton,
                       onPressed: _onNext,
                     ),
                   ],
                 ),
               ),
             ],
+          ),
+          // First chance to pick English or French (owner, 2026-10-26).
+          Positioned(
+            top: skipTop,
+            left: 24 + insets.left,
+            child: const LanguageSwitch(),
           ),
           Positioned(
             top: skipTop,
@@ -148,9 +159,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 shape: const StadiumBorder(),
               ),
-              child: const Text(
-                'Skip',
-                style: TextStyle(
+              child: Text(
+                l10n.skipButton,
+                style: const TextStyle(
                   color: AppColors.onDark,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

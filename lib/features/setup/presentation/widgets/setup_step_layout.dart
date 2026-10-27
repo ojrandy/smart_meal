@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../domain/setup_draft.dart';
@@ -69,7 +70,10 @@ class SetupStepLayout extends StatelessWidget {
                       const SizedBox(width: 48),
                     Expanded(
                       child: Text(
-                        'Step ${step.number} of ${SetupStep.total}',
+                        context.l10n.setupStepCounter(
+                          step.number,
+                          SetupStep.total,
+                        ),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 13,
@@ -98,7 +102,7 @@ class SetupStepLayout extends StatelessWidget {
                   minHeight: 6,
                   color: AppColors.primary,
                   backgroundColor: AppColors.surfaceVariant,
-                  semanticsLabel: 'Setup progress',
+                  semanticsLabel: context.l10n.setupProgressLabel,
                 ),
               ),
             ),

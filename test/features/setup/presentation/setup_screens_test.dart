@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_meal/core/l10n/l10n.dart';
 import 'package:smart_meal/core/providers/shared_preferences_provider.dart';
 import 'package:smart_meal/core/theme/app_fonts.dart';
 import 'package:smart_meal/core/theme/app_theme.dart';
@@ -39,6 +40,7 @@ Future<_Harness> _pump(
   String location = '/setup/lifestyle',
   SetupDraft? draft,
   SetupStep? step,
+  Locale? locale,
 }) async {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 2.75;
@@ -91,7 +93,10 @@ Future<_Harness> _pump(
     UncontrolledProviderScope(
       container: container,
       child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: AppTheme.lightTheme,
+        locale: locale,
         routerConfig: router,
       ),
     ),
@@ -172,6 +177,37 @@ void main() {
     await _tap(tester, 'Continue');
     expect(find.text('How do you like to cook?'), findsOneWidget);
     expect(h.notifier.draft.budgetAmount, 2000);
+  });
+
+  testWidgets('in French, questions and budget advice read naturally', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      draft: const SetupDraft()
+          .withLifestyle(Lifestyle.family)
+          .withHouseholdSize(4),
+      step: SetupStep.budget,
+      locale: const Locale('fr'),
+    );
+
+    expect(
+      find.text('Combien dépensez-vous pour la nourriture\xA0?'),
+      findsOneWidget,
+    );
+    expect(find.text('Étape 3 sur 9'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), '2000');
+    await _tap(tester, 'Par jour');
+
+    expect(
+      find.textContaining(
+        'Pour 4 personnes, nous conseillons au moins 3\xA0100\xA0FCFA par jour',
+      ),
+      findsOneWidget,
+    );
+    await _tap(tester, 'Continuer');
+    expect(find.text('Comment aimez-vous cuisiner\xA0?'), findsOneWidget);
   });
 
   testWidgets('a budget above the suggestion shows no advice', (tester) async {

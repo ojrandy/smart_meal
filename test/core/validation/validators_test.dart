@@ -21,7 +21,7 @@ void main() {
       ('one-letter TLD', 'a@b.c'),
     ]) {
       test('rejects $label', () {
-        expect(validateEmail(email), 'Please enter a valid email');
+        expect(validateEmail(email), FieldError.emailInvalid);
       });
     }
 
@@ -29,7 +29,7 @@ void main() {
       test(
         'asks for an email when given ${empty == null ? 'null' : '"$empty"'}',
         () {
-          expect(validateEmail(empty), 'Please enter your email');
+          expect(validateEmail(empty), FieldError.emailMissing);
         },
       );
     }
@@ -44,35 +44,19 @@ void main() {
       expect(validateNewPassword('Abcdef1!'), isNull);
     });
 
-    for (final (label, password, message) in [
-      ('empty', '', 'Please enter a password'),
-      ('7 characters', 'Abcde1!', 'Password must be at least 8 characters'),
-      (
-        'no uppercase',
-        'abcdefg1!',
-        'Use upper- and lowercase letters, a number and a symbol',
-      ),
-      (
-        'no lowercase',
-        'ABCDEFG1!',
-        'Use upper- and lowercase letters, a number and a symbol',
-      ),
-      (
-        'no digit',
-        'Abcdefgh!',
-        'Use upper- and lowercase letters, a number and a symbol',
-      ),
-      (
-        'no symbol',
-        'Abcdefgh1',
-        'Use upper- and lowercase letters, a number and a symbol',
-      ),
-      ('73 bytes', 'Aa1!${'x' * 69}', 'Password is too long'),
+    for (final (label, password, error) in [
+      ('empty', '', FieldError.newPasswordMissing),
+      ('7 characters', 'Abcde1!', FieldError.passwordTooShort),
+      ('no uppercase', 'abcdefg1!', FieldError.passwordTooSimple),
+      ('no lowercase', 'ABCDEFG1!', FieldError.passwordTooSimple),
+      ('no digit', 'Abcdefgh!', FieldError.passwordTooSimple),
+      ('no symbol', 'Abcdefgh1', FieldError.passwordTooSimple),
+      ('73 bytes', 'Aa1!${'x' * 69}', FieldError.passwordTooLong),
       // 39 characters, but 'é' is two UTF-8 bytes: 74 bytes in all.
-      ('over 72 bytes in UTF-8', 'Aa1!${'é' * 35}', 'Password is too long'),
+      ('over 72 bytes in UTF-8', 'Aa1!${'é' * 35}', FieldError.passwordTooLong),
     ]) {
       test('rejects $label', () {
-        expect(validateNewPassword(password), message);
+        expect(validateNewPassword(password), error);
       });
     }
 
@@ -87,8 +71,8 @@ void main() {
     });
 
     test('asks for a password when empty', () {
-      expect(validateLoginPassword(''), 'Please enter your password');
-      expect(validateLoginPassword(null), 'Please enter your password');
+      expect(validateLoginPassword(''), FieldError.passwordMissing);
+      expect(validateLoginPassword(null), FieldError.passwordMissing);
     });
   });
 
@@ -100,14 +84,14 @@ void main() {
     test('rejects a mismatch', () {
       expect(
         validatePasswordConfirmation('Abcdef1?', 'Abcdef1!'),
-        "Passwords don't match",
+        FieldError.confirmationMismatch,
       );
     });
 
     test('asks for confirmation when empty', () {
       expect(
         validatePasswordConfirmation('', 'Abcdef1!'),
-        'Please confirm your password',
+        FieldError.confirmationMissing,
       );
     });
   });

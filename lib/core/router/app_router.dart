@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'scaffold_with_nav_bar.dart';
+import '../l10n/l10n.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -148,7 +149,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'recipe/:id',
                     builder: (context, state) {
                       final id = state.pathParameters['id'];
-                      return PlaceholderScreen(title: 'Recipe Details: $id');
+                      return PlaceholderScreen(
+                        title: context.l10n.recipeDetailsTitle(id ?? ''),
+                      );
                     },
                   ),
                 ],
@@ -161,7 +164,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/discover',
                 builder: (context, state) =>
-                    const PlaceholderScreen(title: 'Discover Screen'),
+                    PlaceholderScreen(title: context.l10n.navDiscover),
               ),
             ],
           ),
@@ -171,7 +174,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/planner',
                 builder: (context, state) =>
-                    const PlaceholderScreen(title: 'Planner Screen'),
+                    PlaceholderScreen(title: context.l10n.navPlanner),
               ),
             ],
           ),
@@ -181,7 +184,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/favorites',
                 builder: (context, state) =>
-                    const PlaceholderScreen(title: 'Favorites Screen'),
+                    PlaceholderScreen(title: context.l10n.navFavorites),
               ),
             ],
           ),
@@ -191,7 +194,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/profile',
                 builder: (context, state) =>
-                    const PlaceholderScreen(title: 'Profile Screen'),
+                    PlaceholderScreen(title: context.l10n.navProfile),
               ),
             ],
           ),

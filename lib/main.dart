@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/app_config.dart';
+import 'core/l10n/l10n.dart';
 import 'core/providers/app_config_provider.dart';
 import 'core/providers/shared_preferences_provider.dart';
 import 'core/router/app_router.dart';
@@ -14,6 +15,7 @@ import 'core/theme/app_fonts.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/app_snack_bar.dart';
 import 'features/auth/domain/password_recovery.dart';
+import 'features/language/domain/app_language.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,17 +69,33 @@ class SmartMealApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // A failed confirmation or recovery link can arrive on any screen, even
     // during the splash, so it is shown at the root.
-    ref.listen<String?>(authLinkErrorProvider, (_, message) {
-      if (message == null) return;
-      showRootSnackBar(message, duration: const Duration(seconds: 6));
+    ref.listen<bool>(authLinkErrorProvider, (_, failed) {
+      if (!failed) return;
+      // The messenger sits inside MaterialApp, so its context has the
+      // app's localizations.
+      final messengerContext = rootScaffoldMessengerKey.currentContext;
+      if (messengerContext != null) {
+        showRootSnackBar(
+          messengerContext.l10n.authLinkErrorNotice,
+          duration: const Duration(seconds: 6),
+        );
+      }
       ref.read(authLinkErrorProvider.notifier).clear();
     });
 
     // Watch the router provider so it rebuilds when auth state changes.
     final router = ref.watch(routerProvider);
+    // Null until the user picks a language: then the phone's language
+    // decides (French phones get French, everything else English).
+    final language = ref.watch(appLanguageProvider);
     return MaterialApp.router(
-      title: 'Smart Meal',
+      onGenerateTitle: (context) => context.l10n.appName,
       theme: AppTheme.lightTheme,
+      locale: language?.locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localeListResolutionCallback: (deviceLocales, _) =>
+          resolveAppLocale(deviceLocales),
       routerConfig: router,
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       debugShowCheckedModeBanner: false,

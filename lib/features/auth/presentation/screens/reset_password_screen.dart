@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/validation/field_error_text.dart';
 import '../../../../core/validation/validators.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../domain/auth_notifier.dart';
 import '../../domain/auth_state.dart';
+import '../auth_error_text.dart';
 import '../widgets/auth_screen_header.dart';
 
 /// Sets a new password for the recovery session a reset link opened. The
@@ -61,11 +64,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     if (next is AuthPasswordUpdated) {
       showAppSnackBar(
         context,
-        'Your password has been updated.',
+        context.l10n.passwordUpdatedNotice,
         isError: false,
       );
     } else if (next is AuthError) {
-      showAppSnackBar(context, next.message);
+      showAppSnackBar(context, authErrorText(context.l10n, next.reason));
     }
   }
 
@@ -74,6 +77,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     ref.listen<SmartMealAuthState>(authNotifierProvider, _onAuthStateChanged);
 
     final isLoading = ref.watch(authNotifierProvider) is AuthLoading;
+    final l10n = context.l10n;
 
     return PopScope(
       canPop: false,
@@ -95,36 +99,40 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 children: [
                   AuthScreenHeader(
                     onBack: isLoading ? null : _cancel,
-                    title: 'Set a new',
-                    highlight: 'password',
+                    title: l10n.resetPasswordTitleLead,
+                    highlight: l10n.resetPasswordTitleAccent,
                   ),
                   const SizedBox(height: 32),
 
                   CustomTextField(
-                    label: 'New password',
+                    label: l10n.newPasswordLabel,
                     hint: '••••••••',
                     prefixIcon: Iconsax.lock,
                     isPassword: true,
                     controller: _passwordController,
-                    validator: validateNewPassword,
+                    validator: (value) =>
+                        fieldErrorText(l10n, validateNewPassword(value)),
                   ),
                   const SizedBox(height: 16),
 
                   CustomTextField(
-                    label: 'Confirm password',
+                    label: l10n.confirmNewPasswordLabel,
                     hint: '••••••••',
                     prefixIcon: Iconsax.lock,
                     isPassword: true,
                     controller: _confirmController,
-                    validator: (value) => validatePasswordConfirmation(
-                      value,
-                      _passwordController.text,
+                    validator: (value) => fieldErrorText(
+                      l10n,
+                      validatePasswordConfirmation(
+                        value,
+                        _passwordController.text,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),
 
                   CustomButton(
-                    text: 'Save password',
+                    text: l10n.savePasswordButton,
                     onPressed: isLoading ? null : _save,
                     isLoading: isLoading,
                   ),
