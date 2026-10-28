@@ -11,6 +11,7 @@ import '../../../../core/widgets/app_snack_bar.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/social_auth_button.dart';
+import '../../../../core/router/launch_redirect.dart';
 import '../../domain/auth_notifier.dart';
 import '../auth_error_text.dart';
 import '../../domain/auth_state.dart';
@@ -76,14 +77,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     // redirects to /home.
     if (next is AuthAwaitingEmailConfirmation) {
       // Supabase answers this way for an email that is already registered,
-      // too, so this copy must be true in both cases.
-      showAppSnackBar(
-        context,
-        context.l10n.signupConfirmationSent,
-        isError: false,
-        duration: const Duration(seconds: 6),
-      );
-      context.go('/auth/login');
+      // too; the check-email screen's copy is true in both cases.
+      context.go(checkEmailRoute, extra: _emailController.text.trim());
     } else if (next is AuthError) {
       showAppSnackBar(context, authErrorText(context.l10n, next.reason));
     }
@@ -195,7 +190,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   // Email Field
                   CustomTextField(
                     label: l10n.emailLabel,
-                    hint: l10n.emailHint,
                     prefixIcon: Iconsax.sms,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -207,7 +201,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   // Password Field
                   CustomTextField(
                     label: l10n.passwordLabel,
-                    hint: '••••••••',
                     prefixIcon: Iconsax.lock,
                     isPassword: true,
                     controller: _passwordController,
@@ -219,7 +212,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   // Confirm Password Field
                   CustomTextField(
                     label: l10n.confirmPasswordLabel,
-                    hint: '••••••••',
                     prefixIcon: Iconsax.lock_1,
                     isPassword: true,
                     controller: _confirmPasswordController,

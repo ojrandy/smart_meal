@@ -11,6 +11,7 @@ import 'core/providers/shared_preferences_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/services/secure_session_storage.dart';
+import 'core/services/timeout_http_client.dart';
 import 'core/theme/app_fonts.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/app_snack_bar.dart';
@@ -40,6 +41,9 @@ Future<void> main() async {
       ),
       pkceAsyncStorage: const SecurePkceStorage(),
     ),
+    // Every request gives up after a time limit, so a lost connection is
+    // reported instead of leaving a screen waiting forever.
+    httpClient: TimeoutHttpClient(),
   );
 
   // Not awaited: push is optional, so neither a missing Firebase config nor

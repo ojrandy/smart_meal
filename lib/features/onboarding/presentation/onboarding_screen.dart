@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_assets.dart';
@@ -118,6 +119,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   itemCount: slides.length,
                   itemBuilder: (context, index) => _SlidePage(
                     slide: slides[index],
+                    isActive: index == _currentIndex,
                     // The title never starts under Skip, even when the
                     // photo is short (small screens, large text).
                     minPhotoHeight: skipTop + skipHeight,
@@ -177,13 +179,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
 class _SlidePage extends StatelessWidget {
   final _OnboardingSlide slide;
+  final bool isActive;
   final double minPhotoHeight;
 
-  const _SlidePage({required this.slide, required this.minPhotoHeight});
+  const _SlidePage({
+    required this.slide,
+    required this.isActive,
+    required this.minPhotoHeight,
+  });
+
+  /// The shown photo settles from this zoom to its full frame (a slow
+  /// "Ken Burns" ease); swiped-away photos drift back, ready for next time.
+  static const _photoZoom = 1.08;
+  static const _photoSettle = Duration(seconds: 7);
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -195,6 +208,46 @@ class _SlidePage extends StatelessWidget {
           ),
         );
 
+        final photo = Image.asset(
+          slide.image,
+          width: double.infinity,
+          height: photoHeight,
+          fit: BoxFit.cover,
+          excludeFromSemantics: true,
+          errorBuilder: (context, error, stackTrace) =>
+              const ColoredBox(color: AppColors.primaryLight),
+        );
+
+        final message = Column(
+          children: [
+            Text(
+              slide.title,
+              // Large system text still grows the title, but stops at 1.8×
+              // so a 3-line title fits on the smallest phones.
+              textScaler: MediaQuery.textScalerOf(
+                context,
+              ).clamp(maxScaleFactor: 1.8),
+              style: textTheme.headlineMedium?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+                fontSize: 30,
+                height: 1.2,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              slide.subtitle,
+              style: textTheme.bodyLarge?.copyWith(
+                color: AppColors.textSecondary,
+                fontSize: 17,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        );
+
         return Column(
           children: [
             SizedBox(
@@ -204,13 +257,16 @@ class _SlidePage extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(32),
                 ),
-                child: Image.asset(
-                  slide.image,
-                  fit: BoxFit.cover,
-                  excludeFromSemantics: true,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const ColoredBox(color: AppColors.primaryLight),
-                ),
+                child: reduceMotion
+                    ? photo
+                    : photo
+                          .animate(target: isActive ? 1 : 0)
+                          .scale(
+                            begin: const Offset(_photoZoom, _photoZoom),
+                            end: const Offset(1, 1),
+                            duration: _photoSettle,
+                            curve: Curves.easeOutCubic,
+                          ),
               ),
             ),
             // Scrolls instead of overflowing on short screens or with
@@ -218,30 +274,17 @@ class _SlidePage extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(24, 28, 24, 8),
-                child: Column(
-                  children: [
-                    Text(
-                      slide.title,
-                      style: textTheme.headlineMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 28,
-                        height: 1.2,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      slide.subtitle,
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: 16,
-                        height: 1.5,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+                child: reduceMotion
+                    ? message
+                    : message
+                          .animate()
+                          .fadeIn(duration: 450.ms)
+                          .slideY(
+                            begin: 0.15,
+                            end: 0,
+                            duration: 450.ms,
+                            curve: Curves.easeOutCubic,
+                          ),
               ),
             ),
           ],

@@ -191,7 +191,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   // Email Field
                   CustomTextField(
                     label: l10n.emailLabel,
-                    hint: l10n.emailHint,
                     prefixIcon: Iconsax.sms,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -203,7 +202,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   // Password Field
                   CustomTextField(
                     label: l10n.passwordLabel,
-                    hint: '••••••••',
                     prefixIcon: Iconsax.lock,
                     isPassword: true,
                     controller: _passwordController,

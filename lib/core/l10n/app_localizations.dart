@@ -284,12 +284,6 @@ abstract class AppLocalizations {
   /// **'Email'**
   String get emailLabel;
 
-  /// Email field example
-  ///
-  /// In en, this message translates to:
-  /// **'user@email.com'**
-  String get emailHint;
-
   /// Password field label
   ///
   /// In en, this message translates to:
@@ -331,12 +325,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign up'**
   String get signUpLink;
-
-  /// After sign-up when email confirmation is on (also shown for an email already registered)
-  ///
-  /// In en, this message translates to:
-  /// **'Almost there! We\'ve sent a confirmation link to your email.'**
-  String get signupConfirmationSent;
 
   /// Sign-up title, first line
   ///
@@ -1280,6 +1268,12 @@ abstract class AppLocalizations {
   /// **'We couldn\'t save your answers. Please try again.'**
   String get setupSaveFailed;
 
+  /// Setup save failed because the phone is offline or the request timed out; the answers are still in memory
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Your answers are kept on this screen: reconnect, then tap Try again.'**
+  String get setupSaveNoConnection;
+
   /// Placeholder title of the recipe detail screen until it is built
   ///
   /// In en, this message translates to:
@@ -1291,6 +1285,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a password'**
   String get fieldNewPasswordMissing;
+
+  /// Title of the screen shown after sign-up while the user waits for the confirmation email
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email'**
+  String get checkEmailTitle;
+
+  /// Under the title; also true when the email was already registered
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve sent a confirmation link to {email}. Open it on this phone and we\'ll take you straight in.'**
+  String checkEmailBody(String email);
+
+  /// Heading of the Smart Meal introduction on the check-email screen
+  ///
+  /// In en, this message translates to:
+  /// **'While you wait'**
+  String get checkEmailWhileYouWait;
+
+  /// Check-email screen: first Smart Meal benefit
+  ///
+  /// In en, this message translates to:
+  /// **'Meals made for your taste'**
+  String get checkEmailPerkTasteTitle;
+
+  /// Check-email screen: first benefit detail
+  ///
+  /// In en, this message translates to:
+  /// **'Ndolé, eru, corn fufu and more, picked for you.'**
+  String get checkEmailPerkTasteBody;
+
+  /// Check-email screen: second Smart Meal benefit
+  ///
+  /// In en, this message translates to:
+  /// **'Plans that fit your budget'**
+  String get checkEmailPerkBudgetTitle;
+
+  /// Check-email screen: second benefit detail
+  ///
+  /// In en, this message translates to:
+  /// **'Plan the week\'s meals in FCFA, with no surprises.'**
+  String get checkEmailPerkBudgetBody;
+
+  /// Check-email screen: third Smart Meal benefit
+  ///
+  /// In en, this message translates to:
+  /// **'Good for your health'**
+  String get checkEmailPerkHealthTitle;
+
+  /// Check-email screen: third benefit detail
+  ///
+  /// In en, this message translates to:
+  /// **'We respect your diet, allergies and goals.'**
+  String get checkEmailPerkHealthBody;
+
+  /// Hint under the benefits
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t find it? Look in Spam or Promotions.'**
+  String get checkEmailSpamTip;
+
+  /// Button to send the confirmation email again
+  ///
+  /// In en, this message translates to:
+  /// **'Resend email'**
+  String get checkEmailResendButton;
+
+  /// Snackbar after the confirmation email was sent again
+  ///
+  /// In en, this message translates to:
+  /// **'Sent again. Check your inbox.'**
+  String get checkEmailResent;
+
+  /// Button that leaves the check-email screen
+  ///
+  /// In en, this message translates to:
+  /// **'Back to sign in'**
+  String get backToSignInButton;
+
+  /// Short pause screen after the food-likes step (step 5)
+  ///
+  /// In en, this message translates to:
+  /// **'Great choices!'**
+  String get setupBreatherTitle;
+
+  /// Pause screen after step 5, before the health questions
+  ///
+  /// In en, this message translates to:
+  /// **'Now a few quick health questions, so every meal is safe for you.'**
+  String get setupBreatherBody;
 }
 
 class _AppLocalizationsDelegate

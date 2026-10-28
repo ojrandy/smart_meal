@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/app_logger.dart';
+import '../../../core/services/network_errors.dart';
 import '../../auth/domain/auth_session.dart';
 import '../data/setup_repository.dart';
 import 'setup_draft.dart';
@@ -31,7 +32,11 @@ class SetupCompleted extends SetupFlowState {
 
 /// Saving failed; nothing was stored. The screen offers a retry.
 class SetupFailed extends SetupFlowState {
-  const SetupFailed(super.draft);
+  const SetupFailed(super.draft, {this.noConnection = false});
+
+  /// The server could not be reached (offline or timed out), so the screen
+  /// says so instead of a generic failure.
+  final bool noConnection;
 }
 
 /// Runs the setup flow (P16). The draft holds sensitive answers, so it
@@ -107,7 +112,7 @@ class SetupNotifier extends Notifier<SetupFlowState> {
         error: error.runtimeType,
         stackTrace: stackTrace,
       );
-      state = SetupFailed(draft);
+      state = SetupFailed(draft, noConnection: isConnectionError(error));
       return;
     }
     state = SetupCompleted(draft);

@@ -8,7 +8,6 @@ import '../theme/app_colors.dart';
 /// Wraps a [TextFormField] inside a custom-styled container.
 class CustomTextField extends StatefulWidget {
   final String label;
-  final String hint;
   final IconData prefixIcon;
   final bool isPassword;
   final TextEditingController? controller;
@@ -21,7 +20,6 @@ class CustomTextField extends StatefulWidget {
   const CustomTextField({
     super.key,
     required this.label,
-    required this.hint,
     required this.prefixIcon,
     this.isPassword = false,
     this.controller,
@@ -76,13 +74,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   keyboardType: widget.keyboardType,
                   validator: widget.validator,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: InputDecoration(
-                    hintText: widget.hint,
-                    hintStyle: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  decoration: const InputDecoration(
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                     border: InputBorder.none,
@@ -90,10 +82,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     focusedBorder: InputBorder.none,
                     errorBorder: InputBorder.none,
                     focusedErrorBorder: InputBorder.none,
-                    errorStyle: const TextStyle(
-                      color: AppColors.error,
-                      fontSize: 11,
-                    ),
+                    errorStyle: TextStyle(color: AppColors.error, fontSize: 11),
                   ),
                   style: const TextStyle(
                     color: AppColors.textPrimary,

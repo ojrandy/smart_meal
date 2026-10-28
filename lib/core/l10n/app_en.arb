@@ -129,10 +129,6 @@
   "@emailLabel": {
     "description": "Email field label"
   },
-  "emailHint": "user@email.com",
-  "@emailHint": {
-    "description": "Email field example"
-  },
   "passwordLabel": "Password",
   "@passwordLabel": {
     "description": "Password field label"
@@ -160,10 +156,6 @@
   "signUpLink": "Sign up",
   "@signUpLink": {
     "description": "Link to sign-up"
-  },
-  "signupConfirmationSent": "Almost there! We've sent a confirmation link to your email.",
-  "@signupConfirmationSent": {
-    "description": "After sign-up when email confirmation is on (also shown for an email already registered)"
   },
   "signupTitleLead": "Create your",
   "@signupTitleLead": {
@@ -858,6 +850,10 @@
   "@setupSaveFailed": {
     "description": "Setup save failed; nothing stored"
   },
+  "setupSaveNoConnection": "No internet connection. Your answers are kept on this screen: reconnect, then tap Try again.",
+  "@setupSaveNoConnection": {
+    "description": "Setup save failed because the phone is offline or the request timed out; the answers are still in memory"
+  },
   "recipeDetailsTitle": "Recipe {id}",
   "@recipeDetailsTitle": {
     "description": "Placeholder title of the recipe detail screen until it is built",
@@ -870,5 +866,70 @@
   "fieldNewPasswordMissing": "Please enter a password",
   "@fieldNewPasswordMissing": {
     "description": "Form error: new password empty (sign-up, reset)"
+  },
+  "checkEmailTitle": "Check your email",
+  "@checkEmailTitle": {
+    "description": "Title of the screen shown after sign-up while the user waits for the confirmation email"
+  },
+  "checkEmailBody": "We've sent a confirmation link to {email}. Open it on this phone and we'll take you straight in.",
+  "@checkEmailBody": {
+    "description": "Under the title; also true when the email was already registered",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "checkEmailWhileYouWait": "While you wait",
+  "@checkEmailWhileYouWait": {
+    "description": "Heading of the Smart Meal introduction on the check-email screen"
+  },
+  "checkEmailPerkTasteTitle": "Meals made for your taste",
+  "@checkEmailPerkTasteTitle": {
+    "description": "Check-email screen: first Smart Meal benefit"
+  },
+  "checkEmailPerkTasteBody": "Ndolé, eru, corn fufu and more, picked for you.",
+  "@checkEmailPerkTasteBody": {
+    "description": "Check-email screen: first benefit detail"
+  },
+  "checkEmailPerkBudgetTitle": "Plans that fit your budget",
+  "@checkEmailPerkBudgetTitle": {
+    "description": "Check-email screen: second Smart Meal benefit"
+  },
+  "checkEmailPerkBudgetBody": "Plan the week's meals in FCFA, with no surprises.",
+  "@checkEmailPerkBudgetBody": {
+    "description": "Check-email screen: second benefit detail"
+  },
+  "checkEmailPerkHealthTitle": "Good for your health",
+  "@checkEmailPerkHealthTitle": {
+    "description": "Check-email screen: third Smart Meal benefit"
+  },
+  "checkEmailPerkHealthBody": "We respect your diet, allergies and goals.",
+  "@checkEmailPerkHealthBody": {
+    "description": "Check-email screen: third benefit detail"
+  },
+  "checkEmailSpamTip": "Can't find it? Look in Spam or Promotions.",
+  "@checkEmailSpamTip": {
+    "description": "Hint under the benefits"
+  },
+  "checkEmailResendButton": "Resend email",
+  "@checkEmailResendButton": {
+    "description": "Button to send the confirmation email again"
+  },
+  "checkEmailResent": "Sent again. Check your inbox.",
+  "@checkEmailResent": {
+    "description": "Snackbar after the confirmation email was sent again"
+  },
+  "backToSignInButton": "Back to sign in",
+  "@backToSignInButton": {
+    "description": "Button that leaves the check-email screen"
+  },
+  "setupBreatherTitle": "Great choices!",
+  "@setupBreatherTitle": {
+    "description": "Short pause screen after the food-likes step (step 5)"
+  },
+  "setupBreatherBody": "Now a few quick health questions, so every meal is safe for you.",
+  "@setupBreatherBody": {
+    "description": "Pause screen after step 5, before the health questions"
   }
 }

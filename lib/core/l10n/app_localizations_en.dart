@@ -119,9 +119,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailLabel => 'Email';
 
   @override
-  String get emailHint => 'user@email.com';
-
-  @override
   String get passwordLabel => 'Password';
 
   @override
@@ -141,10 +138,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signUpLink => 'Sign up';
-
-  @override
-  String get signupConfirmationSent =>
-      'Almost there! We\'ve sent a confirmation link to your email.';
 
   @override
   String get signupTitleLead => 'Create your';
@@ -682,10 +675,65 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t save your answers. Please try again.';
 
   @override
+  String get setupSaveNoConnection =>
+      'No internet connection. Your answers are kept on this screen: reconnect, then tap Try again.';
+
+  @override
   String recipeDetailsTitle(String id) {
     return 'Recipe $id';
   }
 
   @override
   String get fieldNewPasswordMissing => 'Please enter a password';
+
+  @override
+  String get checkEmailTitle => 'Check your email';
+
+  @override
+  String checkEmailBody(String email) {
+    return 'We\'ve sent a confirmation link to $email. Open it on this phone and we\'ll take you straight in.';
+  }
+
+  @override
+  String get checkEmailWhileYouWait => 'While you wait';
+
+  @override
+  String get checkEmailPerkTasteTitle => 'Meals made for your taste';
+
+  @override
+  String get checkEmailPerkTasteBody =>
+      'Ndolé, eru, corn fufu and more, picked for you.';
+
+  @override
+  String get checkEmailPerkBudgetTitle => 'Plans that fit your budget';
+
+  @override
+  String get checkEmailPerkBudgetBody =>
+      'Plan the week\'s meals in FCFA, with no surprises.';
+
+  @override
+  String get checkEmailPerkHealthTitle => 'Good for your health';
+
+  @override
+  String get checkEmailPerkHealthBody =>
+      'We respect your diet, allergies and goals.';
+
+  @override
+  String get checkEmailSpamTip => 'Can\'t find it? Look in Spam or Promotions.';
+
+  @override
+  String get checkEmailResendButton => 'Resend email';
+
+  @override
+  String get checkEmailResent => 'Sent again. Check your inbox.';
+
+  @override
+  String get backToSignInButton => 'Back to sign in';
+
+  @override
+  String get setupBreatherTitle => 'Great choices!';
+
+  @override
+  String get setupBreatherBody =>
+      'Now a few quick health questions, so every meal is safe for you.';
 }

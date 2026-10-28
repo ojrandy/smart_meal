@@ -72,6 +72,7 @@ class _SetupProcessingScreenState extends ConsumerState<SetupProcessingScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(setupNotifierProvider);
     final failed = state is SetupFailed;
+    final noConnection = state is SetupFailed && state.noConnection;
     final l10n = context.l10n;
     final stages = _stagesFor(l10n);
 
@@ -146,8 +147,18 @@ class _SetupProcessingScreenState extends ConsumerState<SetupProcessingScreen> {
                         ),
                       ),
                   ] else ...[
+                    Icon(
+                      noConnection
+                          ? Icons.wifi_off_rounded
+                          : Icons.error_outline_rounded,
+                      color: AppColors.textSecondary,
+                      size: 36,
+                    ),
+                    const SizedBox(height: 16),
                     Text(
-                      l10n.setupSaveFailed,
+                      noConnection
+                          ? l10n.setupSaveNoConnection
+                          : l10n.setupSaveFailed,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 16,

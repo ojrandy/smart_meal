@@ -7,6 +7,7 @@ import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
+import '../../features/auth/presentation/screens/check_email_screen.dart';
 import '../../features/auth/domain/auth_session.dart';
 import '../../features/auth/domain/password_recovery.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
@@ -106,6 +107,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/auth/forgot-password',
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: checkEmailRoute,
+        // Only reachable from sign-up, which passes the address; anything
+        // else (e.g. a restored location) goes to sign-in.
+        redirect: (context, state) =>
+            state.extra is String ? null : '/auth/login',
+        builder: (context, state) =>
+            CheckEmailScreen(email: state.extra! as String),
       ),
       GoRoute(
         path: resetPasswordRoute,

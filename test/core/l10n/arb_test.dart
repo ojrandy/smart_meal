@@ -29,7 +29,6 @@ void main() {
   // dish names, units.
   const sameInBoth = {
     'appName',
-    'emailHint',
     'cuisineCameroonianHint',
     'cuisineIndianHint',
     'cookTimeMinutes',

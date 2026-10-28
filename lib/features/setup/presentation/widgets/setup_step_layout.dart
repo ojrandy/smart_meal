@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_button.dart';
@@ -112,6 +114,7 @@ class SetupStepLayout extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _StepIllustration(step: step),
                     Semantics(
                       header: true,
                       child: Text(
@@ -165,6 +168,78 @@ class SetupStepLayout extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// A large illustration at the top of each question whose scene follows the
+/// step (owner request, 2026-10-28), so the flow feels guided and friendly.
+/// It takes about 40% of the screen height and scrolls with the question,
+/// so it never covers an answer; it steps aside while the keyboard is open.
+/// Decorative: screen readers skip it.
+class _StepIllustration extends StatelessWidget {
+  const _StepIllustration({required this.step});
+
+  final SetupStep step;
+
+  /// Share of the screen height, bounded so small phones keep room for the
+  /// question and tablets don't get a giant picture.
+  static const _heightFactor = 0.4;
+  static const _minHeight = 180.0;
+  static const _maxHeight = 380.0;
+
+  static String _assetFor(SetupStep step) => switch (step) {
+    SetupStep.lifestyle => AppAssets.setupLifestyle,
+    SetupStep.household => AppAssets.setupHousehold,
+    SetupStep.budget => AppAssets.setupBudget,
+    SetupStep.cooking => AppAssets.setupCooking,
+    SetupStep.cuisines => AppAssets.setupCuisines,
+    SetupStep.consent => AppAssets.setupConsent,
+    SetupStep.diet => AppAssets.setupDiet,
+    SetupStep.allergies => AppAssets.setupAllergies,
+    SetupStep.goals => AppAssets.setupGoals,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.viewInsetsOf(context).bottom > 0) {
+      return const SizedBox.shrink();
+    }
+
+    final height = (MediaQuery.sizeOf(context).height * _heightFactor).clamp(
+      _minHeight,
+      _maxHeight,
+    );
+
+    final illustration = Container(
+      height: height,
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+      decoration: BoxDecoration(
+        color: AppColors.primaryLight,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Image.asset(
+        _assetFor(step),
+        fit: BoxFit.contain,
+        excludeFromSemantics: true,
+        // A missing asset must never break the question.
+        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: MediaQuery.disableAnimationsOf(context)
+          ? illustration
+          : illustration
+                .animate(key: ValueKey(step))
+                .fadeIn(duration: 350.ms)
+                .scale(
+                  begin: const Offset(0.94, 0.94),
+                  duration: 450.ms,
+                  curve: Curves.easeOutBack,
+                ),
     );
   }
 }

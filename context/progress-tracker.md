@@ -68,8 +68,8 @@ Last reviewed: **2026-10-27** (L10N — English + French on `main`, French appro
 |---|---|---|
 | `/setup/loading` | 🟡 | P15: `SetupLoadingScreen` — waits for the setup check, offline with nothing cached → "No connection…" + Try again + Sign out, unfinished → `/setup/lifestyle`. Built in app style (owner); final look may change in P16 |
 | `/setup/lifestyle` (steps 1–4) | 🟡 | P16: one question per step — lifestyle, household (1–20), budget in FCFA with non-blocking advice, cooking skill + time. Plain Cameroonian wording. Pending: owner phone check |
-| `/setup/preferences` (steps 5–9) | 🟡 | P16: kinds of food (like / don't like), consent (required), diet, allergies ("No, none" is an answer), health goals (optional). Pending: owner phone check |
-| `/setup/processing` (AI processing experience) | 🟡 | P16: saves through the atomic `complete_setup` RPC with a 2.1 s minimum display, retry on failure; the router then goes home. First recommendations come with P17 |
+| `/setup/preferences` (steps 5–9) | 🟡 | P16: kinds of food (like / don't like), consent (required), diet, allergies ("No, none" is an answer), health goals (optional). Pending: owner phone check. 2026-10-28: every step shows a large unDraw illustration (40 % of screen height); short pause after step 5 |
+| `/setup/processing` (AI processing experience) | 🟡 | P16: saves through the atomic `complete_setup` RPC with a 2.1 s minimum display, retry on failure; the router then goes home. 2026-10-28: offline or timed out (20 s, `TimeoutHttpClient`) → "No internet connection…" + Try again, answers kept. First recommendations come with P17 |
 | Supabase `user_preferences` table | ✅ | P13 schema (live); written by P16's `complete_setup` RPC |
 | Setup status gate | 🟡 | P15: `SetupStatusRepository` + `setupStatusProvider`; refresh on sign-in, resume, retry; per-user cache cleared on sign-out |
 

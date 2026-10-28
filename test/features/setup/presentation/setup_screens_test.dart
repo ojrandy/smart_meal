@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_meal/core/constants/app_assets.dart';
 import 'package:smart_meal/core/l10n/l10n.dart';
 import 'package:smart_meal/core/providers/shared_preferences_provider.dart';
 import 'package:smart_meal/core/theme/app_fonts.dart';
@@ -274,6 +276,26 @@ void main() {
     expect(h.notifier.draft.cuisines, isEmpty);
   });
 
+  testWidgets('after the food step, a short pause before the health ones', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      location: '/setup/preferences',
+      draft: completeDraft(),
+      step: SetupStep.cuisines,
+    );
+
+    await tester.ensureVisible(find.text('Continue'));
+    await tester.tap(find.text('Continue'));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('Great choices!'), findsOneWidget);
+
+    await tester.pumpAndSettle();
+    expect(find.text('Great choices!'), findsNothing);
+    expect(find.text('Your health information, your choice'), findsOneWidget);
+  });
+
   testWidgets('consent is required before the health questions', (
     tester,
   ) async {
@@ -351,7 +373,7 @@ void main() {
       draft: completeDraft(),
       step: SetupStep.goals,
     );
-    h.setup.onComplete = (_) => throw const SocketException('down');
+    h.setup.onComplete = (_) => throw StateError('server refused');
 
     await _tap(tester, 'Skip');
     await tester.pump(const Duration(seconds: 3));
@@ -368,6 +390,55 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pump();
     expect(h.container.read(setupStatusProvider), SetupStatus.complete);
+  });
+
+  for (final (name, error) in [
+    ('offline', const SocketException('down')),
+    ('timed out', TimeoutException('slow')),
+  ]) {
+    testWidgets('a save that fails $name says there is no connection and '
+        'keeps the answers for a retry', (tester) async {
+      final h = await _pump(
+        tester,
+        location: '/setup/preferences',
+        draft: completeDraft(),
+        step: SetupStep.goals,
+      );
+      h.setup.onComplete = (_) => throw error;
+
+      await _tap(tester, 'Skip');
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('No internet connection'), findsOneWidget);
+      expect(find.byIcon(Icons.wifi_off_rounded), findsOneWidget);
+      expect(find.text('Personalising your meals…'), findsNothing);
+
+      h.setup.onComplete = null;
+      await tester.tap(find.text('Try again'));
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pump();
+      expect(h.setup.saved, hasLength(1));
+      expect(h.container.read(setupStatusProvider), SetupStatus.complete);
+    });
+  }
+
+  testWidgets('every step shows its illustration above the question', (
+    tester,
+  ) async {
+    await _pump(tester);
+
+    final image = tester.widget<Image>(
+      find.byWidgetPredicate(
+        (w) =>
+            w is Image &&
+            w.image is AssetImage &&
+            (w.image as AssetImage).assetName == AppAssets.setupLifestyle,
+      ),
+    );
+    expect(image.excludeFromSemantics, isTrue);
+    final top = tester.getTopLeft(find.text('What best describes you?')).dy;
+    expect(tester.getBottomLeft(find.byWidget(image)).dy, lessThan(top));
   });
 
   testWidgets('opening processing without a finished draft goes back to the '

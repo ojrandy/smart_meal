@@ -59,7 +59,8 @@ Future<SharedPreferences> _pump(
     ),
   );
   await tester.runAsync(GoogleFonts.pendingFonts);
-  await tester.pump();
+  // Settles the photo zoom and text entrance (onboarding animates once).
+  await tester.pumpAndSettle();
   return prefs;
 }
 

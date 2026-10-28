@@ -123,9 +123,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get emailLabel => 'E-mail';
 
   @override
-  String get emailHint => 'nom@email.com';
-
-  @override
   String get passwordLabel => 'Mot de passe';
 
   @override
@@ -145,10 +142,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get signUpLink => 'S\'inscrire';
-
-  @override
-  String get signupConfirmationSent =>
-      'Presque fini ! Nous avons envoyé un lien de confirmation à votre e-mail.';
 
   @override
   String get signupTitleLead => 'Créez votre';
@@ -691,10 +684,67 @@ class AppLocalizationsFr extends AppLocalizations {
       'Nous n\'avons pas pu enregistrer vos réponses. Veuillez réessayer.';
 
   @override
+  String get setupSaveNoConnection =>
+      'Pas de connexion Internet. Vos réponses sont conservées sur cet écran : reconnectez-vous, puis appuyez sur Réessayer.';
+
+  @override
   String recipeDetailsTitle(String id) {
     return 'Recette $id';
   }
 
   @override
   String get fieldNewPasswordMissing => 'Veuillez saisir un mot de passe';
+
+  @override
+  String get checkEmailTitle => 'Vérifiez vos e-mails';
+
+  @override
+  String checkEmailBody(String email) {
+    return 'Nous avons envoyé un lien de confirmation à $email. Ouvrez-le sur ce téléphone et nous vous connecterons directement.';
+  }
+
+  @override
+  String get checkEmailWhileYouWait => 'En attendant';
+
+  @override
+  String get checkEmailPerkTasteTitle => 'Des repas à votre goût';
+
+  @override
+  String get checkEmailPerkTasteBody =>
+      'Ndolé, eru, couscous de maïs et plus, choisis pour vous.';
+
+  @override
+  String get checkEmailPerkBudgetTitle => 'Des menus adaptés à votre budget';
+
+  @override
+  String get checkEmailPerkBudgetBody =>
+      'Planifiez les repas de la semaine en FCFA, sans surprise.';
+
+  @override
+  String get checkEmailPerkHealthTitle => 'Bon pour votre santé';
+
+  @override
+  String get checkEmailPerkHealthBody =>
+      'Nous respectons votre régime, vos allergies et vos objectifs.';
+
+  @override
+  String get checkEmailSpamTip =>
+      'Vous ne le trouvez pas ? Regardez dans Spam ou Promotions.';
+
+  @override
+  String get checkEmailResendButton => 'Renvoyer l\'e-mail';
+
+  @override
+  String get checkEmailResent =>
+      'E-mail renvoyé. Vérifiez votre boîte de réception.';
+
+  @override
+  String get backToSignInButton => 'Retour à la connexion';
+
+  @override
+  String get setupBreatherTitle => 'Excellents choix !';
+
+  @override
+  String get setupBreatherBody =>
+      'Maintenant, quelques questions rapides sur votre santé, pour que chaque repas vous convienne.';
 }

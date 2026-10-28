@@ -68,7 +68,8 @@ void main() {
         }
         await GoogleFonts.pendingFonts();
       });
-      await tester.pump();
+      // Settles one-shot entrance animations (e.g. onboarding's photo zoom).
+      await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
       expect(find.textContaining('missing'), findsNothing);

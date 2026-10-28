@@ -28,6 +28,7 @@ class LaunchSnapshot {
 }
 
 const resetPasswordRoute = '/auth/reset-password';
+const checkEmailRoute = '/auth/check-email';
 const setupEntryRoute = '/setup/loading';
 const homeRoute = '/home';
 

@@ -35,6 +35,7 @@ class FakeAuthRepository implements AuthRepository {
   Future<AuthResponse> Function()? onSignInWithGoogle;
   Future<void> Function()? onSignOut;
   Future<void> Function()? onResetPassword;
+  Future<void> Function()? onResendSignupConfirmation;
   Future<void> Function(String password)? onUpdatePassword;
   Future<void> Function()? onSignOutOtherSessions;
   Future<void> Function()? onDeleteAccount;
@@ -69,6 +70,10 @@ class FakeAuthRepository implements AuthRepository {
     required String email,
     required String password,
   }) => (onSignUp ?? (throw UnimplementedError()))();
+
+  @override
+  Future<void> resendSignupConfirmation(String email) =>
+      (onResendSignupConfirmation ?? (throw UnimplementedError()))();
 
   @override
   Future<AuthResponse> signIn({

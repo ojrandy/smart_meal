@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/formatting/fcfa.dart';
@@ -40,6 +43,12 @@ class SetupQuestionsScreen extends ConsumerStatefulWidget {
 class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
   late final TextEditingController _budgetController;
   bool _showMissing = false;
+
+  /// True during the short pause after the food-likes step (step 5), before
+  /// the health questions, so the questionnaire does not feel endless
+  /// (owner request, 2026-10-27).
+  bool _breather = false;
+  static const _breatherHold = Duration(milliseconds: 1800);
 
   SetupNotifier get _notifier => ref.read(setupNotifierProvider.notifier);
 
@@ -93,10 +102,22 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
       context.go(_processingRoute);
       return;
     }
+    if (step == SetupStep.cuisines) {
+      unawaited(_pauseThenNext());
+      return;
+    }
     final next = _notifier.next();
     if (next.isLifestyleSection != widget.lifestyleSection) {
       context.go(_preferencesRoute);
     }
+  }
+
+  Future<void> _pauseThenNext() async {
+    setState(() => _breather = true);
+    await Future<void>.delayed(_breatherHold);
+    if (!mounted) return;
+    _notifier.next();
+    setState(() => _breather = false);
   }
 
   void _back(SetupStep step) {
@@ -109,6 +130,9 @@ class _SetupQuestionsScreenState extends ConsumerState<SetupQuestionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_breather) {
+      return const PopScope(canPop: false, child: _SetupBreather());
+    }
     final state = ref.watch(setupNotifierProvider);
     final step = state is SetupEditing ? state.step : SetupStep.goals;
     final draft = state.draft;
@@ -607,6 +631,91 @@ class _BudgetAdviceNote extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The pause after step 5: a spinner around a bowl, a cheer, and what comes
+/// next. It moves on by itself after [_SetupQuestionsScreenState._breatherHold].
+class _SetupBreather extends StatelessWidget {
+  const _SetupBreather();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(
+          width: 88,
+          height: 88,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox.expand(
+                child: CircularProgressIndicator(
+                  strokeWidth: 4,
+                  color: AppColors.primary,
+                  backgroundColor: AppColors.primaryLight,
+                ),
+              ),
+              ExcludeSemantics(
+                child: Text(
+                  '🍲',
+                  textScaler: TextScaler.noScaling,
+                  style: TextStyle(fontSize: 34, height: 1),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 28),
+        Semantics(
+          liveRegion: true,
+          child: Text(
+            l10n.setupBreatherTitle,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          l10n.setupBreatherBody,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 16,
+            color: AppColors.textSecondary,
+            height: 1.5,
+          ),
+        ),
+      ],
+    );
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: reduceMotion
+                ? content
+                : content
+                      .animate()
+                      .fadeIn(duration: 350.ms)
+                      .scale(
+                        begin: const Offset(0.92, 0.92),
+                        duration: 450.ms,
+                        curve: Curves.easeOutBack,
+                      ),
+          ),
         ),
       ),
     );

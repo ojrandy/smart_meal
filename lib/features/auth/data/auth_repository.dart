@@ -162,6 +162,15 @@ class AuthRepository {
     await _client.auth.signOut();
   }
 
+  /// Sends the sign-up confirmation email to [email] again.
+  Future<void> resendSignupConfirmation(String email) {
+    return _client.auth.resend(
+      type: OtpType.signup,
+      email: email,
+      emailRedirectTo: authRedirectUri,
+    );
+  }
+
   // ── Password Reset ─────────────────────────────────────────────────────────
 
   /// Sends a password reset email to [email]. The link opens the app, and

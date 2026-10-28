@@ -106,7 +106,6 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                   CustomTextField(
                     label: l10n.newPasswordLabel,
-                    hint: '••••••••',
                     prefixIcon: Iconsax.lock,
                     isPassword: true,
                     controller: _passwordController,
@@ -117,7 +116,6 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                   CustomTextField(
                     label: l10n.confirmNewPasswordLabel,
-                    hint: '••••••••',
                     prefixIcon: Iconsax.lock,
                     isPassword: true,
                     controller: _confirmController,

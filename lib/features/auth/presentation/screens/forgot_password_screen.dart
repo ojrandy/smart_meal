@@ -138,7 +138,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
                   CustomTextField(
                     label: l10n.emailLabel,
-                    hint: l10n.emailHint,
                     prefixIcon: Iconsax.sms,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,

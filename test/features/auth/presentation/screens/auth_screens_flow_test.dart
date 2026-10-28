@@ -10,6 +10,7 @@ import 'package:smart_meal/core/theme/app_theme.dart';
 import 'package:smart_meal/core/widgets/custom_button.dart';
 import 'package:smart_meal/core/widgets/social_auth_button.dart';
 import 'package:smart_meal/features/auth/data/auth_repository.dart';
+import 'package:smart_meal/features/auth/presentation/screens/check_email_screen.dart';
 import 'package:smart_meal/features/auth/presentation/screens/login_screen.dart';
 import 'package:smart_meal/features/auth/presentation/screens/signup_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthResponse;
@@ -28,6 +29,10 @@ Future<FakeAuthRepository> _pump(WidgetTester tester, String location) async {
     routes: [
       GoRoute(path: '/auth/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/auth/signup', builder: (_, _) => const SignupScreen()),
+      GoRoute(
+        path: '/auth/check-email',
+        builder: (_, state) => CheckEmailScreen(email: state.extra! as String),
+      ),
     ],
   );
   addTearDown(router.dispose);
@@ -175,24 +180,59 @@ void main() {
       expect(find.text("Passwords don't match"), findsOneWidget);
     });
 
-    testWidgets('without a session, confirms by email and goes to sign-in', (
-      tester,
-    ) async {
+    // The check-email screen animates without end, so these tests pump
+    // fixed durations instead of settling.
+    Future<FakeAuthRepository> signUpAndWait(WidgetTester tester) async {
       final repo = await _pump(tester, '/auth/signup');
       repo.onSignUp = () async => AuthResponse(user: testUser());
       await tester.enterText(_field(0), 'cook@example.com');
       await tester.enterText(_field(1), 'Abcdef1!');
       await tester.enterText(_field(2), 'Abcdef1!');
-
       await _tapText(tester, 'Create Account ✨');
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 2));
+      return repo;
+    }
 
+    testWidgets('without a session, shows the check-email screen', (
+      tester,
+    ) async {
+      await signUpAndWait(tester);
+
+      expect(find.byType(CheckEmailScreen), findsOneWidget);
+      expect(find.text('Check your email'), findsOneWidget);
       expect(
-        find.text(
-          "Almost there! We've sent a confirmation link to your email.",
-        ),
+        find.textContaining('cook@example.com', findRichText: true),
         findsOneWidget,
       );
+      expect(find.text('While you wait'), findsOneWidget);
+      // The first email just went out, so resend waits for the cooldown.
+      expect(find.textContaining('Resend in'), findsOneWidget);
+    });
+
+    testWidgets('check-email resends after the cooldown, then waits again', (
+      tester,
+    ) async {
+      final repo = await signUpAndWait(tester);
+      var resent = 0;
+      repo.onResendSignupConfirmation = () async => resent++;
+
+      await tester.pump(const Duration(seconds: 61));
+      await _tapText(tester, 'Resend email');
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(resent, 1);
+      expect(find.text('Sent again. Check your inbox.'), findsOneWidget);
+      expect(find.textContaining('Resend in'), findsOneWidget);
+      // Let the snackbar and cooldown run out before the test ends.
+      await tester.pump(const Duration(seconds: 61));
+    });
+
+    testWidgets('check-email leads back to sign-in', (tester) async {
+      await signUpAndWait(tester);
+
+      await _tapText(tester, 'Back to sign in');
+      await tester.pump(const Duration(seconds: 1));
+
       expect(find.byType(LoginScreen), findsOneWidget);
     });
   });

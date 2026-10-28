@@ -118,6 +118,17 @@ Add one row per screen built with the T1 template.
 | pgTAP tests | 0 | | P13 |
 
 ## Execution log
+### 2026-10-28 — Polish + offline — ✅ Owner approved, committed
+Agent/session: Claude Code (Opus 5.5)
+Summary: Owner requests 2026-10-27/28 on branch `l10n-bilingual`, uncommitted. Fixed Google sign-in: added an Android OAuth client, and the owner enabled the Supabase Google provider (`/auth/v1/settings` → `google: true`). Removed every field placeholder. Swapped in real West/Central African food photos (credits in `design-assets/source/PHOTO-CREDITS.md`). Gave the onboarding photos a slow zoom and made the text larger. Added an animated `/auth/check-email` screen with a resend cooldown after email sign-up. Added a short pause after setup step 5. Replaced the small step avatar with a large unDraw illustration per setup step (owner: "too small … 40–50 % of the screen"): 40 % of the screen height (180–380 px), recoloured to the app green with brown skin tones, at the top of the scrolling question and hidden while the keyboard is open. Offline (owner: "stuck at a personalization screen"): every Supabase request now goes through `TimeoutHttpClient` (20 s for the response to start and for each pause in the body), and `isConnectionError` turns a failed save into "No internet connection…" with a wifi-off icon and Try again, keeping the answers. Email sending: the owner set up Brevo SMTP; Supabase custom SMTP and the email rate limit are being set by the owner.
+Verification:
+  `flutter analyze` → no issues
+  `flutter test` → 344 passed (new: TimeoutHttpClient + isConnectionError unit tests, offline/timed-out save, step illustration)
+  debug APK built; owner (2026-10-28): "everything is okay. commit it"
+Inputs consumed: owner design decisions above
+New inputs or decisions needed: French wording of the new strings (check-email, breather, `setupSaveNoConnection`); Supabase SMTP and rate-limit setup; release SHA-1s for the Google Android client
+Known issues added/closed: closed — requests could hang forever offline (no timeout); closed — Google sign-in failed (no Android OAuth client, provider disabled)
+
 ### 2026-10-27 — L10N + CI — ⏸️ French approved, merged, on the owner's phone
 Agent/session: Claude Code (Opus 5.5)
 Summary: Owner (2026-10-27): French approved; install the app on the phone; run gitleaks locally. Gitleaks 8.30.1 (the CI version) with `.gitleaks.toml` over the full history found one finding: rule `generic-api-key`, `test/core/config/app_config_test.dart:91`, commit `887db90` (P07, 2026-10-20) — the fake values `'sb_secret_abc'` and `'eyJhbGciOiJIUzI1NiJ9.x.y'` that test AppConfig's refusal of secret keys. Not a credential, nothing to rotate. Added `.gitleaksignore` with that one fingerprint and the reason; any other finding still fails CI. Merged `l10n-bilingual` into `main` (fast-forward) and pushed. Built a profile APK from `main` (AOT like release, debug-signed because `android/key.properties` does not exist yet) with `env/dev.json` and installed it on the owner's Pixel 6a over adb.

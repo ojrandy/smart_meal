@@ -99,6 +99,29 @@ class AuthNotifier extends Notifier<SmartMealAuthState> {
     }
   }
 
+  /// Sends the confirmation email again. Like [resetPassword], a rate limit
+  /// answers as a sent email, so the screen never reveals the account state.
+  Future<void> resendSignupConfirmation(String email) async {
+    state = AuthLoading();
+    try {
+      await _repo.resendSignupConfirmation(email);
+      state = AuthAwaitingEmailConfirmation();
+    } catch (error, stackTrace) {
+      if (error is sb.AuthException &&
+          error.code == 'over_email_send_rate_limit') {
+        AppLogger.log(
+          'resendSignupConfirmation rate limited',
+          name: 'auth',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        state = AuthAwaitingEmailConfirmation();
+      } else {
+        state = _failure('resendSignupConfirmation', error, stackTrace);
+      }
+    }
+  }
+
   // ── Password Reset ─────────────────────────────────────────────────────────
 
   Future<void> resetPassword(String email) async {

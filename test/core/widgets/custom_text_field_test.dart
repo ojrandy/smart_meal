@@ -16,14 +16,12 @@ void main() {
             CustomTextField(
               key: const Key('plain'),
               label: 'Email',
-              hint: 'user@email.com',
               prefixIcon: Icons.mail,
               controller: TextEditingController(),
             ),
             CustomTextField(
               key: const Key('password'),
               label: 'Password',
-              hint: '••••••••',
               prefixIcon: Icons.lock,
               isPassword: true,
               controller: TextEditingController(text: 'secret'),
