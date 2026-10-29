@@ -1,6 +1,7 @@
 # SmartMeal — Data Model
 
-Schema v1, from P13 (owner-approved 2026-10-23). Source of truth:
+Schema v1, from P13 (owner-approved 2026-10-23), plus the food catalog
+from LF01 (owner-approved 2026-10-29). Source of truth:
 `supabase/migrations/`. This page explains the schema; when the two
 disagree, the migrations win — fix this page.
 
@@ -23,6 +24,7 @@ erDiagram
   cuisines ||--o{ user_cuisine_preferences : "liked / disliked"
   cuisines ||--o{ recipes : classifies
   recipes ||--o{ recipe_ingredients : lists
+  ingredients ||--o{ recipe_ingredients : "priced and measured by"
   recipes ||--o{ recipe_steps : describes
   recipes ||--o{ favorites : "saved in"
   recipes ||--o{ meal_plan_entries : "planned in"
@@ -45,7 +47,8 @@ cascade: P14's Edge Function deletes `avatars/{uid}/…`.
 | `cuisines` | Lookup | `slug` key; grows over time, so a table, not an enum. Reference data shipped by migration `20261024073206` (P16): cameroonian, west_african, italian, french, indian, chinese — names in plain words ("Cameroonian food"); the app adds familiar dish examples per slug |
 | `user_cuisine_preferences` | Like / dislike per cuisine | |
 | `recipes` | Catalog | Clients see `is_published` rows only. `allergens` never null (empty = none of the listed allergens). GIN indexes on `allergens` and `dietary_tags` for filters |
-| `recipe_ingredients`, `recipe_steps` | Recipe detail | Visible when the parent recipe is published. `quantity` null = "to taste" |
+| `recipe_ingredients`, `recipe_steps` | Recipe detail | Visible when the parent recipe is published. `name` / `quantity` / `unit` are the display text; `quantity` null = "to taste". `ingredient_id` + `amount` (in the food's pricing unit: 0.5 kg, 0.15 L, 2 pieces) say what the recipe consumes (LF01); frying oil counts only what the food absorbs |
+| `ingredients` | Food catalog (LF01) | Reference data from `docs/reference/ingredient-*.csv` via `tool/food_catalog.dart`. Price per `pricing_unit` (kg, litre or piece) with range, confidence, date and source; `grams_per_piece` (required for piece) and `density_g_per_ml` (required iff litre) convert every amount to grams; `edible_portion` (0–1) separates what is bought from what is eaten. 12 nutrients per 100 g edible portion, **null = unknown, never 0** (H2), with `nutrient_source`, `wafct_code`, `fdc_id`. `allergens`, `flags` (draft until `MEDICAL_RULES`), `aliases` (≤ 10 local names), `is_kitchen_staple` (setup "At home" grid), `is_active` (requires a price). 70 foods: 43 active, 27 waiting for a market price |
 | `favorites` | Saved recipes | Insert only for published recipes |
 | `meal_plans` | One per user per ISO week | `week_start` is a Monday. No update: delete and recreate |
 | `meal_plan_entries` | Slots in a plan | Carries the plan's `week_start` through a composite foreign key, so `plan_date` is checked to fall in the plan's week |
@@ -69,6 +72,10 @@ value`), never removed or renamed.
 | `meal_slot` | breakfast, lunch, dinner, snack |
 | `interaction_type` | viewed, favorited, unfavorited, planned, cooked, dismissed, rated |
 | `push_platform` | android, ios |
+| `pricing_unit` | kg, litre, piece |
+| `ingredient_category` | grains_flours, tubers_plantain, legumes_nuts_seeds, oils_fats, meat_poultry, fish_seafood, eggs_dairy, vegetables_leaves, fruits, spices_seasoning, other — also the My Kitchen shelves |
+| `ingredient_flag` | organ_meat, high_purine, processed_meat, alcohol, raw_or_undercooked_egg, high_mercury_fish, bouillon_cube, refined_starch, added_sugar, deep_fried, very_spicy, acidic — **draft** until the `MEDICAL_RULES` review |
+| `price_confidence` | high, medium, low |
 
 ## Access matrix
 
@@ -85,6 +92,8 @@ both `using` and `with check`. Writes are limited to listed columns, so
 | `user_cuisine_preferences` | own | own | own; `preference` | own |
 | `recipes` | published | — | — | — |
 | `recipe_ingredients`, `recipe_steps` | parent published | — | — | — |
+| `ingredients` | active rows | — | — | — |
+| `recipe_costs`, `recipe_nutrition` (views) | published recipes (security invoker: the RLS above applies) | — | — | — |
 | `favorites` | own | own, published recipe | — | own |
 | `meal_plans` | own | own | — | own |
 | `meal_plan_entries` | own plan | own plan, published recipe | own plan; date, slot, recipe, servings | own plan |
@@ -103,6 +112,7 @@ only write path for the catalog.
 | `private.set_updated_at()` | invoker | trigger only | `updated_at` maintenance |
 | `private.purge_expired_interactions()` | invoker | pg_cron (postgres) | 12-month retention |
 | `public.complete_setup(...)` | invoker | authenticated | P16. Validates every setup answer, then in one transaction upserts `user_preferences` (`allergens_declared = true`: an empty list means "None"), replaces `user_cuisine_preferences` and sets `profiles.setup_completed_at`. Requires `p_sensitive_data_consent = true` (owner: consent required). Budget 1–10 000 000 FCFA; low budgets are only *advised* against in the app. Profile (T1) reuses it to edit answers |
+| `private.check_recipe_publishable()` | invoker | deferred constraint triggers on `recipes`, `recipe_ingredients`, `ingredients` | LF01 publishing guard, checked at commit: a published recipe has at least one line, every measured line linked to a food with an amount, active foods only, and `recipes.allergens` covering every food's allergens (S11). Errors are `23514 recipe_not_publishable: …` |
 | `public.note_account_deletion_attempt(uuid)` | invoker | service_role only | P14 rate limit (5 per user per rolling hour) for the `delete-account` Edge Function; counters in `private.account_deletion_attempts`, swept after a day |
 
 ## Edge Functions
@@ -114,6 +124,16 @@ only write path for the catalog.
 `private` is not exposed through the Data API, and `authenticated` / `anon`
 have no usage on it.
 
+## Views (LF01)
+
+Both are `security_invoker`, so a caller sees only published recipes and
+active foods.
+
+| View | Per recipe | Rules |
+|---|---|---|
+| `recipe_costs` | `cost_xaf`, `cost_per_serving_xaf`, `cost_source` (`catalog` / `estimate`) | Σ amount × price. "To taste" lines without an amount count as free. If any other line lacks a catalog price, the hand-entered `recipes.est_cost_xaf` is the fallback (`estimate`); it is dropped once every recipe is catalog-costed |
+| `recipe_nutrition` | The 12 nutrients per serving, plus `energy_complete`, `macros_complete`, `minerals_complete`, `folate_complete`, `nutrition_complete` | amount → grams (kg × 1000, litre × 1000 × density, piece × grams per piece) × edible portion. Any line with no food, no amount or an unknown value makes that nutrient null for the recipe (H2); a food not eaten (edible portion 0) adds 0 |
+
 ## Storage
 
 | Bucket | Access | Limits |
@@ -123,7 +143,10 @@ have no usage on it.
 
 ## Seed
 
-`supabase/seed.sql`: 12 published recipes (cuisines come from the migration) (Ndolé, Eru, Achu,
-Koki, Poulet DG, Mbongo tchobi, jollof, puff-puff and four international).
-Local only. Prices are placeholders for the owner to validate; images are
-null so the app shows its fallback.
+`supabase/seed.sql`: 12 published recipes (cuisines and foods come from
+the migrations) (Ndolé, Eru, Achu, Koki, Poulet DG, Mbongo tchobi, jollof,
+puff-puff and four international). Local only. Every line is linked to a
+food, so costs come from the catalog. The 22 foods these recipes need that
+have no market price yet get **DEV PLACEHOLDER** prices in the seed (local
+only; `price_source` says so; never copied to production). Images are null
+so the app shows its fallback.

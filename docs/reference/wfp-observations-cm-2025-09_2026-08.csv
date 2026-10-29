@@ -1,0 +1,660 @@
+date,market,commodity,unit,price_xaf
+2025-09-15,Kumba,"Bananas",KG,398
+2025-09-15,Kumba,"Beans (niebe)",KG,1200
+2025-09-15,Kumba,"Beans (red)",KG,1200
+2025-09-15,Kumba,"Cassava (cossette)",KG,550
+2025-09-15,Kumba,"Cassava meal (gari)",KG,750
+2025-09-15,Kumba,"Cocoyam (macabo)",KG,1000
+2025-09-15,Kumba,"Groundnuts (shelled)",KG,1200
+2025-09-15,Kumba,"Leafy vegetables",KG,352
+2025-09-15,Kumba,"Maize (yellow)",KG,400
+2025-09-15,Kumba,"Milk (powder)",400 G,3500
+2025-09-15,Kumba,"Oil (palm)",L,1000
+2025-09-15,Kumba,"Okra (fresh)",KG,1038
+2025-09-15,Kumba,"Onions",KG,838
+2025-09-15,Kumba,"Plantains",KG,545
+2025-09-15,Kumba,"Potatoes (Irish)",KG,418
+2025-09-15,Kumba,"Potatoes",KG,418
+2025-09-15,Kumba,"Salt",KG,400
+2025-09-15,Kumba,"Sugar",KG,1000
+2025-09-15,Kumba,"Taro",KG,457
+2025-09-15,Kumba,"Tomatoes",KG,940
+2025-09-15,Kumba,"Yam",KG,807
+2025-09-15,Limbé,"Bananas",KG,378
+2025-09-15,Limbé,"Beans (niebe)",KG,900
+2025-09-15,Limbé,"Beans (red)",KG,1083
+2025-09-15,Limbé,"Cassava (cossette)",KG,482
+2025-09-15,Limbé,"Cassava meal (gari)",KG,540
+2025-09-15,Limbé,"Cocoyam (macabo)",KG,712
+2025-09-15,Limbé,"Groundnuts (shelled)",KG,1150
+2025-09-15,Limbé,"Leafy vegetables",KG,500
+2025-09-15,Limbé,"Maize (yellow)",KG,422
+2025-09-15,Limbé,"Milk (powder)",400 G,3517
+2025-09-15,Limbé,"Oil (palm)",L,933
+2025-09-15,Limbé,"Okra (fresh)",KG,970
+2025-09-15,Limbé,"Onions",KG,558
+2025-09-15,Limbé,"Plantains",KG,467
+2025-09-15,Limbé,"Potatoes (Irish)",KG,468
+2025-09-15,Limbé,"Potatoes",KG,293
+2025-09-15,Limbé,"Salt",KG,323
+2025-09-15,Limbé,"Sugar",KG,800
+2025-09-15,Limbé,"Taro",KG,565
+2025-09-15,Limbé,"Tomatoes",KG,470
+2025-09-15,Limbé,"Yam",KG,885
+2025-09-15,Muea,"Bananas",KG,334
+2025-09-15,Muea,"Beans (niebe)",KG,900
+2025-09-15,Muea,"Beans (red)",KG,1200
+2025-09-15,Muea,"Cassava (cossette)",KG,463
+2025-09-15,Muea,"Cassava meal (gari)",KG,546
+2025-09-15,Muea,"Cocoyam (macabo)",KG,793
+2025-09-15,Muea,"Groundnuts (shelled)",KG,1200
+2025-09-15,Muea,"Leafy vegetables",KG,292
+2025-09-15,Muea,"Maize (yellow)",KG,415
+2025-09-15,Muea,"Milk (powder)",400 G,3500
+2025-09-15,Muea,"Oil (palm)",L,1000
+2025-09-15,Muea,"Okra (fresh)",KG,967
+2025-09-15,Muea,"Onions",KG,492
+2025-09-15,Muea,"Plantains",KG,314
+2025-09-15,Muea,"Potatoes (Irish)",KG,529
+2025-09-15,Muea,"Potatoes",KG,333
+2025-09-15,Muea,"Salt",KG,317
+2025-09-15,Muea,"Sugar",KG,800
+2025-09-15,Muea,"Taro",KG,513
+2025-09-15,Muea,"Tomatoes",KG,531
+2025-09-15,Muea,"Yam",KG,873
+2025-09-15,Mutengene,"Bananas",KG,429
+2025-09-15,Mutengene,"Beans (niebe)",KG,900
+2025-09-15,Mutengene,"Beans (red)",KG,844
+2025-09-15,Mutengene,"Cassava (cossette)",KG,476
+2025-09-15,Mutengene,"Cassava meal (gari)",KG,594
+2025-09-15,Mutengene,"Cocoyam (macabo)",KG,626
+2025-09-15,Mutengene,"Groundnuts (shelled)",KG,1200
+2025-09-15,Mutengene,"Leafy vegetables",KG,520
+2025-09-15,Mutengene,"Maize (yellow)",KG,403
+2025-09-15,Mutengene,"Milk (powder)",400 G,3500
+2025-09-15,Mutengene,"Oil (palm)",L,1000
+2025-09-15,Mutengene,"Okra (fresh)",KG,923
+2025-09-15,Mutengene,"Onions",KG,638
+2025-09-15,Mutengene,"Plantains",KG,559
+2025-09-15,Mutengene,"Potatoes (Irish)",KG,460
+2025-09-15,Mutengene,"Potatoes",KG,352
+2025-09-15,Mutengene,"Salt",KG,383
+2025-09-15,Mutengene,"Sugar",KG,906
+2025-09-15,Mutengene,"Taro",KG,501
+2025-09-15,Mutengene,"Tomatoes",KG,490
+2025-09-15,Mutengene,"Yam",KG,976
+2025-09-15,Tiko,"Bananas",KG,433
+2025-09-15,Tiko,"Beans (niebe)",KG,900
+2025-09-15,Tiko,"Beans (red)",KG,917
+2025-09-15,Tiko,"Cassava (cossette)",KG,498
+2025-09-15,Tiko,"Cassava meal (gari)",KG,617
+2025-09-15,Tiko,"Cocoyam (macabo)",KG,697
+2025-09-15,Tiko,"Groundnuts (shelled)",KG,1067
+2025-09-15,Tiko,"Leafy vegetables",KG,400
+2025-09-15,Tiko,"Maize (yellow)",KG,413
+2025-09-15,Tiko,"Milk (powder)",400 G,3500
+2025-09-15,Tiko,"Oil (palm)",L,1000
+2025-09-15,Tiko,"Okra (fresh)",KG,988
+2025-09-15,Tiko,"Onions",KG,713
+2025-09-15,Tiko,"Plantains",KG,502
+2025-09-15,Tiko,"Potatoes (Irish)",KG,437
+2025-09-15,Tiko,"Potatoes",KG,333
+2025-09-15,Tiko,"Salt",KG,367
+2025-09-15,Tiko,"Sugar",KG,883
+2025-09-15,Tiko,"Taro",KG,517
+2025-09-15,Tiko,"Tomatoes",KG,443
+2025-09-15,Tiko,"Yam",KG,995
+2025-10-15,Buea,"Bananas",KG,563
+2025-10-15,Buea,"Beans (niebe)",KG,1200
+2025-10-15,Buea,"Beans (red)",KG,1200
+2025-10-15,Buea,"Cassava (cossette)",KG,500
+2025-10-15,Buea,"Cassava meal (gari)",KG,695
+2025-10-15,Buea,"Cocoyam (macabo)",KG,968
+2025-10-15,Buea,"Groundnuts (shelled)",KG,1317
+2025-10-15,Buea,"Leafy vegetables",KG,434
+2025-10-15,Buea,"Maize (yellow)",KG,433
+2025-10-15,Buea,"Milk (powder)",400 G,3500
+2025-10-15,Buea,"Oil (palm)",L,967
+2025-10-15,Buea,"Okra (fresh)",KG,2381
+2025-10-15,Buea,"Onions",KG,745
+2025-10-15,Buea,"Plantains",KG,571
+2025-10-15,Buea,"Potatoes (Irish)",KG,628
+2025-10-15,Buea,"Potatoes",KG,363
+2025-10-15,Buea,"Salt",KG,300
+2025-10-15,Buea,"Sugar",KG,967
+2025-10-15,Buea,"Taro",KG,563
+2025-10-15,Buea,"Tomatoes",KG,883
+2025-10-15,Buea,"Yam",KG,871
+2025-10-15,Kumba,"Bananas",KG,398
+2025-10-15,Kumba,"Beans (niebe)",KG,1200
+2025-10-15,Kumba,"Beans (red)",KG,1200
+2025-10-15,Kumba,"Cassava (cossette)",KG,550
+2025-10-15,Kumba,"Cassava meal (gari)",KG,750
+2025-10-15,Kumba,"Cocoyam (macabo)",KG,1000
+2025-10-15,Kumba,"Groundnuts (shelled)",KG,1200
+2025-10-15,Kumba,"Leafy vegetables",KG,364
+2025-10-15,Kumba,"Maize (yellow)",KG,400
+2025-10-15,Kumba,"Milk (powder)",400 G,3500
+2025-10-15,Kumba,"Oil (palm)",L,1000
+2025-10-15,Kumba,"Okra (fresh)",KG,1125
+2025-10-15,Kumba,"Onions",KG,900
+2025-10-15,Kumba,"Plantains",KG,549
+2025-10-15,Kumba,"Potatoes (Irish)",KG,459
+2025-10-15,Kumba,"Potatoes",KG,390
+2025-10-15,Kumba,"Salt",KG,400
+2025-10-15,Kumba,"Sugar",KG,1000
+2025-10-15,Kumba,"Taro",KG,576
+2025-10-15,Kumba,"Tomatoes",KG,846
+2025-10-15,Kumba,"Yam",KG,807
+2025-10-15,Muea,"Bananas",KG,317
+2025-10-15,Muea,"Beans (niebe)",KG,900
+2025-10-15,Muea,"Beans (red)",KG,1200
+2025-10-15,Muea,"Cassava (cossette)",KG,463
+2025-10-15,Muea,"Cassava meal (gari)",KG,546
+2025-10-15,Muea,"Cocoyam (macabo)",KG,827
+2025-10-15,Muea,"Groundnuts (shelled)",KG,1200
+2025-10-15,Muea,"Leafy vegetables",KG,354
+2025-10-15,Muea,"Maize (yellow)",KG,415
+2025-10-15,Muea,"Milk (powder)",400 G,3500
+2025-10-15,Muea,"Oil (palm)",L,1000
+2025-10-15,Muea,"Okra (fresh)",KG,928
+2025-10-15,Muea,"Onions",KG,503
+2025-10-15,Muea,"Plantains",KG,354
+2025-10-15,Muea,"Potatoes (Irish)",KG,554
+2025-10-15,Muea,"Potatoes",KG,353
+2025-10-15,Muea,"Salt",KG,308
+2025-10-15,Muea,"Sugar",KG,808
+2025-10-15,Muea,"Taro",KG,580
+2025-10-15,Muea,"Tomatoes",KG,625
+2025-10-15,Muea,"Yam",KG,898
+2025-10-15,Mutengene,"Bananas",KG,333
+2025-10-15,Mutengene,"Beans (niebe)",KG,900
+2025-10-15,Mutengene,"Beans (red)",KG,1200
+2025-10-15,Mutengene,"Cassava (cossette)",KG,463
+2025-10-15,Mutengene,"Cassava meal (gari)",KG,545
+2025-10-15,Mutengene,"Cocoyam (macabo)",KG,680
+2025-10-15,Mutengene,"Groundnuts (shelled)",KG,1200
+2025-10-15,Mutengene,"Leafy vegetables",KG,528
+2025-10-15,Mutengene,"Maize (yellow)",KG,415
+2025-10-15,Mutengene,"Milk (powder)",400 G,3500
+2025-10-15,Mutengene,"Oil (palm)",L,1000
+2025-10-15,Mutengene,"Okra (fresh)",KG,943
+2025-10-15,Mutengene,"Onions",KG,628
+2025-10-15,Mutengene,"Plantains",KG,577
+2025-10-15,Mutengene,"Potatoes (Irish)",KG,528
+2025-10-15,Mutengene,"Potatoes",KG,347
+2025-10-15,Mutengene,"Salt",KG,383
+2025-10-15,Mutengene,"Sugar",KG,843
+2025-10-15,Mutengene,"Taro",KG,510
+2025-10-15,Mutengene,"Tomatoes",KG,525
+2025-10-15,Mutengene,"Yam",KG,977
+2025-10-15,Tiko,"Bananas",KG,333
+2025-10-15,Tiko,"Beans (niebe)",KG,900
+2025-10-15,Tiko,"Beans (red)",KG,1200
+2025-10-15,Tiko,"Cassava (cossette)",KG,437
+2025-10-15,Tiko,"Cassava meal (gari)",KG,547
+2025-10-15,Tiko,"Cocoyam (macabo)",KG,775
+2025-10-15,Tiko,"Groundnuts (shelled)",KG,1200
+2025-10-15,Tiko,"Leafy vegetables",KG,517
+2025-10-15,Tiko,"Maize (yellow)",KG,415
+2025-10-15,Tiko,"Milk (powder)",400 G,3500
+2025-10-15,Tiko,"Oil (palm)",L,1000
+2025-10-15,Tiko,"Okra (fresh)",KG,662
+2025-10-15,Tiko,"Onions",KG,700
+2025-10-15,Tiko,"Plantains",KG,408
+2025-10-15,Tiko,"Potatoes (Irish)",KG,617
+2025-10-15,Tiko,"Potatoes",KG,388
+2025-10-15,Tiko,"Salt",KG,317
+2025-10-15,Tiko,"Sugar",KG,800
+2025-10-15,Tiko,"Taro",KG,583
+2025-10-15,Tiko,"Tomatoes",KG,487
+2025-10-15,Tiko,"Yam",KG,1018
+2025-11-15,Bamenda,"Beans (niebe)",KG,1098
+2025-11-15,Bamenda,"Beans (red)",KG,1055
+2025-11-15,Bamenda,"Cassava meal (gari)",KG,480
+2025-11-15,Bamenda,"Cocoyam (macabo)",KG,528
+2025-11-15,Bamenda,"Groundnuts (shelled)",KG,982
+2025-11-15,Bamenda,"Leafy vegetables",KG,415
+2025-11-15,Bamenda,"Maize (yellow)",KG,327
+2025-11-15,Bamenda,"Milk (powder)",400 G,3500
+2025-11-15,Bamenda,"Oil (palm)",L,975
+2025-11-15,Bamenda,"Okra (fresh)",KG,1155
+2025-11-15,Bamenda,"Onions",KG,1103
+2025-11-15,Bamenda,"Plantains",KG,398
+2025-11-15,Bamenda,"Potatoes (Irish)",KG,439
+2025-11-15,Bamenda,"Potatoes",KG,187
+2025-11-15,Bamenda,"Salt",KG,417
+2025-11-15,Bamenda,"Sugar",KG,1000
+2025-11-15,Bamenda,"Taro",KG,278
+2025-11-15,Bamenda,"Yam",KG,860
+2025-11-15,Kumba,"Bananas",KG,400
+2025-11-15,Kumba,"Beans (niebe)",KG,1200
+2025-11-15,Kumba,"Beans (red)",KG,1200
+2025-11-15,Kumba,"Cassava (cossette)",KG,550
+2025-11-15,Kumba,"Cassava meal (gari)",KG,750
+2025-11-15,Kumba,"Cocoyam (macabo)",KG,739.17
+2025-11-15,Kumba,"Groundnuts (shelled)",KG,1200
+2025-11-15,Kumba,"Leafy vegetables",KG,402.5
+2025-11-15,Kumba,"Maize (yellow)",KG,400
+2025-11-15,Kumba,"Milk (powder)",400 G,3750
+2025-11-15,Kumba,"Oil (palm)",L,1000
+2025-11-15,Kumba,"Okra (fresh)",KG,730.83
+2025-11-15,Kumba,"Onions",KG,1159.2
+2025-11-15,Kumba,"Plantains",KG,555.42
+2025-11-15,Kumba,"Potatoes (Irish)",KG,534.17
+2025-11-15,Kumba,"Potatoes",KG,349.17
+2025-11-15,Kumba,"Salt",KG,400
+2025-11-15,Kumba,"Sugar",KG,1000
+2025-11-15,Kumba,"Taro",KG,463.33
+2025-11-15,Kumba,"Tomatoes",KG,710
+2025-11-15,Kumba,"Yam",KG,808.33
+2025-11-15,Limbé,"Bananas",KG,393.33
+2025-11-15,Limbé,"Beans (niebe)",KG,950
+2025-11-15,Limbé,"Beans (red)",KG,941.67
+2025-11-15,Limbé,"Cassava (cossette)",KG,481.67
+2025-11-15,Limbé,"Cassava meal (gari)",KG,535.83
+2025-11-15,Limbé,"Cocoyam (macabo)",KG,645
+2025-11-15,Limbé,"Groundnuts (shelled)",KG,1179.2
+2025-11-15,Limbé,"Leafy vegetables",KG,406.67
+2025-11-15,Limbé,"Maize (yellow)",KG,443.33
+2025-11-15,Limbé,"Milk (powder)",400 G,3533.3
+2025-11-15,Limbé,"Oil (palm)",L,1050
+2025-11-15,Limbé,"Okra (fresh)",KG,1092.5
+2025-11-15,Limbé,"Onions",KG,754.17
+2025-11-15,Limbé,"Plantains",KG,494.17
+2025-11-15,Limbé,"Potatoes (Irish)",KG,515.83
+2025-11-15,Limbé,"Potatoes",KG,350.83
+2025-11-15,Limbé,"Salt",KG,321.67
+2025-11-15,Limbé,"Sugar",KG,841.67
+2025-11-15,Limbé,"Taro",KG,570
+2025-11-15,Limbé,"Tomatoes",KG,485
+2025-11-15,Limbé,"Yam",KG,920
+2025-11-15,Mamfé,"Bananas",KG,195.83
+2025-11-15,Mamfé,"Beans (niebe)",KG,1450
+2025-11-15,Mamfé,"Beans (red)",KG,1450
+2025-11-15,Mamfé,"Cassava (cossette)",KG,500
+2025-11-15,Mamfé,"Cassava meal (gari)",KG,597.5
+2025-11-15,Mamfé,"Cocoyam (macabo)",KG,1423.3
+2025-11-15,Mamfé,"Groundnuts (shelled)",KG,1458.3
+2025-11-15,Mamfé,"Leafy vegetables",KG,1613.3
+2025-11-15,Mamfé,"Maize (yellow)",KG,416.67
+2025-11-15,Mamfé,"Milk (powder)",400 G,4500
+2025-11-15,Mamfé,"Oil (palm)",L,1000
+2025-11-15,Mamfé,"Okra (fresh)",KG,1179.2
+2025-11-15,Mamfé,"Onions",KG,1038.3
+2025-11-15,Mamfé,"Plantains",KG,551.67
+2025-11-15,Mamfé,"Potatoes (Irish)",KG,416.67
+2025-11-15,Mamfé,"Potatoes",KG,562.5
+2025-11-15,Mamfé,"Salt",KG,486.67
+2025-11-15,Mamfé,"Sugar",KG,1091.7
+2025-11-15,Mamfé,"Taro",KG,602.5
+2025-11-15,Mamfé,"Tomatoes",KG,850
+2025-11-15,Mamfé,"Yam",KG,1093.3
+2025-11-15,Muea,"Bananas",KG,350
+2025-11-15,Muea,"Beans (niebe)",KG,933.33
+2025-11-15,Muea,"Beans (red)",KG,1050
+2025-11-15,Muea,"Cassava (cossette)",KG,470
+2025-11-15,Muea,"Cassava meal (gari)",KG,556.67
+2025-11-15,Muea,"Cocoyam (macabo)",KG,711.67
+2025-11-15,Muea,"Groundnuts (shelled)",KG,1066.7
+2025-11-15,Muea,"Leafy vegetables",KG,305
+2025-11-15,Muea,"Maize (yellow)",KG,423.33
+2025-11-15,Muea,"Milk (powder)",400 G,3516.7
+2025-11-15,Muea,"Oil (palm)",L,1000
+2025-11-15,Muea,"Okra (fresh)",KG,905
+2025-11-15,Muea,"Onions",KG,931.67
+2025-11-15,Muea,"Plantains",KG,396.67
+2025-11-15,Muea,"Potatoes (Irish)",KG,518.33
+2025-11-15,Muea,"Potatoes",KG,370
+2025-11-15,Muea,"Salt",KG,311.67
+2025-11-15,Muea,"Sugar",KG,900
+2025-11-15,Muea,"Taro",KG,583.33
+2025-11-15,Muea,"Tomatoes",KG,532.5
+2025-11-15,Muea,"Yam",KG,806.67
+2025-11-15,Mutengene,"Bananas",KG,386.67
+2025-11-15,Mutengene,"Beans (niebe)",KG,929.17
+2025-11-15,Mutengene,"Beans (red)",KG,958.33
+2025-11-15,Mutengene,"Cassava (cossette)",KG,475
+2025-11-15,Mutengene,"Cassava meal (gari)",KG,560.83
+2025-11-15,Mutengene,"Cocoyam (macabo)",KG,701.67
+2025-11-15,Mutengene,"Groundnuts (shelled)",KG,1133.3
+2025-11-15,Mutengene,"Leafy vegetables",KG,451.67
+2025-11-15,Mutengene,"Maize (yellow)",KG,424.17
+2025-11-15,Mutengene,"Milk (powder)",400 G,3500
+2025-11-15,Mutengene,"Oil (palm)",L,1016.7
+2025-11-15,Mutengene,"Okra (fresh)",KG,939.17
+2025-11-15,Mutengene,"Onions",KG,1516.7
+2025-11-15,Mutengene,"Plantains",KG,407.5
+2025-11-15,Mutengene,"Potatoes (Irish)",KG,540
+2025-11-15,Mutengene,"Potatoes",KG,305.83
+2025-11-15,Mutengene,"Salt",KG,333.33
+2025-11-15,Mutengene,"Sugar",KG,883.33
+2025-11-15,Mutengene,"Taro",KG,506.67
+2025-11-15,Mutengene,"Tomatoes",KG,442.5
+2025-11-15,Mutengene,"Yam",KG,949.17
+2025-11-15,Tiko,"Bananas",KG,411.67
+2025-11-15,Tiko,"Beans (niebe)",KG,941.67
+2025-11-15,Tiko,"Beans (red)",KG,950
+2025-11-15,Tiko,"Cassava (cossette)",KG,510
+2025-11-15,Tiko,"Cassava meal (gari)",KG,601.67
+2025-11-15,Tiko,"Cocoyam (macabo)",KG,577.5
+2025-11-15,Tiko,"Groundnuts (shelled)",KG,1066.7
+2025-11-15,Tiko,"Leafy vegetables",KG,505
+2025-11-15,Tiko,"Maize (yellow)",KG,427.5
+2025-11-15,Tiko,"Milk (powder)",400 G,3500
+2025-11-15,Tiko,"Oil (palm)",L,1150
+2025-11-15,Tiko,"Okra (fresh)",KG,1263.3
+2025-11-15,Tiko,"Onions",KG,1858.3
+2025-11-15,Tiko,"Plantains",KG,495.83
+2025-11-15,Tiko,"Potatoes (Irish)",KG,500
+2025-11-15,Tiko,"Potatoes",KG,277.5
+2025-11-15,Tiko,"Salt",KG,375
+2025-11-15,Tiko,"Sugar",KG,966.67
+2025-11-15,Tiko,"Taro",KG,453.33
+2025-11-15,Tiko,"Tomatoes",KG,523.33
+2025-11-15,Tiko,"Yam",KG,878.33
+2025-12-15,Bamenda,"Beans (niebe)",KG,783
+2025-12-15,Bamenda,"Beans (red)",KG,841
+2025-12-15,Bamenda,"Cassava (cossette)",KG,554
+2025-12-15,Bamenda,"Cassava meal (gari)",KG,523
+2025-12-15,Bamenda,"Cocoyam (macabo)",KG,364
+2025-12-15,Bamenda,"Groundnuts (shelled)",KG,820
+2025-12-15,Bamenda,"Leafy vegetables",KG,557
+2025-12-15,Bamenda,"Maize (yellow)",KG,339
+2025-12-15,Bamenda,"Milk (powder)",400 G,3500
+2025-12-15,Bamenda,"Oil (palm)",L,1000
+2025-12-15,Bamenda,"Okra (fresh)",KG,873
+2025-12-15,Bamenda,"Onions",KG,893
+2025-12-15,Bamenda,"Plantains",KG,469
+2025-12-15,Bamenda,"Potatoes (Irish)",KG,423
+2025-12-15,Bamenda,"Potatoes",KG,183
+2025-12-15,Bamenda,"Salt",KG,399
+2025-12-15,Bamenda,"Sugar",KG,1000
+2025-12-15,Bamenda,"Taro",KG,368
+2025-12-15,Bamenda,"Yam",KG,646
+2025-12-15,Kumba,"Bananas",KG,400
+2025-12-15,Kumba,"Beans (niebe)",KG,1200
+2025-12-15,Kumba,"Beans (red)",KG,1200
+2025-12-15,Kumba,"Cassava (cossette)",KG,556
+2025-12-15,Kumba,"Cassava meal (gari)",KG,750
+2025-12-15,Kumba,"Cocoyam (macabo)",KG,353
+2025-12-15,Kumba,"Groundnuts (shelled)",KG,1200
+2025-12-15,Kumba,"Leafy vegetables",KG,416
+2025-12-15,Kumba,"Maize (yellow)",KG,400
+2025-12-15,Kumba,"Milk (powder)",400 G,4000
+2025-12-15,Kumba,"Oil (palm)",L,1000
+2025-12-15,Kumba,"Okra (fresh)",KG,1091
+2025-12-15,Kumba,"Onions",KG,1334
+2025-12-15,Kumba,"Plantains",KG,549
+2025-12-15,Kumba,"Potatoes (Irish)",KG,528
+2025-12-15,Kumba,"Potatoes",KG,323
+2025-12-15,Kumba,"Salt",KG,400
+2025-12-15,Kumba,"Sugar",KG,1000
+2025-12-15,Kumba,"Taro",KG,551
+2025-12-15,Kumba,"Tomatoes",KG,664
+2025-12-15,Kumba,"Yam",KG,828
+2025-12-15,Limbé,"Bananas",KG,388
+2025-12-15,Limbé,"Beans (niebe)",KG,942
+2025-12-15,Limbé,"Beans (red)",KG,842
+2025-12-15,Limbé,"Cassava (cossette)",KG,477
+2025-12-15,Limbé,"Cassava meal (gari)",KG,506
+2025-12-15,Limbé,"Cocoyam (macabo)",KG,474
+2025-12-15,Limbé,"Groundnuts (shelled)",KG,1033
+2025-12-15,Limbé,"Leafy vegetables",KG,507
+2025-12-15,Limbé,"Maize (yellow)",KG,428
+2025-12-15,Limbé,"Milk (powder)",400 G,3517
+2025-12-15,Limbé,"Oil (palm)",L,1100
+2025-12-15,Limbé,"Okra (fresh)",KG,1188
+2025-12-15,Limbé,"Onions",KG,906
+2025-12-15,Limbé,"Plantains",KG,483
+2025-12-15,Limbé,"Potatoes (Irish)",KG,509
+2025-12-15,Limbé,"Potatoes",KG,307
+2025-12-15,Limbé,"Salt",KG,326
+2025-12-15,Limbé,"Sugar",KG,825
+2025-12-15,Limbé,"Taro",KG,491
+2025-12-15,Limbé,"Tomatoes",KG,447
+2025-12-15,Limbé,"Yam",KG,967
+2025-12-15,Mamfé,"Bananas",KG,273.33
+2025-12-15,Mamfé,"Beans (niebe)",KG,1200
+2025-12-15,Mamfé,"Beans (red)",KG,1200
+2025-12-15,Mamfé,"Cassava (cossette)",KG,500
+2025-12-15,Mamfé,"Cassava meal (gari)",KG,600
+2025-12-15,Mamfé,"Cocoyam (macabo)",KG,1265
+2025-12-15,Mamfé,"Groundnuts (shelled)",KG,1517
+2025-12-15,Mamfé,"Leafy vegetables",KG,1545
+2025-12-15,Mamfé,"Maize (yellow)",KG,500
+2025-12-15,Mamfé,"Milk (powder)",400 G,4500
+2025-12-15,Mamfé,"Oil (palm)",L,1533
+2025-12-15,Mamfé,"Okra (fresh)",KG,1263
+2025-12-15,Mamfé,"Onions",KG,1168
+2025-12-15,Mamfé,"Plantains",KG,750
+2025-12-15,Mamfé,"Potatoes (Irish)",KG,406.67
+2025-12-15,Mamfé,"Potatoes",KG,425
+2025-12-15,Mamfé,"Salt",KG,678.33
+2025-12-15,Mamfé,"Sugar",KG,750
+2025-12-15,Mamfé,"Taro",KG,758.33
+2025-12-15,Mamfé,"Tomatoes",KG,1255
+2025-12-15,Mamfé,"Yam",KG,1355
+2026-02-15,Bamenda,"Beans (red)",KG,650
+2026-02-15,Bamenda,"Cassava (fresh)",KG,134
+2026-02-15,Bamenda,"Maize (white)",KG,250
+2026-02-15,Bamenda,"Maize (yellow)",KG,278
+2026-02-15,Bamenda,"Oil (palm)",L,933
+2026-02-15,Buea,"Cassava (fresh)",KG,86
+2026-02-15,Buea,"Maize (white)",KG,336
+2026-02-15,Buea,"Maize (yellow)",KG,335
+2026-02-15,Buea,"Oil (palm)",L,1076
+2026-02-15,Douala-Marché Central,"Bananas",KG,210
+2026-02-15,Douala-Marché Central,"Cassava (fresh)",KG,226
+2026-02-15,Douala-Marché Central,"Oil (palm)",L,1000
+2026-02-15,Douala-Marché Central,"Wheat flour",KG,480
+2026-02-15,Kumba,"Beans (red)",KG,614
+2026-02-15,Kumba,"Maize (white)",KG,282
+2026-02-15,Kumba,"Maize (yellow)",KG,265
+2026-02-15,Kumba,"Oil (palm)",L,796
+2026-02-15,Kumba,"Wheat flour",KG,488
+2026-02-15,Mamfé,"Beans (red)",KG,600
+2026-02-15,Mamfé,"Cassava (fresh)",KG,123
+2026-02-15,Mamfé,"Maize (white)",KG,403
+2026-02-15,Mamfé,"Maize (yellow)",KG,431
+2026-02-15,Mamfé,"Oil (palm)",L,1025
+2026-02-15,Mamfé,"Wheat flour",KG,456
+2026-02-15,Yaoundé-Mfoundi,"Bananas",KG,220
+2026-02-15,Yaoundé-Mfoundi,"Cassava (fresh)",KG,200
+2026-02-15,Yaoundé-Mfoundi,"Cocoyam (macabo)",KG,263
+2026-02-15,Yaoundé-Mfoundi,"Maize (white)",KG,180
+2026-02-15,Yaoundé-Mfoundi,"Maize (yellow)",KG,180
+2026-02-15,Yaoundé-Mfoundi,"Oil (palm)",L,1013
+2026-02-15,Yaoundé-Mfoundi,"Plantains",KG,383
+2026-02-15,Yaoundé-Mfoundi,"Wheat flour",KG,451
+2026-03-15,Bamenda,"Beans (red)",KG,637
+2026-03-15,Bamenda,"Cassava (fresh)",KG,133
+2026-03-15,Bamenda,"Maize (white)",KG,241
+2026-03-15,Bamenda,"Maize (yellow)",KG,271
+2026-03-15,Bamenda,"Oil (palm)",L,917
+2026-03-15,Buea,"Cassava (fresh)",KG,93
+2026-03-15,Buea,"Maize (white)",KG,289
+2026-03-15,Buea,"Maize (yellow)",KG,300
+2026-03-15,Buea,"Oil (palm)",L,768
+2026-03-15,Douala-Marché Central,"Bananas",KG,208
+2026-03-15,Douala-Marché Central,"Cassava (fresh)",KG,213
+2026-03-15,Douala-Marché Central,"Oil (palm)",L,988
+2026-03-15,Douala-Marché Central,"Wheat flour",KG,480
+2026-03-15,Kumba,"Beans (red)",KG,696
+2026-03-15,Kumba,"Maize (white)",KG,261
+2026-03-15,Kumba,"Maize (yellow)",KG,258
+2026-03-15,Kumba,"Oil (palm)",L,728
+2026-03-15,Kumba,"Wheat flour",KG,500
+2026-03-15,Mamfé,"Beans (red)",KG,475
+2026-03-15,Mamfé,"Cassava (fresh)",KG,111
+2026-03-15,Mamfé,"Maize (white)",KG,278
+2026-03-15,Mamfé,"Maize (yellow)",KG,306
+2026-03-15,Mamfé,"Oil (palm)",L,938
+2026-03-15,Mamfé,"Wheat flour",KG,456
+2026-03-15,Yaoundé-Mfoundi,"Bananas",KG,203
+2026-03-15,Yaoundé-Mfoundi,"Cassava (fresh)",KG,200
+2026-03-15,Yaoundé-Mfoundi,"Cocoyam (macabo)",KG,274
+2026-03-15,Yaoundé-Mfoundi,"Maize (white)",KG,190
+2026-03-15,Yaoundé-Mfoundi,"Maize (yellow)",KG,190
+2026-03-15,Yaoundé-Mfoundi,"Oil (palm)",L,930
+2026-03-15,Yaoundé-Mfoundi,"Plantains",KG,338
+2026-03-15,Yaoundé-Mfoundi,"Wheat flour",KG,455
+2026-04-15,Bamenda,"Beans (red)",KG,456
+2026-04-15,Bamenda,"Cassava (fresh)",KG,133
+2026-04-15,Bamenda,"Maize (white)",KG,222
+2026-04-15,Bamenda,"Maize (yellow)",KG,250
+2026-04-15,Bamenda,"Oil (palm)",L,877
+2026-04-15,Buea,"Cassava (fresh)",KG,91
+2026-04-15,Buea,"Maize (white)",KG,317
+2026-04-15,Buea,"Maize (yellow)",KG,308
+2026-04-15,Buea,"Oil (palm)",L,721
+2026-04-15,Douala-Marché Central,"Bananas",KG,203
+2026-04-15,Douala-Marché Central,"Cassava (fresh)",KG,218
+2026-04-15,Douala-Marché Central,"Oil (palm)",L,928
+2026-04-15,Douala-Marché Central,"Wheat flour",KG,480
+2026-04-15,Kumba,"Beans (red)",KG,718
+2026-04-15,Kumba,"Cassava (fresh)",KG,143
+2026-04-15,Kumba,"Maize (white)",KG,268
+2026-04-15,Kumba,"Maize (yellow)",KG,268
+2026-04-15,Kumba,"Oil (palm)",L,646
+2026-04-15,Kumba,"Wheat flour",KG,500
+2026-04-15,Mamfé,"Beans (red)",KG,660
+2026-04-15,Mamfé,"Cassava (fresh)",KG,116
+2026-04-15,Mamfé,"Maize (white)",KG,339
+2026-04-15,Mamfé,"Maize (yellow)",KG,344
+2026-04-15,Mamfé,"Oil (palm)",L,770
+2026-04-15,Mamfé,"Wheat flour",KG,456
+2026-04-15,Yaoundé-Mfoundi,"Bananas",KG,196
+2026-04-15,Yaoundé-Mfoundi,"Cassava (fresh)",KG,187
+2026-04-15,Yaoundé-Mfoundi,"Cocoyam (macabo)",KG,292
+2026-04-15,Yaoundé-Mfoundi,"Maize (white)",KG,190
+2026-04-15,Yaoundé-Mfoundi,"Maize (yellow)",KG,190
+2026-04-15,Yaoundé-Mfoundi,"Oil (palm)",L,908
+2026-04-15,Yaoundé-Mfoundi,"Plantains",KG,325
+2026-04-15,Yaoundé-Mfoundi,"Wheat flour",KG,452
+2026-05-15,Bamenda,"Beans (red)",KG,430
+2026-05-15,Bamenda,"Cassava (fresh)",KG,133
+2026-05-15,Bamenda,"Maize (white)",KG,222
+2026-05-15,Bamenda,"Maize (yellow)",KG,250
+2026-05-15,Bamenda,"Oil (palm)",L,875
+2026-05-15,Buea,"Beans (red)",KG,547
+2026-05-15,Buea,"Cassava (fresh)",KG,85
+2026-05-15,Buea,"Maize (white)",KG,283
+2026-05-15,Buea,"Maize (yellow)",KG,278
+2026-05-15,Buea,"Oil (palm)",L,809
+2026-05-15,Douala-Marché Central,"Bananas",KG,199
+2026-05-15,Douala-Marché Central,"Cassava (fresh)",KG,213
+2026-05-15,Douala-Marché Central,"Oil (palm)",L,863
+2026-05-15,Douala-Marché Central,"Wheat flour",KG,480
+2026-05-15,Kumba,"Beans (red)",KG,751
+2026-05-15,Kumba,"Cassava (fresh)",KG,154
+2026-05-15,Kumba,"Maize (white)",KG,247
+2026-05-15,Kumba,"Maize (yellow)",KG,249
+2026-05-15,Kumba,"Oil (palm)",L,655
+2026-05-15,Kumba,"Wheat flour",KG,500
+2026-05-15,Mamfé,"Beans (red)",KG,656
+2026-05-15,Mamfé,"Cassava (fresh)",KG,103
+2026-05-15,Mamfé,"Maize (white)",KG,389
+2026-05-15,Mamfé,"Maize (yellow)",KG,389
+2026-05-15,Mamfé,"Oil (palm)",L,713
+2026-05-15,Mamfé,"Wheat flour",KG,456
+2026-05-15,Yaoundé-Mfoundi,"Bananas",KG,191
+2026-05-15,Yaoundé-Mfoundi,"Cassava (fresh)",KG,183
+2026-05-15,Yaoundé-Mfoundi,"Maize (white)",KG,202
+2026-05-15,Yaoundé-Mfoundi,"Maize (yellow)",KG,202
+2026-05-15,Yaoundé-Mfoundi,"Oil (palm)",L,885
+2026-05-15,Yaoundé-Mfoundi,"Plantains",KG,314
+2026-05-15,Yaoundé-Mfoundi,"Wheat flour",KG,450
+2026-06-15,Bamenda,"Beans (red)",KG,415
+2026-06-15,Bamenda,"Cassava (fresh)",KG,133
+2026-06-15,Bamenda,"Maize (white)",KG,222
+2026-06-15,Bamenda,"Maize (yellow)",KG,250
+2026-06-15,Bamenda,"Oil (palm)",L,875
+2026-06-15,Buea,"Beans (red)",KG,470
+2026-06-15,Buea,"Cassava (fresh)",KG,84
+2026-06-15,Buea,"Maize (white)",KG,244
+2026-06-15,Buea,"Maize (yellow)",KG,250
+2026-06-15,Buea,"Oil (palm)",L,931
+2026-06-15,Douala-Marché Central,"Bananas",KG,204
+2026-06-15,Douala-Marché Central,"Cassava (fresh)",KG,206
+2026-06-15,Douala-Marché Central,"Oil (palm)",L,840
+2026-06-15,Douala-Marché Central,"Wheat flour",KG,480
+2026-06-15,Kumba,"Beans (red)",KG,710
+2026-06-15,Kumba,"Cassava (fresh)",KG,155
+2026-06-15,Kumba,"Maize (white)",KG,225
+2026-06-15,Kumba,"Maize (yellow)",KG,232
+2026-06-15,Kumba,"Oil (palm)",L,720
+2026-06-15,Kumba,"Wheat flour",KG,500
+2026-06-15,Mamfé,"Beans (red)",KG,625
+2026-06-15,Mamfé,"Cassava (fresh)",KG,88
+2026-06-15,Mamfé,"Maize (white)",KG,375
+2026-06-15,Mamfé,"Maize (yellow)",KG,375
+2026-06-15,Mamfé,"Oil (palm)",L,663
+2026-06-15,Mamfé,"Wheat flour",KG,456
+2026-06-15,Yaoundé-Mfoundi,"Bananas",KG,188
+2026-06-15,Yaoundé-Mfoundi,"Cassava (fresh)",KG,198
+2026-06-15,Yaoundé-Mfoundi,"Oil (palm)",L,871
+2026-06-15,Yaoundé-Mfoundi,"Plantains",KG,319
+2026-06-15,Yaoundé-Mfoundi,"Wheat flour",KG,450
+2026-07-15,Bamenda,"Beans (red)",KG,383
+2026-07-15,Bamenda,"Cassava (fresh)",KG,138
+2026-07-15,Bamenda,"Maize (white)",KG,222
+2026-07-15,Bamenda,"Maize (yellow)",KG,247
+2026-07-15,Bamenda,"Oil (palm)",L,875
+2026-07-15,Buea,"Beans (red)",KG,546
+2026-07-15,Buea,"Cassava (fresh)",KG,78
+2026-07-15,Buea,"Maize (white)",KG,280
+2026-07-15,Buea,"Maize (yellow)",KG,251
+2026-07-15,Buea,"Oil (palm)",L,841
+2026-07-15,Douala-Marché Central,"Bananas",KG,204
+2026-07-15,Douala-Marché Central,"Cassava (fresh)",KG,206
+2026-07-15,Douala-Marché Central,"Oil (palm)",L,848
+2026-07-15,Douala-Marché Central,"Wheat flour",KG,480
+2026-07-15,Kumba,"Beans (red)",KG,550
+2026-07-15,Kumba,"Cassava (fresh)",KG,158
+2026-07-15,Kumba,"Maize (white)",KG,191
+2026-07-15,Kumba,"Maize (yellow)",KG,174
+2026-07-15,Kumba,"Oil (palm)",L,750
+2026-07-15,Kumba,"Wheat flour",KG,500
+2026-07-15,Mamfé,"Beans (red)",KG,595
+2026-07-15,Mamfé,"Cassava (fresh)",KG,84
+2026-07-15,Mamfé,"Maize (white)",KG,333
+2026-07-15,Mamfé,"Maize (yellow)",KG,333
+2026-07-15,Mamfé,"Oil (palm)",L,780
+2026-07-15,Mamfé,"Wheat flour",KG,456
+2026-07-15,Yaoundé-Mfoundi,"Bananas",KG,197
+2026-07-15,Yaoundé-Mfoundi,"Cassava (fresh)",KG,200
+2026-07-15,Yaoundé-Mfoundi,"Cocoyam (macabo)",KG,299
+2026-07-15,Yaoundé-Mfoundi,"Maize (white)",KG,240
+2026-07-15,Yaoundé-Mfoundi,"Maize (yellow)",KG,240
+2026-07-15,Yaoundé-Mfoundi,"Oil (palm)",L,844
+2026-07-15,Yaoundé-Mfoundi,"Plantains",KG,309
+2026-07-15,Yaoundé-Mfoundi,"Wheat flour",KG,450
+2026-08-15,Bamenda,"Beans (red)",KG,375
+2026-08-15,Bamenda,"Cassava (fresh)",KG,146
+2026-08-15,Bamenda,"Maize (white)",KG,198
+2026-08-15,Bamenda,"Maize (yellow)",KG,230
+2026-08-15,Bamenda,"Oil (palm)",L,875
+2026-08-15,Buea,"Beans (red)",KG,635
+2026-08-15,Buea,"Cassava (fresh)",KG,177
+2026-08-15,Buea,"Maize (white)",KG,297
+2026-08-15,Buea,"Maize (yellow)",KG,314
+2026-08-15,Buea,"Oil (palm)",L,775
+2026-08-15,Douala-Marché Central,"Bananas",KG,203
+2026-08-15,Douala-Marché Central,"Cassava (fresh)",KG,209
+2026-08-15,Douala-Marché Central,"Oil (palm)",L,883
+2026-08-15,Douala-Marché Central,"Wheat flour",KG,480
+2026-08-15,Kumba,"Beans (red)",KG,505
+2026-08-15,Kumba,"Cassava (fresh)",KG,148
+2026-08-15,Kumba,"Maize (white)",KG,257
+2026-08-15,Kumba,"Maize (yellow)",KG,250
+2026-08-15,Kumba,"Oil (palm)",L,750
+2026-08-15,Kumba,"Wheat flour",KG,500
+2026-08-15,Mamfé,"Beans (red)",KG,575
+2026-08-15,Mamfé,"Cassava (fresh)",KG,181
+2026-08-15,Mamfé,"Maize (white)",KG,333
+2026-08-15,Mamfé,"Maize (yellow)",KG,333
+2026-08-15,Mamfé,"Oil (palm)",L,800
+2026-08-15,Mamfé,"Wheat flour",KG,456
+2026-08-15,Yaoundé-Mfoundi,"Oil (palm)",L,900
+2026-08-15,Yaoundé-Mfoundi,"Wheat flour",KG,472.5

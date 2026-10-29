@@ -239,6 +239,18 @@ Reference implementation to copy the pattern from: `lib/features/auth/`.
 - **Remote.** `supabase link`, `db push` and every other remote command
   need the owner's explicit approval; show `db push --dry-run` first.
   `seed.sql` is local only.
+- **Food catalog (LF01).** `public.ingredients` is reference data: its
+  rows come from `docs/reference/ingredient-*.csv` through
+  `tool/food_catalog.dart`, which writes the generated block of the newest
+  catalog migration (an upsert). Never hand-edit that block; a price
+  refresh is a new migration with a regenerated block, and
+  `test/tool/food_catalog_test.dart` fails if the block and the CSVs
+  disagree. Nutrients come from FAO/INFOODS WAFCT 2019 and USDA FoodData
+  Central files downloaded once; the app never calls a nutrition API
+  (H5, and no third-party key in the client, S1). Costs and nutrients per
+  serving are derived in the database (`recipe_costs`, `recipe_nutrition`,
+  security-invoker views); a deferred constraint trigger keeps every
+  published recipe linked to active foods and its allergen list complete.
 
 ## What NOT to do
 
