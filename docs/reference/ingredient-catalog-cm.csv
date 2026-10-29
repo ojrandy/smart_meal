@@ -1,0 +1,71 @@
+slug,wafct_code,fdc_id,edible_portion,edible_portion_source,grams_per_piece,density_g_per_ml,conversion_note,allergens,flags,is_kitchen_staple,aliases
+rice-imported,01_036,169756,,,,,,,refined_starch,true,riz;rice
+rice-local,01_037,169756,,,,,,,,false,riz local;local rice
+maize-dry,01_004,168920,,,,,,,,false,corn;maïs
+maize-flour,01_080,169748,,,,,,,,true,corn flour;farine de maïs
+wheat-flour,01_043,169761,,,,,,gluten,refined_starch,true,flour;farine
+cassava-chips,02_002,,,,,,,,,false,cossettes;water fufu
+gari,02_039,,,,,,,,,true,garri
+pasta-spaghetti,01_052,168927,,,500,,Pack weight from the pack label (500 g),gluten,refined_starch,true,spaghetti;macaroni;pâtes
+cassava-fresh,02_001,169985,,,,,,,,false,manioc;cassava
+cocoyam-macabo,02_005,,,,,,,,,false,macabo;ibo coco
+taro,02_015,169308,,,,,,,,false,taro;achu cocoyam
+yam,02_019,170071,,,,,,,,false,igname;yam
+potato-irish,02_009,170026,,,,,,,,true,pomme de terre;Irish
+sweet-potato,02_022,168482,,,,,,,,false,patate;sweet potato
+plantain,02_042,169130,,,250,,One ordinary finger about 250 g as bought (agent estimate; weigh one),,,true,plantain;banane plantain
+banana,05_003,173944,,,,,,,,false,banane;banana
+beans-red,,173744,,,,,,,,true,haricot;beans
+cowpeas,03_004,173758,,,,,,,,false,niébé;black-eyed beans;koki beans
+groundnuts,06_010,172430,,,,,,peanuts,,true,arachide;groundnut;peanuts
+egusi,06_013,169407,1,Sold shelled (WAFCT 0.37 is for seeds in the shell),,,,,,false,pistache;egusi
+njansang,,,,,,,,,,false,djansang;njangsang
+palm-oil,11_004,171015,,,,0.92,USDA household measure: 1 tbsp = 13.6 g,,,true,huile rouge;red oil
+vegetable-oil,11_007,171015,,,,0.92,USDA household measure: 1 tbsp = 13.6 g. Cameroonian refined oils are mostly palm olein,,,true,huile;oil
+beef-boneless,07_002,171796,,,,,,,,false,viande;beef
+beef-bone-in,07_002,171796,0.8,Agent estimate: about 20 % bone; confirm at a market,,,,,,false,viande avec os;beef with bone
+chicken,07_030,171447,0.68,USDA SR Legacy refuse for a whole broiler: 32 % bone,,,,,,false,poulet;chicken
+mackerel-frozen,09_003,175119,,,,,,fish,,false,maquereau;mackerel
+crayfish-dried,09_057,174206,,,25,,One 100 FCFA pack about 25 g (agent estimate; weigh one),crustaceans,high_purine,true,crayfish;crevettes séchées
+fish-smoked,09_053,173712,,,150,,One 500 FCFA piece about 150 g (agent estimate; weigh one),fish,high_purine,false,poisson fumé;smoked fish
+stockfish,09_053,,,,,,,fish,high_purine,false,morue séchée;stockfish
+eggs,08_001,171287,,,60,,One egg about 60 g as bought,eggs,,true,œufs;eggs
+milk-powder,10_002,170876,,,,,,milk,,false,lait en poudre;powdered milk
+tomato,04_021,170457,,,,,,,acidic,true,tomate;tomato
+onion,04_018,170000,,,,,,,,true,oignon;onion
+okra-fresh,04_017,169260,,,,,,,,false,gombo;okra
+leafy-greens,04_023,,,,,,,,,false,njama njama;folong;amaranth
+ndole-leaves,04_022,,1,Sold washed and ready to cook,500,,One 1 000 FCFA ball about 500 g (agent estimate; weigh one),,,false,ndolé;bitterleaf
+eru-leaves,,,1,Sold sliced and ready to cook,400,,One 1 000 FCFA bundle about 400 g (agent estimate; weigh one),,,false,eru;okok;okazi
+garlic,04_015,169230,,,,,,,,false,ail;garlic
+ginger,04_082,169231,,,,,,,,false,gingembre;ginger
+pepper-fresh,04_046,170106,,,100,,One 100 FCFA heap about 100 g (agent estimate; weigh one),,very_spicy,true,piment;pepe;scotch bonnet
+salt,13_015,173468,,,,,,,,true,sel;salt
+sugar,13_002,169655,,,,,,,added_sugar,true,sucre;sugar
+bouillon-cube,,171560,,,4,,Maggi cube 4 g (400 g pack of 100),gluten;celery;soy,bouillon_cube,true,Maggi;cube
+tomato-paste,04_066,170459,,,70,,Sachet weight from the label (70 g),,acidic,true,tomate concentrée;tomato paste
+drinking-water,12_019,,,,,1.0,Water: 1 ml = 1 g,,,false,eau;water
+celery,,169988,,,50,,One 100 FCFA bunch about 50 g (agent estimate; weigh one),celery,,false,céleri;green spices
+spring-onion,,170005,,,100,,One 100 FCFA bunch about 100 g (agent estimate; weigh one),,,false,oignon vert;green spices
+prawns,09_059,175179,,,,,,crustaceans,high_purine,false,crevettes;prawns
+waterleaf,04_078,,,,,,,,,false,waterleaf;pourpier
+beef-skin-kanda,,,1,Sold cleaned,,,,,,false,kanda;peau de bœuf
+limestone-kanwa,,,1,,,,,,,false,nikki;kanwa
+achu-spice,,,1,,,,,,,false,achu spice;épices achu
+mbongo-spice,,,1,,,,,,,false,mbongo;mbongo tchobi spice
+banana-leaves,,,0,Wrapping only: not eaten,200,,One bundle about 200 g (agent estimate),,,false,feuilles de bananier;banana leaves
+carrot,04_006,170393,,,,,,,,false,carotte;carrot
+green-beans,04_003,169961,,,,,,,,false,haricots verts;green beans
+fish-fresh,09_007,171952,,,,,,fish,,false,carpe;tilapia;fresh fish
+bell-pepper,04_047,170108,,,,,,,,false,poivron;bell pepper
+yeast-dry,13_017,175043,,,,,,,,false,levure;yeast
+tomato-tinned,04_065,170051,,,400,,Tin weight from the label (400 g),,acidic,false,tomates pelées;tinned tomatoes
+parmesan,,170848,,,,,,milk,,false,parmesan
+milk-uht,10_001,171265,,,,1.03,USDA household measure: 1 cup = 244 g,milk,,false,lait;milk
+butter,11_011,173410,,,,,,milk,,false,beurre;butter
+chickpeas-tinned,,173800,,,240,,Drained weight of a 400 g tin about 240 g (USDA proportion),,,false,pois chiches;chickpeas
+coconut-milk,06_006,170173,,,380,,400 ml tin; USDA household measure: 1 cup = 226 g,,,false,lait de coco;coconut milk
+mustard-seeds,,170929,,,,,,mustard,,false,moutarde;mustard seeds
+curry-powder,13_022,170924,,,,,,celery;mustard,,false,curry
+soy-sauce,,174277,,,,1.08,USDA household measure: 1 tbsp = 16 g,soy;gluten,,false,sauce soja;soy sauce
+sesame-oil,,171016,,,,0.92,USDA household measure: 1 tbsp = 13.6 g,sesame,,false,huile de sésame;sesame oil
